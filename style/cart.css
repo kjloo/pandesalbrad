@@ -1,0 +1,7 @@
+.cart-price::before {
+    content: "$";
+}
+
+.cart-delete {
+	cursor: pointer;
+}

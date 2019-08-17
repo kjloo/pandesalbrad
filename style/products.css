@@ -1,0 +1,15 @@
+.sticker {
+    height: 250px;
+    width: 250px;
+    display: block;
+    align-content: center;
+    padding: 1.5em;
+}
+
+.name-label {
+    text-align: center;
+}
+
+.price-label::before {
+    content: "$";
+}
