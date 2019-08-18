@@ -7,46 +7,38 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
     include "sqlConn.inc";
 
 
-    $fname = mysqli_real_escape_string($conn, $_POST['fname']);
-    $lname = mysqli_real_escape_string($conn, $_POST['lname']);
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $email = $_POST['email'];
     $role = "Customer";
 
     // Check if username is taken
     $sql = "SELECT Username FROM users WHERE Username = ?";
 
-    if($stmt = mysqli_prepare($conn, $sql)) {
-		mysqli_stmt_bind_param($stmt, "s", $username);
-
-		mysqli_stmt_execute($stmt);
-
-		$result = mysqli_stmt_get_result($stmt);
-		
-		mysqli_stmt_close($stmt);
+    if($stmt = $conn->prepare($sql)) {
+        $stmt->execute([$username]);
 
 		// Get Result
-		if ($result->num_rows > 0) {
+		if ($stmt->rowCount() > 0) {
 		    // Username already exists, return error
 		    header("Location: ../signup.html?signup=taken");
-		    exit();
 		} else {
 	        // Create SQL Query
             $sql = "INSERT INTO users (Firstname, Lastname, Username, Password, Email, RoleID) SELECT ?, ?, ?, ?, ?, RoleID FROM roles WHERE Role = '$role'";
 	
-	        if($stmt = mysqli_prepare($conn, $sql)) {
+	        if($stmt = $conn->prepare($sql)) {
 	            $hash = password_hash($password, PASSWORD_BCRYPT);
-                mysqli_stmt_bind_param($stmt, "sssss", $fname, $lname, $username, $hash, $email);
-
-                mysqli_stmt_execute($stmt);
-		
-                mysqli_stmt_close($stmt);
+                $stmt->execute([$fname, $lname, $username, $hash, $email]);
+                // Error check?
 
                 header("Location: ../index.html?signup=success");
             }
 		}
 	}
+    // Close connection
+    $conn = null;
 
 } else {
 	header("Location: ../index.html?signup=error");

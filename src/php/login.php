@@ -6,24 +6,18 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
 
     include "sqlConn.inc";
 
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $username = $_POST['username'];
+    $password = $_POST['password'];
     // Create SQL Query
     $sql = "SELECT * FROM users WHERE Username = ?";
 
-    if($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "s", $username);
-
-        mysqli_stmt_execute($stmt);
-
-        $result = mysqli_stmt_get_result($stmt);
-
-        mysqli_stmt_close($stmt);
+    if($stmt = $conn->prepare($sql)) {
+        $stmt->execute([$username]);
 
         // Get Result
-        if ($result->num_rows == 1) {
+        if ($stmt->rowCount() == 1) {
             // output data of each row
-            $row = $result->fetch_assoc();
+            $row = $stmt->fetch();
             // Verify password
             $hashVerify = password_verify($password, $row['Password']);
             if ($hashVerify == true) {
@@ -36,19 +30,11 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
 
                 // Query for shopping cart
                 $sql = "SELECT ProductID, Quantity FROM carts WHERE UserID = ?";
-                if ($stmt = mysqli_prepare($conn, $sql)) {
-                    mysqli_stmt_bind_param($stmt, "i", $_SESSION['u_id']);
+                if ($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$_SESSION['u_id']]);
 
-                    mysqli_stmt_execute($stmt);
-
-                    $result = mysqli_stmt_get_result($stmt);
-
-                    mysqli_stmt_close($stmt);
-                    if ($result->num_rows > 0) {
-                        // output data of each row
-                        while ($row = $result->fetch_assoc()) {
-                            $_SESSION['u_cart'][$row['ProductID']] = $row['Quantity'];
-                        }
+                    foreach($stmt as $row) {
+                        $_SESSION['u_cart'][$row['ProductID']] = $row['Quantity'];
                     }
                 }
 
@@ -58,9 +44,10 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
             }
         } else {
             header("Location: ../index.html?login=fail");
-            exit();
         }
     }
+    // Close Connection
+    $conn = null;
 
 } else {
     header("Location: ../index.html?login=error");

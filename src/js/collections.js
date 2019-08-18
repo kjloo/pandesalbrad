@@ -82,7 +82,6 @@ app.controller('productsPageController', function($http, $scope, $location, shop
         var url = "/php/pushCart.php";
         var data = {
             pushCart: true,
-            userID: shoppingCart.userID,
             productID: productID,
             quantity: 1
         };
@@ -104,7 +103,6 @@ app.controller('cartPageController', function($http, $scope, shoppingCart) {
         var url = "/php/popCart.php";
         var data = {
             popCart: true,
-            userID: shoppingCart.userID,
             productID: productID
         };
         var config = {

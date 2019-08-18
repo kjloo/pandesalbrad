@@ -16,24 +16,18 @@ if (isset($_POST['pushCart']) && !empty($_POST['productID']) && !empty($_POST['q
         exit();
     }
 
-    if (!empty($_POST['userID'])) {
+    if (isset($__SESSION['u_id'])) {
         include "sqlConn.inc";
-        $userID = mysqli_real_escape_string($conn, $_POST['userID']);
-        $productID = mysqli_real_escape_string($conn, $_POST['productID']);
-        $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
+        $userID = $_SESSION['u_id'];
+        $productID = $_POST['productID'];
+        $quantity = $_POST['quantity'];
 	    // Create SQL Query
 	    // First see if item already in cart
     	$sql = "SELECT Quantity FROM carts WHERE UserID = ? AND ProductID = ?";
-    	if($stmt = mysqli_prepare($conn, $sql)) {
-    	    mysqli_stmt_bind_param($stmt, "ii", $userID, $productID);
+    	if($stmt = $conn->prepare($sql)) {
+    	    $stmt->execute([$userID, $productID]);
 
-    		mysqli_stmt_execute($stmt);
-
-    		$result = mysqli_stmt_get_result($stmt);
-    		
-    		mysqli_stmt_close($stmt);
-
-            $exists = ($result->num_rows > 0);
+            $exists = ($stmt->rowCount() > 0);
         }
 
     	// If row already exists, create UPDATE. Else create INSERT
@@ -43,16 +37,13 @@ if (isset($_POST['pushCart']) && !empty($_POST['productID']) && !empty($_POST['q
             $sql = "INSERT INTO carts (Quantity, UserID, ProductID) VALUES (?, ?, ?)";
         }
     	
-    	if($stmt = mysqli_prepare($conn, $sql)) {
-    		mysqli_stmt_bind_param($stmt, "iii",$quantity, $userID, $productID);
-
-    		mysqli_stmt_execute($stmt);
-
-    		$result = mysqli_stmt_get_result($stmt);
-    		
-    		mysqli_stmt_close($stmt);
+    	if($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$quantity, $userID, $productID]);
+            // Error check?
     	}
     	// Successfully inserted into database
+        // Close connection
+        $conn = null;
     }
 } else {
     exit();

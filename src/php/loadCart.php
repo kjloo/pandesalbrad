@@ -10,25 +10,18 @@ include "sqlConn.inc";
 $cart = array_keys($_SESSION['u_cart']);
 // Create replacement string
 $ids_arr = str_repeat('?,', count($cart) - 1) . '?';
-$data_type = str_repeat("i", count($cart));
 $sql = "SELECT Name, Price, ProductID FROM products WHERE ProductID in ({$ids_arr})";
 $data = array();
 
-if($stmt = mysqli_prepare($conn, $sql)) {
+if($stmt = $conn->prepare($sql)) {
 
-   call_user_func_array(mysqli_stmt_bind_param, array_merge(array($stmt, $data_type), $cart));
-
-    mysqli_stmt_execute($stmt);
-
-    $result = mysqli_stmt_get_result($stmt);
-
-    mysqli_stmt_close($stmt);
+    $stmt->execute($cart);
 
     // Get Result
-    if ($result->num_rows > 0) {
+    if ($stmt->rowCount() > 0) {
         $grandtotal = 0;
         // output data of each row
-        while ($row = $result->fetch_assoc()) {
+        foreach ($stmt as $row) {
             $id = $row['ProductID'];
             $price = $row['Price'];
             $quantity = $_SESSION['u_cart'][$id];
@@ -46,6 +39,9 @@ if($stmt = mysqli_prepare($conn, $sql)) {
         $data[] = $final_row;
     }
 }
+
+// Close Connection
+$conn = null;
 
 echo json_encode($data);
 

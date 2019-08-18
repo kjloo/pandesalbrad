@@ -2,8 +2,9 @@
     session_start();
 
     $data = array();
-    $data["Username"] = NULL;
-    $data["Cart"] = NULL;
+    $data["Username"] = null;
+    $data["UserID"] = null;
+    $data["Cart"] = null;
     if (isset($_SESSION['u_id']) && isset($_SESSION['u_name']) && isset($_SESSION['u_role'])) {
         $data["UserID"] = $_SESSION['u_id'];
         $data["Username"] = $_SESSION['u_name'];
