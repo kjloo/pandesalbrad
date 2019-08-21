@@ -33,6 +33,15 @@
     margin: 0em;
 }
 
+.icon-button {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    outline: inherit;
+}
+
 .fa-stack {
     font-size: 1.5em;
 }

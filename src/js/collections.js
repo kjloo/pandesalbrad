@@ -6,20 +6,13 @@ app.config(function($locationProvider) {
 });
 
 app.factory('shoppingCart', function($http) {
-    var cart = [];
     return {
         loadCollections: function(s) {
             $http.get('/php/loadCollections.php').then(function(response) {
                 s.collections = response.data;
             });
         },
-        loadCart: function(s) {
-            $http.get('/php/loadCart.php').then(function(response) {
-                s.cart = response.data;
-            });
-        },
         count: 0,
-        cart: cart,
         userID: null
     }
 });
@@ -36,6 +29,11 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
                 shoppingCart.count += shoppingCart.cart[key];
             }
         })
+    }
+
+    $scope.searchProducts = function(searchString) {
+        // Open products page
+        $window.location.href = `products.html?name=${searchString}`;
     }
 
     $scope.logout = function() {
@@ -71,7 +69,8 @@ app.controller('productsPageController', function($http, $scope, $location, shop
         $http({
             url: '/php/loadProducts.php',
             method: "GET",
-            params: {collection: $location.search().collectionID}
+            params: {collection: $location.search().collectionID,
+                     name: $location.search().name}
          }).then(function(response) {
             console.log(response);
             $scope.products = response.data;
@@ -97,7 +96,11 @@ app.controller('productsPageController', function($http, $scope, $location, shop
 });
 
 app.controller('cartPageController', function($http, $scope, shoppingCart) {
-    $scope.loadCart = shoppingCart.loadCart($scope);
+    $scope.loadCart = function() {
+        $http.get('/php/loadCart.php').then(function(response) {
+            $scope.cart = response.data;
+        });
+    };
 
     $scope.deleteFromCart = function(productID) {
         var url = "/php/popCart.php";
@@ -112,11 +115,13 @@ app.controller('cartPageController', function($http, $scope, shoppingCart) {
         };
         $http.post(url, jsonToURI(data), config).then(function(response) {
             var quantity = response.data.Quantity;
-            //shoppingCart.cart.pop();
-            $scope.cart = $scope.cart.filter(function(item) {
+            /*$scope.cart = $scope.cart.filter(function(item) {
                 return item.ProductID != productID;
-            })
+            })*/
+            // Decrement cart by quantity
             shoppingCart.count -= quantity;
+            // Reload cart to get new total
+            $scope.loadCart();
         })
     }
 });

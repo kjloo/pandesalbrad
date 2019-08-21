@@ -35,14 +35,18 @@
         <tbody>
             <tr ng-repeat="item in cart">
                <th scope="row"></th>
-               <td>{{item.Name}}</td>
-               <td>{{item.Quantity}}</td>
-               <td class="cart-price">{{item.Total}}</td>
-               <td class="cart-delete" ng-if="item.ProductID != null" ng-click="deleteFromCart(item.ProductID)">x</td>
-               <td ng-if="item.ProductID == null"></td>
+               <td ng-if="item.ProductID != null">{{item.Name}}</td>
+               <td ng-if="item.ProductID != null">{{item.Quantity}}</td>
+               <td ng-if="item.ProductID != null" class="cart-price">{{item.Total}}</td>
+               <td ng-if="item.ProductID != null" class="cart-delete" ng-click="deleteFromCart(item.ProductID)">x</td>
+               <th ng-if="item.ProductID == null">{{item.Name}}</th>
+               <th ng-if="item.ProductID == null"></th>
+               <th ng-if="item.ProductID == null" class="cart-price">{{item.Total}}</th>
+               <th></th>
             </tr>
         </tbody>
         </table>
+        <button class="my-2">Checkout</button>
     </div>
 </div>
 </body>

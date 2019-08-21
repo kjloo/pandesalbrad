@@ -29,11 +29,11 @@
 			</ul>
 		</div>
         <div class="navbar-nav w-md-75 w-100 order-2">
-			<form class="mx-auto form-inline pl-3 ml-3 w-100">
+			<form class="mx-auto form-inline pl-3 ml-3 w-100" ng-submit="searchProducts(searchString)">
 				<div class="form-group search-menu row pl-2 mb-2 w-100">
-				   <input class="form-control form-control-sm col-10" type="text" placeholder="What are you looking for?"
-					 aria-label="Search">
-				   <i class="fas fa-search col-2" aria-hidden="true"></i>
+				   <input class="form-control form-control-sm col-10" type="search" placeholder="What are you looking for?"
+					 aria-label="Search" ng-model="searchString">
+				   <button type="submit" class="icon-button"><i class="fas fa-search col-2" aria-hidden="true"></i></button>
 				</div>
 			</form>
         </div>
