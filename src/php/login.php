@@ -21,7 +21,7 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
             // Verify password
             $hashVerify = password_verify($password, $row['Password']);
             if ($hashVerify == true) {
-                include session.inc;
+                include "session.inc";
                 $_SESSION['u_fname'] = $row['Firstname'];
                 $_SESSION['u_lname'] = $row['Lastname'];
                 $_SESSION['u_id'] = $row['UserID'];

@@ -125,3 +125,19 @@ app.controller('cartPageController', function($http, $scope, shoppingCart) {
         })
     }
 });
+
+app.controller('accountPageController', function($http, $scope) {
+    $scope.getAccountInfo = function() {
+        $http.get('/php/getAccountInfo.php').then(function(response) {
+            $scope.account = response.data;
+        });
+    };
+});
+
+app.controller('shippingPageController', function($http, $scope) {
+    $scope.getShippingInfo = function() {
+        $http.get('/php/getShippingInfo.php').then(function(response) {
+            $scope.account = response.data;
+        });
+    };
+});

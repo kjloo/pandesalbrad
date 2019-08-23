@@ -5,8 +5,6 @@ session_start();
 include "sqlConn.inc";
 
 // Create SQL Query
-//$sql = "SELECT p.Name, p.ProductID, SUM(p.Price) AS Price, SUM(c.Quantity) AS Quantity FROM carts c INNER JOIN products p ON c.ProductID = p.ProductID WHERE c.UserID = ? GROUP BY p.Name WITH ROLLUP";
-// 
 $cart = array_keys($_SESSION['u_cart']);
 // Create replacement string
 $ids_arr = str_repeat('?,', count($cart) - 1) . '?';

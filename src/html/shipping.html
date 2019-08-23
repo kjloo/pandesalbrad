@@ -19,34 +19,33 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container">
-	<div class="row">
-		<form class="user-form my-5 mx-auto py-3" action="/php/signup.php" method="post">
-			<div class="form-group">
-				<h3>Sign Up</h3>
-			</div>
-			<div class="form-group">
-				<input type="text" placeholder="First Name" name="fname">
-			</div>
-			<div class="form-group">
-				<input type="text" placeholder="Last Name" name="lname">
-			</div>
-			<div class="form-group">
-				<input type="text" placeholder="Username" name="username">
-			</div>
-			<div class="form-group">
-				<input type="password" placeholder="Password" name="password">
-			</div>
-
-			<div class="form-group">
-				<input type="email" aria-describedby="emailHelp" placeholder="Enter email" name="email">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-			</div>
-			<div class="form-group">
-				<button type="submit" name="signup">Sign Up</button>
-			</div>
-		</form>
-	</div>
+<div class="container" ng-controller="shippingPageController" ng-init="getShippingInfo()">
+    <div class="row">
+        <form class="user-form my-5 mx-auto py-3" action="/php/setAddress.php" method="post">
+            <div class="form-group">
+                <h3>Shipping Information</h3>
+            </div>
+            <div class="form-group">
+                <h4>Address</h4>
+                <input type="text" placeholder="Address" name="address" required value="{{account.Address}}">
+            </div>
+            <div class="form-group">
+                <h4>City</h4>
+                <input type="text" placeholder="City" name="city" required value="{{account.City}}">
+            </div>
+            <div class="form-group">
+                <h4>State</h4>
+                <input type="text" placeholder="State" name="state" required value="{{account.State}}">
+            </div>
+            <div class="form-group">
+                <h4>ZIP Code</h4>
+                <input type="text" placeholder="ZIP Code" name="zipcode" required value="{{account.Zipcode}}">
+            </div>
+            <div class="form-group">
+                <button type="submit" name="setAddress">Save</button>
+            </div>
+        </form>
+    </div>
 </div>
 </body>
 <footer>

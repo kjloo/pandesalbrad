@@ -24,7 +24,7 @@ function get_client_ip() {
 // Regenerate session id to prevent session fixation
 function regenerate_session_id() {
     if (!isset($_SESSION['initiated'])) {
-        session_regenerate_id();
+        session_regenerate_id(true);
         $_SESSION['initiated'] = true;
     }
 }
