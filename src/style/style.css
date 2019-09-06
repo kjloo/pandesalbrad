@@ -97,6 +97,17 @@ hr.dark {
     margin: 1rem;
 }
 
+.summary {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.summary > * {
+    margin-right: 2em;
+    margin-left: 2em;
+}
+
 .user-form {
     border-color: black;
     border-style: solid;

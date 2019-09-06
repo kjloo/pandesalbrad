@@ -58,6 +58,11 @@ jsonToURI = function(data) {
     return rc.join("&");
 };
 
+// configure controller for sign-up page
+app.controller('signupPageController', function($http, $scope, $location) {
+    $scope.message = $location.search().message;
+});
+
 // configure existing services inside initialization blocks.
 app.controller('collectionsPageController', function($http, $scope, shoppingCart) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
@@ -72,7 +77,7 @@ app.controller('productsPageController', function($http, $scope, $location, shop
             params: {collection: $location.search().collectionID,
                      name: $location.search().name}
          }).then(function(response) {
-            console.log(response);
+            //console.log(response);
             $scope.products = response.data;
         });
     };
@@ -95,12 +100,39 @@ app.controller('productsPageController', function($http, $scope, $location, shop
     }
 });
 
-app.controller('cartPageController', function($http, $scope, shoppingCart) {
+app.controller('cartPageController', function($http, $scope, $window, shoppingCart) {
     $scope.loadCart = function() {
         $http.get('/php/loadCart.php').then(function(response) {
             $scope.cart = response.data;
+            $scope.total = $scope.cart[$scope.cart.length - 1].Total;
         });
     };
+
+
+    // Render the PayPal button into #paypal-button-container
+    // This seems to be protected by CORB
+    paypal.Buttons({
+        style: {
+            layout: 'horizontal'
+        },
+        // Set up the transaction
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $scope.total
+                    }
+                }]
+            });
+        },
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                // Show a receipt message to the buyer
+                $window.location.href = `receipt.html?total=${details.purchase_units[0].amount.value}`;
+            });
+        }
+    }).render('#paypal-button-container');
 
     $scope.deleteFromCart = function(productID) {
         var url = "/php/popCart.php";
@@ -124,6 +156,12 @@ app.controller('cartPageController', function($http, $scope, shoppingCart) {
             $scope.loadCart();
         })
     }
+});
+
+app.controller('receiptPageController', function($http, $scope, $location, shoppingCart) {
+    $scope.printReceipt = function() {
+        $scope.total = $location.search().total;
+    };
 });
 
 app.controller('accountPageController', function($http, $scope) {

@@ -2,7 +2,7 @@
 
 session_start();
 
-if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']) && !empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['email'])) {
+if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']) && !empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['password2']) && !empty($_POST['email'])) {
 
     include "sqlConn.inc";
 
@@ -11,8 +11,15 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
     $lname = $_POST['lname'];
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $password2 = $_POST['password2'];
     $email = $_POST['email'];
     $role = "Customer";
+
+    // Compare passwords and return error if they do not match
+    if ($password != $password2) {
+        header("Location: ../signup.html?message=password+mismatch");
+        exit();
+    }
 
     // Check if username is taken
     $sql = "SELECT Username FROM users WHERE Username = ?";
