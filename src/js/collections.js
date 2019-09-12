@@ -13,7 +13,18 @@ app.factory('shoppingCart', function($http) {
             });
         },
         count: 0,
-        userID: null
+        userID: null,
+        total: 0.00
+    }
+});
+
+app.factory('accountLoader', function($http) {
+    return {
+        getShippingInfo: function(s) {
+            $http.get('/php/getShippingInfo.php').then(function(response) {
+                s.account = response.data;
+            });
+        }
     }
 });
 
@@ -24,6 +35,7 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
             shoppingCart.userID = response.data.UserID;
             $scope.user = response.data.Username;
             $scope.fname = response.data.Firstname;
+            shoppingCart.total = response.data.Total;
             shoppingCart.cart = response.data.Cart;
             for (var key in shoppingCart.cart) {
                 shoppingCart.count += shoppingCart.cart[key];
@@ -42,6 +54,7 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
             $scope.user = null;
             $scope.fname = null;
             shoppingCart.count = 0;
+            shoppingCart.total = 0.00;
 
             //redirect to home page
             $window.location.href = "index.html";
@@ -106,33 +119,7 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
             $scope.cart = response.data;
             $scope.total = $scope.cart[$scope.cart.length - 1].Total;
         });
-    };
-
-
-    // Render the PayPal button into #paypal-button-container
-    // This seems to be protected by CORB
-    paypal.Buttons({
-        style: {
-            layout: 'horizontal'
-        },
-        // Set up the transaction
-        createOrder: function(data, actions) {
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: $scope.total
-                    }
-                }]
-            });
-        },
-        // Finalize the transaction
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(function(details) {
-                // Show a receipt message to the buyer
-                $window.location.href = `receipt.html?total=${details.purchase_units[0].amount.value}`;
-            });
-        }
-    }).render('#paypal-button-container');
+    }; 
 
     $scope.deleteFromCart = function(productID) {
         var url = "/php/popCart.php";
@@ -156,12 +143,14 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
             $scope.loadCart();
         })
     }
+
+    $scope.openCheckoutPage = function() {
+        $window.location.href = 'checkout.html';
+    }
 });
 
-app.controller('receiptPageController', function($http, $scope, $location, shoppingCart) {
-    $scope.printReceipt = function() {
-        $scope.total = $location.search().total;
-    };
+app.controller('receiptPageController', function($http, $scope, shoppingCart) {
+    $scope.shoppingCart = shoppingCart;
 });
 
 app.controller('accountPageController', function($http, $scope) {
@@ -172,10 +161,49 @@ app.controller('accountPageController', function($http, $scope) {
     };
 });
 
-app.controller('shippingPageController', function($http, $scope) {
-    $scope.getShippingInfo = function() {
-        $http.get('/php/getShippingInfo.php').then(function(response) {
-            $scope.account = response.data;
-        });
-    };
+app.controller('shippingPageController', function($http, $scope, accountLoader) {
+    $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
+});
+
+app.controller('checkoutPageController', function($http, $scope, $window, accountLoader, shoppingCart) {
+    $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
+    // Render the PayPal button into #paypal-button-container
+    // This seems to be protected by CORB
+    paypal.Buttons({
+        style: {
+            layout: 'horizontal'
+        },
+        // Set up the transaction
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: shoppingCart.total
+                    }
+                }]
+            });
+        },
+        // Finalize the transaction
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                var url = "/php/processOrder.php";
+                var json = {
+                              orderID: data.orderID,
+                              addressID: $scope.account.addressID,
+                              processOrder: true
+                            };
+                var config = {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                    }
+                };
+                $http.post(url, jsonToURI(json), config).then(function(response) {
+                    //console.log(response);
+                    $window.location.href = `receipt.html`;
+                });
+
+            });
+        }
+    }).render('#paypal-button-container');
+    $scope.shoppingCart = shoppingCart;
 });

@@ -2,7 +2,7 @@
 
 session_start();
 
-if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAddress']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode'])) {
+if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAddress']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode']) && !empty($_POST['addressID'])) {
 
     include "sqlConn.inc";
 
@@ -10,13 +10,14 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAd
     $city = $_POST['city'];
     $state = $_POST['state'];
     $zipcode = $_POST['zipcode'];
-    $userid = $_SESSION['u_id'];
+    $addressID = $_POST['addressID'];
+    $userID = $_SESSION['u_id'];
 
     // Create update statement
-    $sql = "UPDATE users SET Address = ?, City = ?, State = ?, Zipcode = ? WHERE UserID = ?";
+    $sql = "UPDATE addresses SET Address = ?, City = ?, State = ?, Zipcode = ? WHERE AddressID = ? AND UserID = ?";
 
     if($stmt = $conn->prepare($sql)) {
-        $stmt->execute([$address, $city, $state, $zipcode, $userid]);
+        $stmt->execute([$address, $city, $state, $zipcode, $addressID, $userID]);
         // Error Check?
     }
     // Close connection

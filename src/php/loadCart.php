@@ -33,8 +33,12 @@ if($stmt = $conn->prepare($sql)) {
         $final_row = array();
         $final_row['Name'] = "Sub Total";
         $final_row['ProductID'] = Null;
-        $final_row['Total'] = money_format('%.2n', $grandtotal);
+        $grandtotal = money_format('%.2n', $grandtotal);
+        $final_row['Total'] = $grandtotal;
         $data[] = $final_row;
+
+        // Save grand total in session
+        $_SESSION['u_total'] = $grandtotal;
     }
 }
 

@@ -7,7 +7,7 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
     include "sqlConn.inc";
 
     // Create SQL Query
-    $sql = "SELECT Address, City, State, Zipcode FROM users WHERE UserID = ?";
+    $sql = "SELECT AddressID, Address, City, State, Zipcode FROM addresses AS a INNER JOIN users AS u on a.UserID = u.UserID WHERE u.UserID = ?";
     if ($stmt = $conn->prepare($sql)) {
         $stmt->execute([$_SESSION['u_id']]);
         // Get Result

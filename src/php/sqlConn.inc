@@ -15,8 +15,8 @@ $options = [
 $conn = new PDO($dsn, $username, $password, $options);
 
 // Check Connection
-if ($conn->connect_error) {
+/*if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-}
+}*/
 
 ?>
