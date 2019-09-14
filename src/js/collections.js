@@ -22,6 +22,7 @@ app.factory('accountLoader', function($http) {
     return {
         getShippingInfo: function(s) {
             $http.get('/php/getShippingInfo.php').then(function(response) {
+                //console.log(response.data);
                 s.account = response.data;
             });
         }
@@ -117,9 +118,36 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
     $scope.loadCart = function() {
         $http.get('/php/loadCart.php').then(function(response) {
             $scope.cart = response.data;
+            $scope.cart.forEach(function(item, index) {
+                item['showUpdate'] = false;
+            });
             $scope.total = $scope.cart[$scope.cart.length - 1].Total;
         });
     }; 
+
+    $scope.showUpdate = function(item) {
+        item['showUpdate'] = true;
+    }
+
+    $scope.updateQuantity = function(productID, quantity) {
+        var url = "/php/updateCart.php";
+        var data = {
+            updateCart: true,
+            productID: productID,
+            quantity: quantity
+        };
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        $http.post(url, jsonToURI(data), config).then(function(response) {
+            var quantity = response.data.QuantityDiff;;
+            shoppingCart.count += quantity;
+            // Reload cart to get new total
+            $scope.loadCart();
+        })
+    }
 
     $scope.deleteFromCart = function(productID) {
         var url = "/php/popCart.php";
@@ -189,7 +217,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
                 var url = "/php/processOrder.php";
                 var json = {
                               orderID: data.orderID,
-                              addressID: $scope.account.addressID,
+                              addressID: $scope.account.AddressID,
                               processOrder: true
                             };
                 var config = {
@@ -198,8 +226,8 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
                     }
                 };
                 $http.post(url, jsonToURI(json), config).then(function(response) {
-                    //console.log(response);
-                    $window.location.href = `receipt.html`;
+                    console.log(response);
+                    //$window.location.href = `receipt.html`;
                 });
 
             });

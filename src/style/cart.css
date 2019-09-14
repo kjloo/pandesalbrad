@@ -5,3 +5,17 @@
 .cart-delete {
 	cursor: pointer;
 }
+
+.cart-sticker {
+    height: 100px;
+    width: 100px;
+    padding: .5em;
+}
+
+.cart-quantity {
+    width: 3em;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
