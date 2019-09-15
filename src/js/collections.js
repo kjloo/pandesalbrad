@@ -212,6 +212,18 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
     }
 });
 
+app.controller('ordersPageController', function($http, $scope) {
+    $scope.getOrders = function() {
+        $http({
+            url: '/php/getOrders.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.orders = response.data;
+        });
+    };;
+});
+
 app.controller('receiptPageController', function($http, $scope, shoppingCart) {
     $scope.shoppingCart = shoppingCart;
 });

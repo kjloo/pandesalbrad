@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/">
+<link rel="shortcut icon" href="/images/favicon.ico?" type="image/x-icon">
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/5257f58f1b.js"></script>
+<script src="/js/collections.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/orders.css">
+<title>Pandesal Brad</title>
+</head>
+<body ng-app="collectionsPage">
+<div ng-include="'navbar.html'">
+</div>
+<div ng-controller="ordersPageController" ng-init="getOrders()">
+    <div class="container order-box my-5" ng-repeat="order in orders">
+        <div class="order-header my-2 row">
+          <div class="col">Order ID: {{order.OrderID}}</div>
+          <div class="col">Date: {{order.OrderDate}}</div>
+          <div class="col">Total: ${{order.Total}}</div>
+          <div class="col">Status: {{order.Status}}</div>
+        </div>
+        <div class="row">
+          <table class="table">
+          <thead>
+              <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Product Name</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col"></th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr ng-repeat="product in order.Products">
+                 <th scope="row"></th>
+                 <td>
+                     <img ng-src="/images/{{product.Image}}" class="order-sticker img-responsive"/>{{product.Name}}
+                 </td>
+                 <td>{{product.Quantity}}</td>
+                 <th scope="row"></th>
+              </tr>
+          </tbody>
+          </table>
+        </div>
+    </div>
+</div>
+</body>
+<footer>
+<div ng-include="'footer.html'"></div>
+</footer>
+</html>

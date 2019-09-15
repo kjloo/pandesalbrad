@@ -1,9 +1,6 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
 include "paypal.inc";
-
-use PayPalCheckoutSdk\Orders\OrdersGetRequest;
 
 session_start();
 
@@ -15,7 +12,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
     $total = $_SESSION['u_total'];
     // Call PayPal to get transaction details
     $client = PayPalClient::client();
-    $response = $client->execute(new OrdersGetRequest($orderID));
+    $response = PayPalClient::order($client, $orderID);
 
     // Compare total
     if ($total != $response->result->purchase_units[0]->amount->value) {
@@ -27,7 +24,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
         if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && !empty($_POST['addressID'])) {
             $userID = $_SESSION['u_id'];
             $addressID = $_POST['addressID'];
-            $sql = "INSERT INTO orders(UserID, OrderID, StatusID, OrderDate, AddressID, Total) VALUES(?, ?, 0, CURDATE(), ?, ?)";
+            $sql = "INSERT INTO orders(UserID, OrderID, StatusID, OrderDate, AddressID, Total) VALUES(?, ?, (SELECT StatusID FROM statuses WHERE status = 'ordered'), CURDATE(), ?, ?)";
             if($stmt = $conn->prepare($sql)) {
                 $stmt->execute([$userID, $orderID, $addressID, $total]);
                 // Error Checking?
@@ -37,7 +34,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
             $city = $_POST['city'];
             $state = $_POST['state'];
             $zipcode = $_POST['zipcode'];
-            $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, Address, City, State, Zipcode) VALUES(?, 0, CURDATE(), ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, Address, City, State, Zipcode) VALUES(?, (SELECT StatusID FROM statuses WHERE status = 'ordered'), CURDATE(), ?, ?, ?, ?, ?)";
             if($stmt = $conn->prepare($sql)) {
                 $stmt->execute([$orderID, $total, $address, $city, $state, $zipcode]);
                 // Error Checking?
