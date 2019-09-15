@@ -2,6 +2,8 @@
 
 session_start();
 
+$data = array();
+
 if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAddress']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode']) && !empty($_POST['addressID'])) {
 
     include "sqlConn.inc";
@@ -22,12 +24,14 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAd
     }
     // Close connection
     $conn = null;
-    header("Location: ../index.html");
+
+    $data['href'] = 'index.html';
 
 } else {
-    header("Location: ../index.html?signup=error");
-    exit();
+    $data['Reload'] = 'index.html?Address=Fail';
 }
+
+echo json_encode($data);
 
 
 ?>

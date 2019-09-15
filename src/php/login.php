@@ -22,12 +22,26 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
             $hashVerify = password_verify($password, $row['Password']);
             if ($hashVerify == true) {
                 include "session.inc";
+                $userID = $row['UserID'];
                 $_SESSION['u_fname'] = $row['Firstname'];
                 $_SESSION['u_lname'] = $row['Lastname'];
-                $_SESSION['u_id'] = $row['UserID'];
+                $_SESSION['u_id'] = $userID;
                 $_SESSION['u_name'] = $row['Username'];
                 $_SESSION['u_email'] = $row['Email'];
                 $_SESSION['u_role'] = $row['RoleID'];
+
+                // Add current cart to database
+                $isCart = isset($_SESSION['u_cart']) && !empty($_SESSION['u_cart']);
+                if ($isCart) {
+                    $cart = $_SESSION['u_cart'];
+                    $ids_arr = str_repeat('(?,?,?),', count($cart) - 1) . '(?,?,?)';
+                    $productsArr = array();
+                    foreach ($cart as $key => $value) {
+                        $productID = $key;
+                        $quantity = $value;
+                        array_push($productsArr, $userID, $productID, $quantity);
+                    }
+                }
 
                 // Query for shopping cart
                 $sql = "SELECT ProductID, Quantity FROM carts WHERE UserID = ?";
@@ -36,6 +50,15 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
 
                     foreach($stmt as $row) {
                         $_SESSION['u_cart'][$row['ProductID']] = $row['Quantity'];
+                    }
+                }
+
+                if ($isCart) {
+                    // Now insert
+                    $sql = "INSERT INTO carts(UserID, ProductID, Quantity) VALUES {$ids_arr}";
+                    if ($stmt = $conn->prepare($sql)) {
+                        $stmt->execute($productsArr);
+                        // Error Check?
                     }
                 }
 

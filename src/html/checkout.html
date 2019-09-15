@@ -23,29 +23,29 @@
 </div>
 <div class="container" ng-controller="checkoutPageController" ng-init="getShippingInfo()">
     <div class="row">
-        <form class="user-form my-5 mx-auto py-3" action="/php/setAddress.php" method="post">
+        <form name="shipping" class="user-form my-5 mx-auto py-3" novalidate class="css-form">
             <div class="form-group">
                 <h3>Confirm Shipping Information</h3>
             </div>
             <div class="form-group">
                 <h4>Address</h4>
-                <input type="text" placeholder="Address" name="address" required value="{{account.Address}}">
+                <input type="text" placeholder="Address" ng-model="account.Address" required>
             </div>
             <div class="form-group">
                 <h4>City</h4>
-                <input type="text" placeholder="City" name="city" required value="{{account.City}}">
+                <input type="text" placeholder="City" ng-model="account.City" required>
             </div>
             <div class="form-group">
                 <h4>State</h4>
-                <input type="text" placeholder="State" name="state" required value="{{account.State}}">
+                <input type="text" placeholder="State" ng-model="account.State" required>
             </div>
             <div class="form-group">
                 <h4>ZIP Code</h4>
-                <input type="text" placeholder="ZIP Code" name="zipcode" required value="{{account.Zipcode}}">
+                <input type="text" placeholder="ZIP Code" ng-model="account.Zipcode" required>
             </div>
-            <input type="hidden" name="addressID" value="{{account.AddressID}}">
+            <input type="hidden" ng-model="account.AddressID">
             <div class="form-group">
-                <button type="submit" name="setAddress">Use This Address</button>
+                <input type="submit" name="setAddress" ng-click="setAddress(false)" value="Use This Address"/>
             </div>
         </form>
         <div class="summary my-5 mx-auto py-3">

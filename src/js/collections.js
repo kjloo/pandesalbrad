@@ -18,13 +18,48 @@ app.factory('shoppingCart', function($http) {
     }
 });
 
-app.factory('accountLoader', function($http) {
+app.factory('accountLoader', function($http, $window) {
     return {
         getShippingInfo: function(s) {
             $http.get('/php/getShippingInfo.php').then(function(response) {
                 //console.log(response.data);
                 s.account = response.data;
+                // If nothing is returned, initialize empty values to allow for use in ng-model
+                // For some reason "null" string is returned...
+                if (s.account == "null") {
+                    s.account = {
+                        'Address': "",
+                        'City': "",
+                        'State': "",
+                        'Zipcode': null
+                    };
+                }
             });
+        },
+        setAddress: function(s, redirect) {
+            // Only if something changed
+            if (!s.shipping.$dirty || !s.addressID) {
+                return;
+            }
+            var url = "/php/setAddress.php";
+            var data = {
+                setAddress: true,
+                address: s.account.Address,
+                city: s.account.City,
+                state: s.account.State,
+                zipcode: s.account.Zipcode,
+                addressID: s.account.AddressID
+            };
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.post(url, jsonToURI(data), config).then(function(response) {
+                if (redirect) {
+                    $window.location.href = response.data.href;
+                }
+            })
         }
     }
 });
@@ -191,10 +226,16 @@ app.controller('accountPageController', function($http, $scope) {
 
 app.controller('shippingPageController', function($http, $scope, accountLoader) {
     $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
+    $scope.setAddress = function(redirect) {
+        accountLoader.setAddress($scope, redirect);
+    }
 });
 
 app.controller('checkoutPageController', function($http, $scope, $window, accountLoader, shoppingCart) {
     $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
+    $scope.setAddress = function(redirect) {
+        accountLoader.setAddress($scope, redirect);
+    }
     // Render the PayPal button into #paypal-button-container
     // This seems to be protected by CORB
     paypal.Buttons({
@@ -215,19 +256,32 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
         onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
                 var url = "/php/processOrder.php";
-                var json = {
-                              orderID: data.orderID,
-                              addressID: $scope.account.AddressID,
-                              processOrder: true
-                            };
+                if (!$scope.account.AddressID) {
+                    var json = {
+                            orderID: data.orderID,
+                            address: $scope.account.Address,
+                            city: $scope.account.City,
+                            state: $scope.account.State,
+                            zipcode: $scope.account.Zipcode,
+                            processOrder: true
+                    };
+                } else {
+                    var json = {
+                        orderID: data.orderID,
+                        addressID: $scope.account.AddressID,
+                        processOrder: true
+                    };
+                }
                 var config = {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
                     }
                 };
                 $http.post(url, jsonToURI(json), config).then(function(response) {
-                    console.log(response);
-                    //$window.location.href = `receipt.html`;
+                    //console.log(response);
+                    if (response.data.Processed) {
+                        $window.location.href = `receipt.html`;
+                    }
                 });
 
             });
