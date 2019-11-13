@@ -6,10 +6,9 @@
     $data["UserID"] = null;
     $data["Cart"] = array();
     $data["Total"] = 0.00;
-    if (isset($_SESSION['u_id']) && isset($_SESSION['u_name']) && isset($_SESSION['u_role'])) {
+    if (isset($_SESSION['u_id']) && isset($_SESSION['u_name'])) {
         $data["UserID"] = $_SESSION['u_id'];
         $data["Username"] = $_SESSION['u_name'];
-        $data["RoleID"] = $_SESSION['u_role'];
         $data["Firstname"] = $_SESSION['u_fname'];
     }
     if (isset($_SESSION['u_cart'])) {

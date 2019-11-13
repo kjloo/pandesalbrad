@@ -28,7 +28,6 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
                 $_SESSION['u_id'] = $userID;
                 $_SESSION['u_name'] = $row['Username'];
                 $_SESSION['u_email'] = $row['Email'];
-                $_SESSION['u_role'] = $row['RoleID'];
 
                 // Add current cart to database
                 $isCart = isset($_SESSION['u_cart']) && !empty($_SESSION['u_cart']);

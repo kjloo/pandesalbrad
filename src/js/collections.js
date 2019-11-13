@@ -79,6 +79,12 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
         })
     }
 
+    $scope.isAdmin = function() {
+        $http.get('/php/isAdmin.php').then(function(response) {
+            $scope.isUserAdmin = response.data.IsAdmin;
+        })
+    }
+
     $scope.searchProducts = function(searchString) {
         // Open products page
         $window.location.href = `products.html?name=${searchString}`;
@@ -300,4 +306,27 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
         }
     }).render('#paypal-button-container');
     $scope.shoppingCart = shoppingCart;
+});
+
+// configure existing services inside initialization blocks.
+app.controller('uploadPageController', function($http, $scope, shoppingCart) {
+    $scope.loadCollections = shoppingCart.loadCollections($scope);
+
+    $scope.showImage = false;
+
+    $scope.readInput = function(input) {
+
+        if (input.files && input.files[0])
+        {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#product-image').attr('src', e.target.result).width(200).height(200);
+                // The Scope here is not the base scope so must tell angular that the variable is updated.
+                $scope.$apply(function() {
+                    $scope.showImage = true;
+                });
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 });
