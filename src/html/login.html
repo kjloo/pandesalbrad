@@ -19,9 +19,10 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container">
+<div class="container" ng-controller="loginPageController">
 	<div class="row">
 		<form class="user-form my-5 mx-auto py-3" action="/php/login.php" method="post">
+			<div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
 			<div class="form-group">
 				<h3>Login</h3>
 			</div>

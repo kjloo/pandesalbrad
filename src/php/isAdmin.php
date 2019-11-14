@@ -4,6 +4,7 @@ session_start();
 
 $rc = array();
 $rc["IsAdmin"] = False;
+$_SESSION['u_isAdmin'] = False;
 if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
     include "sqlConn.inc";
 
@@ -22,7 +23,9 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
     $conn = null;
 
     // Analyze and return result
-    $rc["IsAdmin"] = ($data['Role'] == 'Admin');
+    $isAdmin = ($data['Role'] == 'Admin');
+    $rc["IsAdmin"] = $isAdmin;
+    $_SESSION['u_isAdmin'] = $isAdmin;
 }
 
 echo json_encode($rc);

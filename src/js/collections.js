@@ -118,6 +118,12 @@ app.controller('signupPageController', function($http, $scope, $location) {
     $scope.message = $location.search().message;
 });
 
+// configure controller for login page
+app.controller('loginPageController', function($http, $scope, $location) {
+    $scope.status = $location.search().login;
+    $scope.message = $location.search().message;
+});
+
 // configure existing services inside initialization blocks.
 app.controller('collectionsPageController', function($http, $scope, shoppingCart) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
@@ -309,24 +315,48 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 });
 
 // configure existing services inside initialization blocks.
-app.controller('uploadPageController', function($http, $scope, shoppingCart) {
+app.controller('uploadPageController', function($http, $scope, $location, shoppingCart) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
 
+    $scope.status = $location.search().upload;
+    $scope.message = $location.search().message;
+
     $scope.showImage = false;
+    $scope.previewData = [];
+    $scope.imageName;
+    $scope.productName;
 
     $scope.readInput = function(input) {
-
-        if (input.files && input.files[0])
-        {
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
             var reader = new FileReader();
             reader.onload = function(e) {
-                $('#product-image').attr('src', e.target.result).width(200).height(200);
-                // The Scope here is not the base scope so must tell angular that the variable is updated.
+                // Utilizing non angular event call so must inform angular that scope variables are changing.
                 $scope.$apply(function() {
+                    var name = file.name;
+                    var type = file.type;
+                    var size = ((file.size/(1024*1024)) > 1) ? (file.size/(1024*1024)) + ' mB' : (file.size/1024)+' kB';
+                    $scope.previewData['data'] = e.target.result;
+                    $scope.previewData['name'] = name;
+                    $scope.previewData['type'] = type;
+                    $scope.previewData['size'] = size;
+                    $scope.imageName = name;
+                    $scope.productName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
                     $scope.showImage = true;
                 });
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
+        } else {
+            // User didn't upload a file
+            $scope.$apply(function() {
+                $scope.removeInput();
+            });
         }
+    }
+    $scope.removeInput = function() {
+        // Unload file
+        $("input[type='file']").val("");
+        $scope.previewData = [];
+        $scope.showImage = false;
     }
 });

@@ -1,0 +1,35 @@
+.product-image {
+    height: 200px;
+    width: 200px;
+    align-content: center;
+    padding: 1.5em;
+}
+
+.image-info {
+    margin-right: 2em;
+    margin-left: 2em;
+}
+
+.preview-data {
+    display: inline-block;
+}
+
+.action-button {
+    display: inline-block;
+}
+
+.remove-image {
+    border: 2px solid #5B93F5;
+    border-radius: 50%;
+    line-height: 1.7em;
+    height: 2em;
+    width: 2em;
+    cursor: pointer;
+    color: #5B93F5;
+    text-align: center;
+    margin: 1em;
+}
+
+.remove-image:hover {
+    border: 2px solid red;
+}

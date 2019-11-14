@@ -67,17 +67,17 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
 
                 header("Location: ../index.html?login=success");
             } else {
-                header("Location: ../index.html?login=incorrect");
+                header("Location: ../login.html?login=fail&message=Incorrect Username or Password.");
             }
         } else {
-            header("Location: ../index.html?login=fail");
+            header("Location: ../login.html?login=fail&message=Incorrect Username Or Password.");
         }
     }
     // Close Connection
     $conn = null;
 
 } else {
-    header("Location: ../index.html?login=error");
+    header("Location: ../login.html?login=fail&message=Unexpected Error.");
     exit();
 }
 

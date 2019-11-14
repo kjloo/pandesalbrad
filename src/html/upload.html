@@ -14,6 +14,7 @@
 <script src="/js/collections.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/upload.css">
 <title>Pandesal Brad</title>
 </head>
 <body ng-app="collectionsPage">
@@ -21,36 +22,48 @@
 </div>
 <div class="container" ng-controller="uploadPageController" ng-init="loadCollections()">
     <div class="row">
-        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadProduct.php" method="post">
+        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadProduct.php" method="post" enctype="multipart/form-data">
+            <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
+            <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
             <div class="form-group">
                 <h3>Upload Product</h3>
             </div>
-            <div class="form-group" ng-show="showImage">
-                <img id="product-image" src="#" />
+            <div class="image-info" ng-show="showImage">
+                <img class="product-image" src="{{previewData.data}}" />
+                <div class="preview-data">
+                    <div><b>Name:</b> {{previewData.name}}</div>
+                    <div><b>Type:</b> {{previewData.type}}</div>
+                    <div><b>Size:</b> {{previewData.size}}</div>
+                </div>
+                <div class="action-button">
+                    <i class="fa fa-close remove-image" ng-click=removeInput()></i> 
+                </div>
             </div>
             <div class="form-group">
-                <input type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="file" accept="image/png, image/jpeg"/>
+                <input type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="uploadedImage" accept="image/png, image/jpeg"/>
             </div>
-            <div class="form-group">
-                <h4>Product Name</h4>
-                <input type="text" placeholder="Product Name" name="pname" required>
-            </div>
-            <div class="form-group">
-                <h4>Image Name</h4>
-                <input type="text" placeholder="Image Name" name="iname" required>
-            </div>
-            <div class="form-group">
-                <h4>Price</h4>
-                <input type="number" min="0.00" step="0.01" placeholder="5.99" name="price" required>
-            </div>
-            <div class="form-group">
-                <h4>Category</h4>
-                <select name="category">
-                    <option ng-repeat="collection in collections" value="{{collection.CollectionID}}">{{collection.Name}}</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <button type="submit" name="upload()">Upload</button>
+            <div ng-show="showImage">
+                <div class="form-group">
+                    <h4>Product Name</h4>
+                    <input type="text" ng-model="productName" placeholder="Product Name" name="pname" required>
+                </div>
+                <div class="form-group">
+                    <h4>Image Name</h4>
+                    <input type="text" ng-model="imageName" placeholder="Image Name" name="iname" required>
+                </div>
+                <div class="form-group">
+                    <h4>Price</h4>
+                    <input type="number" min="0.00" step="0.01" placeholder="5.99" name="price" required>
+                </div>
+                <div class="form-group">
+                    <h4>Category</h4>
+                    <select name="category">
+                        <option ng-repeat="collection in collections" value="{{collection.CollectionID}}">{{collection.Name}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="upload">Upload</button>
+                </div>
             </div>
         </form>
     </div>
