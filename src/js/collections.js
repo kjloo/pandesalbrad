@@ -157,8 +157,34 @@ app.controller('productsPageController', function($http, $scope, $location, shop
         };
         $http.post(url, jsonToURI(data), config).then(function(response) {
             shoppingCart.count++;
-        })
+        });
     }
+
+    // Functions for product management
+    $scope.openEditPage = function(productID) {
+        var url = "";
+    }
+
+    $scope.deleteProduct = function(productID) {
+        // Prompt user with warning
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteProduct.php/" + productID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Product.";
+                var deleteID = response.data.ProductID;
+                $scope.products = $scope.products.filter(function(product) {
+                    return product.ProductID != deleteID;
+                });
+            });
+        }
+    }
+
+    $scope.message = null;
 });
 
 app.controller('cartPageController', function($http, $scope, $window, shoppingCart) {

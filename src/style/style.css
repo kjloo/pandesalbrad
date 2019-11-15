@@ -28,9 +28,21 @@
     align-items: center;
 }
 
+.table-sticker {
+    height: 100px;
+    width: 100px;
+    padding: .5em;
+}
+
 #collections:hover .dropdown-menu {
     display: block;
     margin: 0em;
+}
+
+.alert {
+    width: 100%;
+    text-align: center;
+    margin: 1em 0em;
 }
 
 .icon-button {
@@ -149,5 +161,7 @@ footer {
 @media (max-width: 768px) {
     #user .dropdown-menu {
         position: absolute;
+        left: -6em;
+        right: auto;
     }
 }

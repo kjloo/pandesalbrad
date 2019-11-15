@@ -36,7 +36,7 @@
             <tr ng-repeat="item in cart">
                <th scope="row"></th>
                <td ng-if="item.ProductID != null">
-                   <img ng-src="/images/{{item.Image}}" class="cart-sticker img-responsive"/>{{item.Name}}
+                   <img ng-src="/images/{{item.Image}}" class="table-sticker img-responsive"/>{{item.Name}}
                </td>
                <td ng-if="item.ProductID != null">
                    <input class="cart-quantity" ng-model="item.Quantity" ng-change="showUpdate(item)" type="number" min="1" ng-value="item.Quantity">
