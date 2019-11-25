@@ -4,7 +4,7 @@ session_start();
 
 $data = array();
 
-if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAddress']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode']) && !empty($_POST['addressID'])) {
+if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAddress']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode'])) {
 
     include "sqlConn.inc";
 
@@ -16,10 +16,16 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && isset($_POST['setAd
     $userID = $_SESSION['u_id'];
 
     // Create update statement
-    $sql = "UPDATE addresses SET Address = ?, City = ?, State = ?, Zipcode = ? WHERE AddressID = ? AND UserID = ?";
+    if (isset($addressID) && $addressID != NULL) {
+        $sql = "UPDATE addresses SET Address = ?, City = ?, State = ?, Zipcode = ? WHERE AddressID = ? AND UserID = ?";
+        $input = [$address, $city, $state, $zipcode, $addressID, $userID];
+    } else {
+        $sql = "INSERT INTO addresses (Address, City, State, Zipcode, UserID) VALUES (?, ?, ?, ?, ?)";
+        $input = [$address, $city, $state, $zipcode, $userID];
+    }
 
     if($stmt = $conn->prepare($sql)) {
-        $stmt->execute([$address, $city, $state, $zipcode, $addressID, $userID]);
+        $stmt->execute($input);
         // Error Check?
     }
     // Close connection

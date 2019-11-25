@@ -7,38 +7,23 @@ function return_error_code() {
     exit();
 }
 
-if (isset($_SESSION['u_id']) && isset($_SESSION['u_isAdmin']) && $_SESSION['u_isAdmin']) {
+include "imageUtils.inc";
+
+if (is_user_admin()) {
     # ProductID will be stored in the path_info from nginx server
     $method = $_SERVER['REQUEST_METHOD'];
-    $productID = $_SERVER['PATH_INFO'];
-    if ($method === 'DELETE' && $productID) {
+    if ($method === 'DELETE' && !empty($_SERVER['PATH_INFO'])) {
         // Get DELETE Request
         include "sqlConn.inc";
 
-        // Retrieve image name
-        $sql = "SELECT Image FROM products WHERE ProductID = ?";
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$productID]);
-
-            if ($stmt->rowCount() == 1) {
-                // output data
-                $row = $stmt->fetch();
-                $iname = $row['Image'];
-            } else {
-                return_error_code();
-            }
-        } else {
+        $productID = $_SERVER['PATH_INFO'];
+        $iname = get_image_name_from_db($productID);
+        if ($iname == null) {
             return_error_code();
         }
 
         // Delete image from server product directory
-        $target_dir = dirname(dirname(__FILE__)) . "/images/";
-        $target_file = $target_dir . $iname;
-
-        $deleted = False;
-        if (file_exists($target_file)) {
-            $deleted = unlink($target_file);
-        }
+        $deleted = delete_image($iname);
 
         if ($deleted) {
             // Create SQL Query

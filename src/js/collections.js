@@ -18,6 +18,16 @@ app.factory('shoppingCart', function($http) {
     }
 });
 
+app.factory('adminUtils', function($http) {
+    return {
+        isAdmin: function(s) {
+            $http.get('/php/isAdmin.php').then(function(response) {
+                s.isUserAdmin = response.data.IsAdmin;
+            })
+        }
+    }
+});
+
 app.factory('accountLoader', function($http, $window) {
     return {
         getShippingInfo: function(s) {
@@ -31,14 +41,15 @@ app.factory('accountLoader', function($http, $window) {
                         'Address': "",
                         'City': "",
                         'State': "",
-                        'Zipcode': null
+                        'Zipcode': null,
+                        'AddressID': null
                     };
                 }
             });
         },
         setAddress: function(s, redirect) {
             // Only if something changed
-            if (!s.shipping.$dirty || !s.addressID) {
+            if (!s.shipping.$dirty) {
                 return;
             }
             var url = "/php/setAddress.php";
@@ -48,8 +59,12 @@ app.factory('accountLoader', function($http, $window) {
                 city: s.account.City,
                 state: s.account.State,
                 zipcode: s.account.Zipcode,
-                addressID: s.account.AddressID
             };
+            if (s.account.AddressID != null) {
+                data.push({
+                    addressID: s.account.AddressID
+                });
+            }
             var config = {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
@@ -64,7 +79,7 @@ app.factory('accountLoader', function($http, $window) {
     }
 });
 
-app.controller('navbarController', function($http, $scope, $window, shoppingCart) {
+app.controller('navbarController', function($http, $scope, $window, shoppingCart, adminUtils) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
     $scope.getSession = function() {
         $http.get('/php/getSession.php').then(function(response) {
@@ -79,11 +94,7 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
         })
     }
 
-    $scope.isAdmin = function() {
-        $http.get('/php/isAdmin.php').then(function(response) {
-            $scope.isUserAdmin = response.data.IsAdmin;
-        })
-    }
+    $scope.isAdmin = adminUtils.isAdmin($scope);
 
     $scope.searchProducts = function(searchString) {
         // Open products page
@@ -130,7 +141,7 @@ app.controller('collectionsPageController', function($http, $scope, shoppingCart
 });
 
 // configure existing services inside initialization blocks.
-app.controller('productsPageController', function($http, $scope, $location, shoppingCart) {
+app.controller('productsPageController', function($http, $scope, $location, $window, shoppingCart) {
     $scope.loadProducts = function() {
         $http({
             url: '/php/loadProducts.php',
@@ -162,7 +173,8 @@ app.controller('productsPageController', function($http, $scope, $location, shop
 
     // Functions for product management
     $scope.openEditPage = function(productID) {
-        var url = "";
+        var url = "upload.html?productID=" + productID;
+        $window.location.href = url;
     }
 
     $scope.deleteProduct = function(productID) {
@@ -250,7 +262,8 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
     }
 });
 
-app.controller('ordersPageController', function($http, $scope) {
+app.controller('ordersPageController', function($http, $scope, adminUtils) {
+    $scope.isAdmin = adminUtils.isAdmin($scope);
     $scope.getOrders = function() {
         $http({
             url: '/php/getOrders.php',
@@ -259,7 +272,79 @@ app.controller('ordersPageController', function($http, $scope) {
             //console.log(response);
             $scope.orders = response.data;
         });
-    };;
+    };
+    $scope.getAllOrders = function() {
+        $http({
+            url: '/php/getAllOrders.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.orders = response.data;
+        });
+    };
+});
+
+app.controller('usersPageController', function($http, $scope, $location) {
+    $scope.message = $location.search().message;
+    $scope.loadUsers = function() {
+        $http({
+            url: '/php/loadUsers.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.users = response.data;
+        });
+    };
+
+    $scope.loadRoles = function() {
+        $http({
+            url: '/php/loadRoles.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.roles = response.data;
+        });
+    };
+
+    $scope.deleteUser = function(userID) {
+        // Prompt user with warning
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteUser.php/" + userID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted User.";
+                var deleteID = response.data.UserID;
+                $scope.users = $scope.users.filter(function(user) {
+                    return user.UserID != deleteID;
+                });
+            });
+        }
+    }
+
+    $scope.setSelected = function(user) {
+        if (Array.isArray($scope.roles) && $scope.roles.length) {
+            user.selected = $scope.roles[0];
+            for (var key in $scope.roles) {
+                var role = $scope.roles[key];
+                if (user.RoleID == role.RoleID) {
+                    user.selected = role;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.$watchGroup(['roles', 'users'], function() {
+        for (var key in $scope.users) {
+            var user = $scope.users[key];
+            $scope.setSelected(user);
+        }
+    });
+
 });
 
 app.controller('receiptPageController', function($http, $scope, shoppingCart) {
@@ -347,10 +432,53 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.status = $location.search().upload;
     $scope.message = $location.search().message;
 
-    $scope.showImage = false;
     $scope.previewData = [];
-    $scope.imageName;
-    $scope.productName;
+
+    $scope.showImage = false;
+    $scope.productID = null;
+    $scope.productPrice = null;
+    $scope.imageName = null;
+    $scope.productName = null;
+    $scope.collectionID = null;
+    $scope.selected = null;
+
+    $scope.productID = $location.search().productID;
+    $scope.getProductInfo = function() {
+        if ($scope.productID != null) {
+            var url = "/php/getProductInfo.php/" + $scope.productID;
+            $http.get(url).then(function(response) {
+                $scope.product = response.data;
+                // Initialize ng-model definitions
+                $scope.productID = $scope.product.ProductID;
+                $scope.productPrice = $scope.product.Price;
+                $scope.imageName = $scope.product.Image;
+                $scope.productName = $scope.product.Name;
+                $scope.collectionID = $scope.product.CollectionID;
+
+                // Show product image
+                $scope.showImage = true;
+                $scope.previewData['data'] = "/images/" + $scope.imageName;
+            });
+        }
+    }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.collections) && $scope.collections.length) {
+            $scope.selected = $scope.collections[0];
+            for (var key in $scope.collections) {
+                var collection = $scope.collections[key];
+                if ($scope.collectionID == collection.CollectionID) {
+                    $scope.selected = collection;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.$watchGroup(['collections', 'collectionID'], function () {
+        $scope.setSelected();
+    });
+
 
     $scope.readInput = function(input) {
         if (input.files && input.files[0]) {
@@ -366,8 +494,13 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
                     $scope.previewData['name'] = name;
                     $scope.previewData['type'] = type;
                     $scope.previewData['size'] = size;
-                    $scope.imageName = name;
-                    $scope.productName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
+
+                    if ($scope.imageName == null) {
+                        $scope.imageName = name;
+                    }
+                    if ($scope.productName == null) {
+                        $scope.productName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
+                    }
                     $scope.showImage = true;
                 });
             };

@@ -1,0 +1,12 @@
+.user-delete {
+    cursor: pointer;
+}
+
+.user-delete:hover {
+    color: red;
+}
+
+.btn-xs {
+    vertical-align: top;
+    padding: .0em .30em;
+}

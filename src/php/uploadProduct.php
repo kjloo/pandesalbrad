@@ -2,9 +2,49 @@
 
 session_start();
 
-if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['price']) && !empty($_POST['category'])) {
+include "imageUtils.inc";
+if (is_user_admin()) {
+    if (isset($_POST['update']) && !empty($_POST['productID']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['price']) && !empty($_POST['category'])) {
 
-    if (isset($_SESSION['u_id']) && isset($_SESSION['u_isAdmin']) && $_SESSION['u_isAdmin']) {
+        include "sqlConn.inc";
+        $productID = $_POST['productID'];
+        $pname = $_POST['pname'];
+        $iname = $_POST['iname'];
+        $price = $_POST['price'];
+        $category = $_POST['category'];
+
+        // Need to get old image name to check if it changed
+        $oldiname = get_image_name_from_db($productID);
+
+        // Check if file data was uploaded and update.
+        if (isset($_FILES['uploadedImage']) && $_FILES['uploadedImage']['size'] > 0) {
+            // Delete current Image
+            delete_image($oldiname);
+            // Upload new Image
+            $errors = upload_image($iname);
+            if(empty($errors) != true) {
+                header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+                exit();
+            }
+        } else if ($iname != $oldiname) {
+            $errors = move_image($oldiname, $iname);
+          
+            if(empty($errors) != true) {
+                header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+                exit();
+            }
+        }
+
+        // Update product info in database
+        // Create SQL Query
+        $sql = "UPDATE products SET Price = ?, Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$price, $iname, $pname, $category, $productID]);
+            // Error Check?
+        }
+        $conn = null;
+        header("Location: ../upload.html?upload=success&message=File Update Successful.");
+    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['price']) && !empty($_POST['category'])) {
 
         include "sqlConn.inc";
         $pname = $_POST['pname'];
@@ -13,39 +53,9 @@ if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST[
         $category = $_POST['category'];
 
         // Copy file to server product directory
-        $target_dir = dirname(dirname(__FILE__)) . "/images/";
-        $target_file = $target_dir . $iname;
-        $errors = array();
-
-        if (file_exists($target_file)) {
-            $errors[] = "File already exists.";
-        }
-
-        $file_size =$_FILES['uploadedImage']['size'];
-        $file_tmp =$_FILES['uploadedImage']['tmp_name'];
-        $file_ext=strtolower(end(explode('.',$_FILES['uploadedImage']['name'])));
+        $errors = upload_image($iname);
           
-        $extensions= array("jpeg", "jpg", "png");
-          
-        if(in_array($file_ext, $extensions) === false) {
-            $errors[] = "File Type not allowed, please choose a JPEG or PNG file.";
-        }
-          
-        if($file_size > 2097152){
-            $errors[] = "File size must be less than 2 MB.";
-        }
-          
-        if(empty($errors) == true){
-            $uploadStatus = move_uploaded_file($file_tmp, $target_file);
-            if ($uploadStatus) {
-                echo "Success File Upload Successful.";
-            } else {
-                echo "Could not upload image.";
-                header("Location: ../upload.html?upload=fail&message=" . $uploadStatus);
-                exit();
-            }
-        } else {
-            //print_r($errors);
+        if(empty($errors) != true) {
             header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
@@ -61,7 +71,7 @@ if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST[
         $conn = null;
         header("Location: ../upload.html?upload=success&message=File Upload Successful.");
     } else {
-        header("Location: ../upload.html?upload=fail&message=Insufficient Permissions.");
+        header("Location: ../upload.html?upload=fail&message=Incorrect Parameters.");
         exit();
     }
 } else {

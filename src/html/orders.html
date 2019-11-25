@@ -21,6 +21,16 @@
 <div ng-include="'navbar.html'">
 </div>
 <div ng-controller="ordersPageController" ng-init="getOrders()">
+    <div class="control-panel">
+        <form class="mx-auto form-inline pl-3 ml-3 w-100" ng-submit="searchProducts(searchString)">
+        <div class="form-group search-menu row pl-2 mb-2 w-100">
+           <input class="form-control form-control-sm col-10" type="search" placeholder="What are you looking for?"
+           aria-label="Search" ng-model="searchString">
+           <button type="submit" class="icon-button"><i class="fas fa-search col-2" aria-hidden="true"></i></button>
+        </div>
+        <button ng-if="isUserAdmin" class="btn btn-primary" ng-click="getAllOrders()">Display All Orders</button>
+      </form>
+    </div>
     <div class="container order-box my-5" ng-repeat="order in orders">
         <div class="order-header my-2 row">
           <div class="col">Order ID: {{order.OrderID}}</div>
