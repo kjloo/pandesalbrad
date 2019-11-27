@@ -158,10 +158,26 @@ footer {
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     #user .dropdown-menu {
         position: absolute;
-        left: -6em;
-        right: auto;
+        left: auto;
+        right: -5.0em;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    #user .dropdown-menu {
+        position: absolute;
+        left: auto;
+        right: -4.5em;
+    }
+}
+
+@media screen and (max-width: 360px) {
+    #user .dropdown-menu {
+        position: absolute;
+        left: auto;
+        right: -4.2em;
     }
 }

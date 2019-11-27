@@ -21,15 +21,21 @@
 <div ng-include="'navbar.html'">
 </div>
 <div ng-controller="ordersPageController" ng-init="getOrders()">
-    <div class="control-panel">
-        <form class="mx-auto form-inline pl-3 ml-3 w-100" ng-submit="searchProducts(searchString)">
-        <div class="form-group search-menu row pl-2 mb-2 w-100">
-           <input class="form-control form-control-sm col-10" type="search" placeholder="What are you looking for?"
-           aria-label="Search" ng-model="searchString">
-           <button type="submit" class="icon-button"><i class="fas fa-search col-2" aria-hidden="true"></i></button>
-        </div>
-        <button ng-if="isUserAdmin" class="btn btn-primary" ng-click="getAllOrders()">Display All Orders</button>
+    <div class="container mt-5 control-panel">
+        <form ng-submit="searchOrder(searchString)">
+            <div class="d-flex search-menu mb-2">
+               <input class="form-control form-control-sm" type="search" placeholder="Search Order Number"
+               aria-label="Search" ng-model="searchString">
+               <button type="submit" class="icon-button"><i class="fas fa-search px-1" aria-hidden="true"></i></button>
+            </div>
       </form>
+    </div>
+    <div class="container mb-2 d-flex admin-panel" ng-if="isUserAdmin">
+        <div class="ml-auto">
+            <button class="btn btn-primary" ng-click="getAllOrders()">Display All Orders</button>
+            <button class="btn btn-success" ng-click="getOpenOrders()">Display Open Orders</button>
+            <button class="btn btn-info" ng-click="getOrders()">Clear Filter</button>
+        </div>
     </div>
     <div class="container order-box my-5" ng-repeat="order in orders">
         <div class="order-header my-2 row">

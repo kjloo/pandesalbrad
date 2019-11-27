@@ -37,24 +37,24 @@
 				</div>
 			</form>
         </div>
-		<ul class="navbar-nav ml-auto w-md-25 order-0 order-md-3 flex-row">
-			<li id="user" class="nav-item dropdown">
+		<div class="navbar-nav ml-auto w-md-25 order-0 order-md-3 flex-row">
+			<div id="user" class="nav-item dropdown">
 				<a class="nav-link" ng-init="getSession(); isAdmin();" data-target="user" data-toggle="dropdown">
                     <span class="d-none d-md-inline" ng-if="user != null">Hello {{fname}}</span>
                     <span class="d-none d-md-inline" ng-if="user == null">My Account</span>
                     <i class="far fa-user" style="color: white"></i>
                 </a>
-				<div class="dropdown-menu" aria-labelledby="user">
-                    <a ng-if="user == null" class="dropdown-item" ng-href="login.html" target="_self">Login</a>
-                    <a ng-if="user == null" class="dropdown-item" ng-href="signup.html" target="_self">Sign Up</a>
-                    <a ng-if="isUserAdmin" ng-href="manage.html" class="dropdown-item" target="_self">Manage Site</a>
-                    <a ng-if="user != null" ng-href="account.html" class="dropdown-item" target="_self">Account Settings</a>
-                    <a ng-if="user != null" ng-href="shipping.html" class="dropdown-item" target="_self">Shipping Information</a>
-                    <a ng-if="user != null" ng-href="orders.html" class="dropdown-item" target="_self">View Orders</a>
-                    <a ng-if="user != null" ng-click="logout()" class="dropdown-item">Logout</a>
-				</div>
-			</li>
-		</ul>
+				<ul class="dropdown-menu" aria-labelledby="user">
+                    <li><a ng-if="user == null" class="dropdown-item" ng-href="login.html" target="_self">Login</a></li>
+                    <li><a ng-if="user == null" class="dropdown-item" ng-href="signup.html" target="_self">Sign Up</a></li>
+                    <li><a ng-if="isUserAdmin" ng-href="manage.html" class="dropdown-item" target="_self">Manage Site</a></li>
+                    <li><a ng-if="user != null" ng-href="account.html" class="dropdown-item" target="_self">Account Settings</a></li>
+                    <li><a ng-if="user != null" ng-href="shipping.html" class="dropdown-item" target="_self">Shipping Information</a></li>
+                    <li><a ng-if="user != null" ng-href="orders.html" class="dropdown-item" target="_self">View Orders</a></li>
+                    <li><a ng-if="user != null" ng-click="logout()" class="dropdown-item">Logout</a></li>
+				</ul>
+			</div>
+		</div>
 		<ul class="navbar-nav ml-auto order-0 order-md-4 flex-row">
 			<li class="nav-item">
                 <span class="fa-stack has-badge" data-count="{{shoppingCart.count}}">

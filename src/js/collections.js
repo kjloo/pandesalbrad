@@ -282,6 +282,15 @@ app.controller('ordersPageController', function($http, $scope, adminUtils) {
             $scope.orders = response.data;
         });
     };
+    $scope.getOpenOrders = function() {
+        $http({
+            url: '/php/getOpenOrders.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.orders = response.data;
+        });
+    };
 });
 
 app.controller('usersPageController', function($http, $scope, $location) {
