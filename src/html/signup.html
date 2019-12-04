@@ -14,12 +14,18 @@
 <script src="/js/collections.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/signup.css">
 <title>Pandesal Brad</title>
 </head>
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
 <div class="container" ng-controller="signupPageController">
+    <div class="row">
+        <div class="alert alert-danger mx-auto pt-3" role="alert" ng-if="message != null">
+            {{message}}!
+        </div>
+    </div>
 	<div class="row">
 		<form class="user-form my-5 mx-auto py-3" action="/php/signup.php" method="post">
 			<div class="form-group">
@@ -39,11 +45,12 @@
 			</div>
 			<div class="form-group">
                 <h4>Password</h4>
-				<input type="password" placeholder="Password" name="password">
+				<input ng-model="password" type="password" placeholder="Password" ng-change="validatePassword(password)" name="password">     
+                <small id="passwordHelp" class="form-text text-muted" role="alert" ng-if="passwordInfo != null">{{passwordInfo}}!</small>
 			</div>
 			<div class="form-group">
                 <h4>Confirm Password</h4>
-				<input type="password" placeholder="Confirm Password" name="password2">
+				<input ng-model="password2" type="password" placeholder="Confirm Password" ng-change="validatePassword(password)" name="password2">
 			</div>
 			<div class="form-group">
                 <h4>Email</h4>
@@ -51,15 +58,10 @@
                 <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
 			</div>
 			<div class="form-group">
-				<button type="submit" name="signup">Sign Up</button>
+				<button ng-disabled="!submittable" type="submit" name="signup">Sign Up</button>
 			</div>
 		</form>
 	</div>
-	<div class="row">
-	    <div class="alert alert-danger mx-auto py-3" role="alert" ng-if="message != null">
-            {{message}}!
-        </div>
-    </div>
 </div>
 </body>
 <footer>

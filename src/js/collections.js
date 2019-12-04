@@ -127,6 +127,24 @@ jsonToURI = function(data) {
 // configure controller for sign-up page
 app.controller('signupPageController', function($http, $scope, $location) {
     $scope.message = $location.search().message;
+    $scope.passwordInfo = null;
+    $scope.password = null;
+    $scope.password2 = null;
+    $scope.submittable = false;
+    $scope.validatePassword = function(password) {
+        var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+        $scope.submittable = false;
+        if (password.length < 10) {
+            $scope.passwordInfo = "Password must be at least 10 characters long";
+        } else if (!strongRegex.test(password)) {
+            $scope.passwordInfo = "Password must be contain upper and lower case letters, a number, and a special character";
+        } else if (password != $scope.password2) {
+            $scope.passwordInfo = "Passwords do not match";
+        } else {
+            $scope.submittable = true;
+            $scope.passwordInfo = null;
+        }
+    }
 });
 
 // configure controller for login page
@@ -264,28 +282,21 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
 
 app.controller('ordersPageController', function($http, $scope, adminUtils) {
     $scope.isAdmin = adminUtils.isAdmin($scope);
-    $scope.getOrders = function() {
+    $scope.loadStatuses = function() {
+        $http({
+            url: "/php/loadStatuses.php",
+            method: "GET"
+        }).then(function(response) {
+            $scope.statuses = response.data;
+        });
+    }
+    $scope.getOrders = function(searchString, status) {
+        var statusID = (status != null) ? status.StatusID : null;
         $http({
             url: '/php/getOrders.php',
-            method: "GET"
-         }).then(function(response) {
-            //console.log(response);
-            $scope.orders = response.data;
-        });
-    };
-    $scope.getAllOrders = function() {
-        $http({
-            url: '/php/getAllOrders.php',
-            method: "GET"
-         }).then(function(response) {
-            //console.log(response);
-            $scope.orders = response.data;
-        });
-    };
-    $scope.getOpenOrders = function() {
-        $http({
-            url: '/php/getOpenOrders.php',
-            method: "GET"
+            method: "GET",
+            params: {orderID: searchString,
+                     statusID: statusID}
          }).then(function(response) {
             //console.log(response);
             $scope.orders = response.data;

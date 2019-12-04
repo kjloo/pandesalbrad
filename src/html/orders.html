@@ -22,7 +22,7 @@
 </div>
 <div ng-controller="ordersPageController" ng-init="getOrders()">
     <div class="container mt-5 control-panel">
-        <form ng-submit="searchOrder(searchString)">
+        <form ng-submit="getOrders(searchString)">
             <div class="d-flex search-menu mb-2">
                <input class="form-control form-control-sm" type="search" placeholder="Search Order Number"
                aria-label="Search" ng-model="searchString">
@@ -32,8 +32,10 @@
     </div>
     <div class="container mb-2 d-flex admin-panel" ng-if="isUserAdmin">
         <div class="ml-auto">
-            <button class="btn btn-primary" ng-click="getAllOrders()">Display All Orders</button>
-            <button class="btn btn-success" ng-click="getOpenOrders()">Display Open Orders</button>
+            <select name="status" ng-init="loadStatuses()" ng-model="selected" ng-options="status.Status for status in statuses">
+                <option value="">-- Order Status --</option>
+            </select>
+            <button class="btn btn-primary" ng-click="getOrders(undefined, selected)">Apply Filter</button>
             <button class="btn btn-info" ng-click="getOrders()">Clear Filter</button>
         </div>
     </div>

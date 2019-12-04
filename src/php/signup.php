@@ -16,8 +16,27 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
     $role = "Customer";
 
     // Compare passwords and return error if they do not match
+    $errors = array();
     if ($password != $password2) {
-        header("Location: ../signup.html?message=password+mismatch");
+        $errors[] = "Passwords do not match";
+    } 
+    if (strlen($password) < 10) {
+        $errors[] = "Password must contain at least 10 characters";
+    }
+    if (!preg_match("/[0-9]/", $password)) {
+        $errors[] = "Password must include at least one number";
+    }
+    if (!preg_match("/[a-z]/", $password)) {
+        $errors[] = "Password must include at least lowercase one letter";
+    }
+    if (!preg_match("/[A-Z]/", $password)) {
+        $errors[] = "Password must include at least uppercase one letter";
+    }
+    if (!preg_match("/\W/", $password)) {
+        $errors[] = "Password must include at least one special character";
+    }
+    if (empty($errors) != true) {
+        header("Location: ../signup.html?signup=fail&message=" . join(",", $errors));
         exit();
     }
 
@@ -48,7 +67,7 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
     $conn = null;
 
 } else {
-	header("Location: ../index.html?signup=error");
+	header("Location: ../signup.html?signup=error&message=Not All Fields Filled In");
 	exit();
 }
 

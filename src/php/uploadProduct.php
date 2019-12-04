@@ -55,7 +55,7 @@ if (is_user_admin()) {
         // Copy file to server product directory
         $errors = upload_image($iname);
           
-        if(empty($errors) != true) {
+        if (empty($errors) != true) {
             header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
