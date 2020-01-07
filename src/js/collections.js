@@ -280,7 +280,8 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
     }
 });
 
-app.controller('ordersPageController', function($http, $scope, adminUtils) {
+app.controller('ordersPageController', function($http, $scope, $location, adminUtils) {
+    $scope.message = $location.search().message;
     $scope.isAdmin = adminUtils.isAdmin($scope);
     $scope.loadStatuses = function() {
         $http({
@@ -302,6 +303,24 @@ app.controller('ordersPageController', function($http, $scope, adminUtils) {
             $scope.orders = response.data;
         });
     };
+    $scope.setSelected = function(order) {
+        if (Array.isArray($scope.statuses) && $scope.statuses.length) {
+            order.selected = $scope.statuses[0];
+            for (var key in $scope.statuses) {
+                var status = $scope.statuses[key];
+                if (order.StatusID == status.StatusID) {
+                    order.selected = status;
+                    break;
+                }
+            }
+        }
+    }
+    $scope.$watchGroup(['statuses', 'orders'], function() {
+        for (var key in $scope.orders) {
+            var order = $scope.orders[key];
+            $scope.setSelected(order);
+        }
+    });
 });
 
 app.controller('usersPageController', function($http, $scope, $location) {
@@ -538,4 +557,23 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
         $scope.previewData = [];
         $scope.showImage = false;
     }
+});
+
+app.controller('activatePageController', function($http, $scope, $location) {
+    $scope.message = null;
+    $scope.activateUser = function() {
+        var token = $location.search().token;
+        $http({
+            url: '/php/activateUser.php/' + token,
+            method: "PUT"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.message = response.data ? 'Successfully Activated Account.' : 'Could Not Activate Account.';
+        });
+    };
+});
+
+app.controller('emailPageController', function($http, $scope, $location) {
+    $scope.message = null;
+    $scope.submittable = true;
 });

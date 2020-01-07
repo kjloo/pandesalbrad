@@ -10,9 +10,11 @@ if (isset($_POST['save']) && !empty($_POST['opassword']) && !empty($_POST['npass
 
         $user_id = $_SESSION['u_id'];
 
-        // Compare passwords and return error if they do not match
-        if ($npassword != $password2) {
-            header("Location: ../password.html?message=Password+Mismatch");
+        // Verify password meets criteria
+        include "passwordUtils.inc";
+        $errors = validate_password($npassword, $password2);
+        if (!empty($errors)) {
+            header("Location: ../password.html?message=" . join(",", $errors));
             exit();
         }
 

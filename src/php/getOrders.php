@@ -13,14 +13,14 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
 
     // Create SQL Query
     $parameters = array();
-    $sql = "SELECT o.OrderID, OrderDate, s.Status, pr.Image, pr.Name, p.Quantity, Total FROM orders AS o INNER JOIN packages AS p ON o.OrderID = p.OrderID INNER JOIN products AS pr ON p.ProductID = pr.ProductID INNER JOIN statuses AS s ON o.StatusID = s.StatusID";
+    $sql = "SELECT o.OrderID, OrderDate, s.Status, o.StatusID, pr.Image, pr.Name, p.Quantity, Total FROM orders AS o INNER JOIN packages AS p ON o.OrderID = p.OrderID INNER JOIN products AS pr ON p.ProductID = pr.ProductID INNER JOIN statuses AS s ON o.StatusID = s.StatusID";
     include "imageUtils.inc";
     if (!is_user_admin()) {
         $sql .= " WHERE UserID = ?";
         $addAnd = True;
         array_push($parameters, $userID);
     }
-    if (!empty($statusID)) {
+    if (isset($statusID)) {
         if ($addAnd) {
             $sql .= " AND";
         }
@@ -28,7 +28,7 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
         $addAnd = True;
         array_push($parameters, $statusID);
     }
-    if (!empty($orderID)) {
+    if (isset($orderID)) {
         if ($addAnd) {
             $sql .= " AND";
         }
@@ -48,6 +48,7 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
                         'OrderID' => $orderID,
                         'OrderDate' => $row['OrderDate'],
                         'Status' => $row['Status'],
+                        'StatusID' => $row['StatusID'],
                         'Total' => $row['Total'],
                         'Products' => array()
                     );

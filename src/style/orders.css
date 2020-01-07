@@ -13,3 +13,12 @@
 .table > tbody > tr > td {
     vertical-align: middle;
 }
+
+.btn-xs {
+    vertical-align: top;
+    padding: .0em .30em;
+}
+
+.order-box form {
+    display: inline-block;
+}

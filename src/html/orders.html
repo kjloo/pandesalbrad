@@ -20,8 +20,9 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div ng-controller="ordersPageController" ng-init="getOrders()">
+<div ng-controller="ordersPageController" ng-init="getOrders(); loadStatuses();">
     <div class="container mt-5 control-panel">
+        <div class="alert alert-success" ng-if="message != null">{{message}}</div>
         <form ng-submit="getOrders(searchString)">
             <div class="d-flex search-menu mb-2">
                <input class="form-control form-control-sm" type="search" placeholder="Search Order Number"
@@ -32,10 +33,10 @@
     </div>
     <div class="container mb-2 d-flex admin-panel" ng-if="isUserAdmin">
         <div class="ml-auto">
-            <select name="status" ng-init="loadStatuses()" ng-model="selected" ng-options="status.Status for status in statuses">
+            <select name="status" ng-model="filter" ng-options="status.Status for status in statuses">
                 <option value="">-- Order Status --</option>
             </select>
-            <button class="btn btn-primary" ng-click="getOrders(undefined, selected)">Apply Filter</button>
+            <button class="btn btn-primary" ng-click="getOrders(undefined, filter)">Apply Filter</button>
             <button class="btn btn-info" ng-click="getOrders()">Clear Filter</button>
         </div>
     </div>
@@ -44,7 +45,15 @@
           <div class="col">Order ID: {{order.OrderID}}</div>
           <div class="col">Date: {{order.OrderDate}}</div>
           <div class="col">Total: ${{order.Total}}</div>
-          <div class="col">Status: {{order.Status}}</div>
+          <div class="col" ng-if="!isUserAdmin">Status: {{order.Status}}</div>
+          <div class="col" ng-if="isUserAdmin">Status: 
+              <form action="/php/editOrderStatus.php" method="post">
+                  <select name="statusID" ng-model="order.selected" ng-options="status.Status for status in statuses track by status.StatusID">
+                  </select>
+                  <input type="hidden" ng-value="order.OrderID" name="orderID">
+                  <button class="btn btn-primary btn-xs" type="submit" name="status"><i class="fas fa-check"></i></button>
+              </form>
+          </div>
         </div>
         <div class="row">
           <table class="table">

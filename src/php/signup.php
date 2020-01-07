@@ -6,7 +6,6 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
 
     include "sqlConn.inc";
 
-
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
     $username = $_POST['username'];
@@ -15,26 +14,9 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
     $email = $_POST['email'];
     $role = "Customer";
 
+    include "passwordUtils.inc";
     // Compare passwords and return error if they do not match
-    $errors = array();
-    if ($password != $password2) {
-        $errors[] = "Passwords do not match";
-    } 
-    if (strlen($password) < 10) {
-        $errors[] = "Password must contain at least 10 characters";
-    }
-    if (!preg_match("/[0-9]/", $password)) {
-        $errors[] = "Password must include at least one number";
-    }
-    if (!preg_match("/[a-z]/", $password)) {
-        $errors[] = "Password must include at least lowercase one letter";
-    }
-    if (!preg_match("/[A-Z]/", $password)) {
-        $errors[] = "Password must include at least uppercase one letter";
-    }
-    if (!preg_match("/\W/", $password)) {
-        $errors[] = "Password must include at least one special character";
-    }
+    $errors = validate_password($password, $password2);
     if (empty($errors) != true) {
         header("Location: ../signup.html?signup=fail&message=" . join(",", $errors));
         exit();
@@ -45,24 +27,50 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
 
     if($stmt = $conn->prepare($sql)) {
         $stmt->execute([$username]);
+        // Get Result
+        if ($stmt->rowCount() > 0) {
+            // Username already exists, return error
+            header("Location: ../signup.html?signup=fail&message=Username is taken");
+            exit();
+        }
+    }
 
-		// Get Result
-		if ($stmt->rowCount() > 0) {
-		    // Username already exists, return error
-		    header("Location: ../signup.html?signup=taken");
-		} else {
-	        // Create SQL Query
-            $sql = "INSERT INTO users (Firstname, Lastname, Username, Password, Email, RoleID) SELECT ?, ?, ?, ?, ?, RoleID FROM roles WHERE Role = '$role'";
-	
-	        if($stmt = $conn->prepare($sql)) {
-	            $hash = password_hash($password, PASSWORD_BCRYPT);
-                $stmt->execute([$fname, $lname, $username, $hash, $email]);
-                // Error check?
+    // Check if email is taken
+    $sql = "SELECT Email FROM users WHERE Email = ?";
 
+    if($stmt = $conn->prepare($sql)) {
+        $stmt->execute([$email]);
+        // Get Result
+        if ($stmt->rowCount() > 0) {
+            // Username already exists, return error
+            header("Location: ../signup.html?signup=fail&message=Email is already in use");
+            exit();
+        } else {
+            // Create validation token
+            $random_hash_token = bin2hex(openssl_random_pseudo_bytes(16));
+            // Send email validation
+            include "email.inc";
+            $subject = "PandesalBrad Email Validation";
+            $msg = "Click the link below to complete account creation:\r\n";
+            $msg .= "http://chingloo.zapto.org:9090/activate.html?token=" . $random_hash_token . "\r\n";
+            if (!send_email($subject, $msg, $email)) {
+                // Email could not send
+                header("Location: ../signup.html?signup=fail&message=Error sending email");
+                exit();
+            } else {
+                // Create SQL Query
+                $sql = "INSERT INTO users (Firstname, Lastname, Username, Password, Email, Activated, Token, RoleID) SELECT ?, ?, ?, ?, ?, FALSE, ?, RoleID FROM roles WHERE Role = '$role'";
+
+                if($stmt = $conn->prepare($sql)) {
+                    $hash = password_hash($password, PASSWORD_BCRYPT);
+                    $stmt->execute([$fname, $lname, $username, $hash, $email, $random_hash_token]);
+                    // Error check?
+                }
                 header("Location: ../index.html?signup=success");
             }
-		}
-	}
+        }
+    }
+
     // Close connection
     $conn = null;
 

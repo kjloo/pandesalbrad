@@ -21,6 +21,11 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
             // Verify password
             $hashVerify = password_verify($password, $row['Password']);
             if ($hashVerify == true) {
+                // Check if account has been activated
+                if (!$row['Activated']) {
+                    header("Location: ../login.html?login=fail&message=Account not yet activated. Please activate account using link provided in email.");
+                    exit();
+                }
                 include "session.inc";
                 $userID = $row['UserID'];
                 $_SESSION['u_fname'] = $row['Firstname'];
