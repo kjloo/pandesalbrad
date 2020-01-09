@@ -2,7 +2,7 @@
 
 $servername = "localhost";
 $username = "Brad";
-$password = "(B)r4dley!";
+$dbpassword = "(B)r4dley!";
 $dbname = "BradStoreDB";
 
 // Create Connection
@@ -12,7 +12,7 @@ $options = [
     PDO::ATTR_STRINGIFY_FETCHES => false,
     PDO::ATTR_EMULATE_PREPARES => false
 ];
-$conn = new PDO($dsn, $username, $password, $options);
+$conn = new PDO($dsn, $username, $dbpassword, $options);
 
 // Check Connection
 /*if ($conn->connect_error) {

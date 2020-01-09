@@ -127,10 +127,13 @@ jsonToURI = function(data) {
 // configure controller for sign-up page
 app.controller('signupPageController', function($http, $scope, $location) {
     $scope.message = $location.search().message;
+    $scope.status = $location.search().status;
     $scope.passwordInfo = null;
     $scope.password = null;
     $scope.password2 = null;
     $scope.submittable = false;
+
+    $scope.token = $location.search().token;
     $scope.validatePassword = function(password) {
         var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
         $scope.submittable = false;
@@ -560,7 +563,7 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
 });
 
 app.controller('activatePageController', function($http, $scope, $location) {
-    $scope.message = null;
+    $scope.message = $location.search().message;
     $scope.activateUser = function() {
         var token = $location.search().token;
         $http({
@@ -574,6 +577,11 @@ app.controller('activatePageController', function($http, $scope, $location) {
 });
 
 app.controller('emailPageController', function($http, $scope, $location) {
-    $scope.message = null;
+    $scope.message = $location.search().message;
     $scope.submittable = true;
+});
+
+app.controller('recoveryPageController', function($http, $scope, $location) {
+    $scope.message = $location.search().message;
+    $scope.status = $location.search().status;
 });

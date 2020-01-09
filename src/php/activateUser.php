@@ -9,7 +9,7 @@ if ($method === 'PUT' && !empty($_SERVER['PATH_INFO'])) {
     $token = $_SERVER['PATH_INFO'];
 
     // Create SQL Query
-    // Delete user from table
+    // Set user activated
     $sql = "UPDATE users SET Activated = TRUE, Token = NULL WHERE Token = ?";
     if($stmt = $conn->prepare($sql)) {
         $stmt->execute([$token]);

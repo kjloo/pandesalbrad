@@ -19,20 +19,30 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="recoveryPageController">
+<div class="container" ng-controller="signupPageController">
+    <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
+    <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
     <div class="row">
-        <form class="user-form my-5 mx-auto py-3" action="/php/passwordRecovery.php" method="post">
-            <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
-            <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
+        <form class="user-form my-5 mx-auto py-3" action="/php/resetPassword.php" method="post">
             <div class="form-group">
-                <h3>Password Recovery</h3>
+                <h3>Reset Password</h3>
             </div>
             <div class="form-group">
                 <h4>Email Address</h4>
                 <input type="email" aria-describedby="emailHelp" placeholder="Enter email" name="email">
             </div>
             <div class="form-group">
-                <button type="submit" name="recovery">Send Recovery Link</button>
+                <h4>New Password</h4>
+                <input ng-model="password" type="password" ng-change="validatePassword(password)" placeholder="Password" name="password">     
+                <small id="passwordHelp" class="form-text text-muted" role="alert" ng-if="passwordInfo != null">{{passwordInfo}}!</small>
+            </div>
+            <div class="form-group">
+                <h4>Confirm Password</h4>
+                <input ng-model="password2" type="password" ng-change="validatePassword(password)" placeholder="Confirm Password" name="password2">
+            </div>
+            <input type="hidden" ng-value="token" name="token">
+            <div class="form-group">
+                <button ng-disabled="!submittable" type="submit" name="reset">Reset</button>
             </div>
         </form>
     </div>
