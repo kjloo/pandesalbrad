@@ -1,5 +1,5 @@
 // Create a new module
-var app = angular.module('collectionsPage', []);
+var app = angular.module('collectionsPage', ['ui.bootstrap']);
 
 app.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
@@ -123,6 +123,20 @@ jsonToURI = function(data) {
     }
     return rc.join("&");
 };
+
+app.controller('mainPageController', function($http, $scope) {
+    $scope.slides = null;
+    $scope.sleep = 5000;
+    $scope.loadSlides = function() {
+        $http({
+            url: '/php/loadSlides.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.slides = response.data;
+        });
+    };
+});
 
 // configure controller for sign-up page
 app.controller('signupPageController', function($http, $scope, $location) {
