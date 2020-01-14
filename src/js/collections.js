@@ -1,5 +1,5 @@
 // Create a new module
-var app = angular.module('collectionsPage', ['ui.bootstrap']);
+var app = angular.module('collectionsPage', []);
 
 app.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
@@ -24,6 +24,26 @@ app.factory('adminUtils', function($http) {
             $http.get('/php/isAdmin.php').then(function(response) {
                 s.isUserAdmin = response.data.IsAdmin;
             })
+        },
+        readInput: function(input, callback) {
+            fileData = {};
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var name = file.name;
+                    var type = file.type;
+                    var size = ((file.size/(1024*1024)) > 1) ? (file.size/(1024*1024)) + ' mB' : (file.size/1024)+' kB';
+                    fileData['data'] = e.target.result;
+                    fileData['name'] = name;
+                    fileData['type'] = type;
+                    fileData['size'] = size;
+                    callback.success(fileData);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                callback.fail();
+            }
         }
     }
 });
@@ -124,19 +144,14 @@ jsonToURI = function(data) {
     return rc.join("&");
 };
 
-app.controller('mainPageController', function($http, $scope) {
-    $scope.slides = null;
-    $scope.sleep = 5000;
-    $scope.loadSlides = function() {
-        $http({
-            url: '/php/loadSlides.php',
-            method: "GET"
-         }).then(function(response) {
-            //console.log(response);
-            $scope.slides = response.data;
-        });
-    };
-});
+isEmpty = function(o) {
+    for(var key in o) {
+        if (o.hasOwnProperty(key)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 // configure controller for sign-up page
 app.controller('signupPageController', function($http, $scope, $location) {
@@ -482,7 +497,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 });
 
 // configure existing services inside initialization blocks.
-app.controller('uploadPageController', function($http, $scope, $location, shoppingCart) {
+app.controller('uploadPageController', function($http, $scope, $location, shoppingCart, adminUtils) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
 
     $scope.status = $location.search().upload;
@@ -535,36 +550,19 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
         $scope.setSelected();
     });
 
-
-    $scope.readInput = function(input) {
-        if (input.files && input.files[0]) {
-            var file = input.files[0];
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                // Utilizing non angular event call so must inform angular that scope variables are changing.
-                $scope.$apply(function() {
-                    var name = file.name;
-                    var type = file.type;
-                    var size = ((file.size/(1024*1024)) > 1) ? (file.size/(1024*1024)) + ' mB' : (file.size/1024)+' kB';
-                    $scope.previewData['data'] = e.target.result;
-                    $scope.previewData['name'] = name;
-                    $scope.previewData['type'] = type;
-                    $scope.previewData['size'] = size;
-
-                    if ($scope.imageName == null) {
-                        $scope.imageName = name;
-                    }
-                    if ($scope.productName == null) {
-                        $scope.productName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
-                    }
-                    $scope.showImage = true;
-                });
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // User didn't upload a file
+    $scope.setImage = function(fileData) {
+        if (!isEmpty(fileData)) {
+            name = fileData["name"];
+            $scope.previewData = fileData;
+            // Utilizing non angular event call so must inform angular that scope variables are changing.
             $scope.$apply(function() {
-                $scope.removeInput();
+                if ($scope.imageName == null) {
+                    $scope.imageName = name;
+                }
+                if ($scope.productName == null) {
+                    $scope.productName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
+                }
+                $scope.showImage = true;
             });
         }
     }
@@ -573,6 +571,12 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
         $("input[type='file']").val("");
         $scope.previewData = [];
         $scope.showImage = false;
+    }
+    $scope.readInput = function(input) {
+        adminUtils.readInput(input, {
+            success: $scope.setImage,
+            fail: function() {$scope.$apply($scope.removeInput())}
+        });
     }
 });
 

@@ -13,31 +13,32 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="//morgul.github.io/ui-bootstrap4/ui-bootstrap-tpls-3.0.6.js"></script>
 <script src="https://kit.fontawesome.com/5257f58f1b.js"></script>
+<script src="/js/main.js"></script>
 <script src="/js/collections.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
 <title>Pandesal Brad</title>
 </head>
-<body ng-app="collectionsPage">
-<div ng-include="'navbar.html'">
-</div>
-<div ng-controller="mainPageController" ng-init="loadSlides()">
-    <div uib-carousel interval="sleep">
-      <div uib-slide ng-repeat="slide in slides track by slide.SlideID" index="$index">
-        <img class="img-fluid" ng-src="/images/{{slide.Image}}" alt="{{slide.Name}}">
-        <div class="carousel-caption">
-          <p>{{slide.Caption}}</p>
+<body ng-app="mainPage">
+    <div ng-include="'navbar.html'">
+    </div>
+    <div ng-controller="mainPageController" ng-init="loadSlides()">
+        <div uib-carousel interval="sleep">
+          <div uib-slide ng-repeat="slide in slides track by slide.SlideID" index="$index">
+            <img class="img-fluid" ng-src="/images/{{slide.Image}}" alt="{{slide.Name}}">
+            <div class="carousel-caption">
+              <p>{{slide.Caption}}</p>
+            </div>
+          </div>
         </div>
-      </div>
     </div>
-</div>
-<div class="container">
-    <div class="row">
-        <img src="/images/logo.jpeg" class="img-fluid" alt="pandesalbrad">
+    <div class="container">
+        <div class="row">
+            <img src="/images/logo.jpeg" class="img-fluid" alt="pandesalbrad">
+        </div>
     </div>
-</div>
 </body>
 <footer>
-<div ng_include="'footer.html'"></div>
+    <div ng_include="'footer.html'"></div>
 </footer>
 </html>
