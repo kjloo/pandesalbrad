@@ -21,16 +21,20 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="productsPageController" ng-init="loadProducts()">
+<div class="container" ng-controller="productPageController" ng-init="loadProduct()">
     <div class="row">
-        <div class="col-md-4 col-sm-6 p-2" ng-repeat="product in products">
-            <a class="nav-link" ng-href="product.html?productID={{product.ProductID}}" target="_self">
-                <img ng-src="/images/{{product.Image}}" class="sticker mx-auto img-responsive"/>
-                <h4 class="name-label text-info">{{product.Name}}</h4>
-                <!--<h4 class="price-label text-danger">{{product.Price}}</h4>-->
-                <!--<input type="button" name="add_to_cart" ng-click="addToCart(product.ProductID)" class="btn btn-success form-control" value="Add to Cart"/>-->
-                <input type="button" name="see_details" ng-click="addToCart(product.ProductID)" class="btn btn-success form-control" value="See Details"/>
-            </a>
+        <div class="col-md-4 col-sm-6 p-2">
+            <img ng-src="/images/{{product.Image}}" class="sticker mx-auto img-responsive"/>
+            <h4 class="name-label text-info">{{product.Name}}</h4>
+        </div>
+        <div class="col-md-4 col-sm-6 p-2 align-self-center">
+            <h4 class="inline-header">Make Selection</h4>
+            <select name="category" ng-init="loadItems()" ng-change="makeSelection()" ng-model="selected" ng-options="selection.Name for selection in items">
+                </select>
+            <h4 class="price-label text-danger" ng-show="item != null">{{item.Price}}</h4>
+        </div>
+        <div class="col-md-4 col-sm-6 p-2 align-self-end">
+            <input type="button" name="add_to_cart" ng-disabled="item == null" ng-click="addToCart(item.ItemID)" class="btn btn-success form-control" value="Add to Cart"/>
         </div>
     </div>
 </div>

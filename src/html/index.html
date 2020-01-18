@@ -25,10 +25,12 @@
     <div ng-controller="mainPageController" ng-init="loadSlides()">
         <div uib-carousel interval="sleep">
           <div uib-slide ng-repeat="slide in slides track by slide.SlideID" index="$index">
-            <img class="img-fluid" ng-src="/images/{{slide.Image}}" alt="{{slide.Name}}">
-            <div class="carousel-caption">
-              <p>{{slide.Caption}}</p>
-            </div>
+            <a class="nav-link" ng-href="{{slide.Link}}" target="_self">
+                <img class="slide-img img-fluid" ng-src="/images/{{slide.Image}}" alt="{{slide.Name}}">
+                <div class="carousel-caption">
+                  <p>{{slide.Caption}}</p>
+                </div>
+            </a>
           </div>
         </div>
     </div>

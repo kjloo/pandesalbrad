@@ -3,19 +3,21 @@
 session_start();
 
 include "imageUtils.inc";
+include "slideUtils.inc";
 if (is_user_admin()) {
-    if (isset($_POST['update']) && !empty($_POST['slideID']) && !empty($_POST['sname']) && !empty($_POST['caption']) && !empty($_POST['iname']) && !empty($_POST['link']) && !empty($_POST['slideIndex'])) {
+    if (isset($_POST['update']) && !empty($_POST['slideID']) && !empty($_POST['sname']) && !empty($_POST['iname']) && isset($_POST['slideIndex'])) {
 
         include "sqlConn.inc";
         $slideID = $_POST['slideID'];
         $sname = $_POST['sname'];
-        $caption = $_POST['caption'];
         $iname = $_POST['iname'];
-        $link = $_POST['link'];
         $slideIndex = $_POST['slideIndex'];
+        // These are optional
+        $caption = $_POST['caption'];
+        $link = $_POST['link'];
 
         // Need to get old image name to check if it changed
-        $oldiname = get_image_name_from_db($productID);
+        $oldiname = get_slide_image_name_from_db($slideID);
 
         // Check if file data was uploaded and update.
         if (isset($_FILES['uploadedImage']) && $_FILES['uploadedImage']['size'] > 0) {
@@ -24,59 +26,72 @@ if (is_user_admin()) {
             // Upload new Image
             $errors = upload_image($iname);
             if(empty($errors) != true) {
-                header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         } else if ($iname != $oldiname) {
             $errors = move_image($oldiname, $iname);
           
             if(empty($errors) != true) {
-                header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         }
 
-        // Update product info in database
-        // Create SQL Query
-        $sql = "UPDATE products SET Price = ?, Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$price, $iname, $pname, $category, $productID]);
-            // Error Check?
+        $slide = array();
+        $slide["SlideID"] = $slideID;
+        $slide["Name"] = $sname;
+        $slide["Image"] = $iname;
+        $slide["SlideIndex"] = $slideIndex;
+        $slide["Caption"] = $caption;
+        $slide["Link"] = $link;
+        $errors = insert_slide($slide);
+
+        if (empty($errors) != true) {
+            header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
+            exit();
         }
         $conn = null;
-        header("Location: ../upload.html?upload=success&message=File Update Successful.");
-    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['price']) && !empty($_POST['category'])) {
+        header("Location: ../banner.html?upload=success&message=Slide Update Successful.");
+    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['sname']) && !empty($_POST['iname']) && isset($_POST['slideIndex'])) {
 
         include "sqlConn.inc";
-        $pname = $_POST['pname'];
+        $sname = $_POST['sname'];
         $iname = $_POST['iname'];
-        $price = $_POST['price'];
-        $category = $_POST['category'];
+        $slideIndex = $_POST['slideIndex'];
+        // These are optional
+        $caption = $_POST['caption'];
+        $link = $_POST['link'];
 
         // Copy file to server product directory
         $errors = upload_image($iname);
           
         if (empty($errors) != true) {
-            header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../bannder.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 
-        // Create SQL Query
-        // First see if item already in cart
-        $sql = "INSERT INTO products (Price, Image, Name, CollectionID) VALUES (?, ?, ?, ?)";
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$price, $iname, $pname, $category]);
-            // Error Check?
+        $slide = array();
+        $slide["Name"] = $sname;
+        $slide["Image"] = $iname;
+        $slide["SlideIndex"] = $slideIndex;
+        $slide["Caption"] = $caption;
+        $slide["Link"] = $link;
+        $errors = insert_slide($slide);
+
+        if (empty($errors) != true) {
+            header("Location: ../bannder.html?upload=fail&message=" . join(",", $errors));
+            exit();
         }
 
         $conn = null;
-        header("Location: ../upload.html?upload=success&message=File Upload Successful.");
+        header("Location: ../banner.html?upload=success&message=Slide Upload Successful.");
     } else {
-        header("Location: ../upload.html?upload=fail&message=Incorrect Parameters.");
+        header("Location: ../banner.html?upload=fail&message=Incorrect Parameters.");
         exit();
     }
 } else {
-    header("Location: ../upload.html?upload=fail&message=Insufficient Permissions.");
+    header("Location: ../banner.html?upload=fail&message=Insufficient Permissions.");
     exit();
 }
 

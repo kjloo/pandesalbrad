@@ -4,12 +4,15 @@ var app = angular.module('mainPage', ['ui.bootstrap', 'collectionsPage']);
 app.factory('slideUtils', function($http) {
     return {
         loadSlides: function(s) {
+            setSlides = function(slides) {
+                s.slides = slides;
+            }
             $http({
                 url: '/php/loadSlides.php',
                 method: "GET"
              }).then(function(response) {
-                console.log(response);
-                s.slides = response.data;
+                //console.log(response);
+                return setSlides(response.data);
             });
         }
     }
@@ -26,16 +29,22 @@ app.controller('bannerPageController', function($http, $scope, $location, slideU
     $scope.status = $location.search().upload;
     $scope.message = $location.search().message;
 
-    $scope.previewData = [];
+    $scope.info = null;
 
-    $scope.showImage = false;
-    $scope.slideID = null;
-    $scope.slideName = null;
-    $scope.caption = null;
-    $scope.imageName = null;
-    $scope.link = null;
-    $scope.slideIndex = null;
-    $scope.selected = null;
+    $scope.resetScope = function() {
+        $scope.previewData = [];
+
+        $scope.showImage = false;
+        $scope.slideID = null;
+        $scope.slideName = null;
+        $scope.caption = null;
+        $scope.imageName = null;
+        $scope.link = null;
+        $scope.slideIndex = null;
+        $scope.selected = null;
+    }
+
+    $scope.resetScope();
 
     $scope.setSlide = function() {
         if (Array.isArray($scope.slides) && $scope.slides.length) {
@@ -45,6 +54,7 @@ app.controller('bannerPageController', function($http, $scope, $location, slideU
                     $scope.slideID = slide.SlideID;
                     $scope.slideName = slide.Name;
                     $scope.caption = slide.Caption;
+                    $scope.imageName = slide.Image;
                     $scope.image = slide.Image;
                     $scope.link = slide.Link;
                     $scope.slideIndex = slide.SlideIndex;
@@ -79,6 +89,35 @@ app.controller('bannerPageController', function($http, $scope, $location, slideU
         }
     });
 
+    $scope.addSlide = function() {
+        $scope.resetScope();
+        if (Array.isArray($scope.slides)) {
+            $scope.slideIndex = $scope.slides.length;
+        } else {
+            $scope.slideIndex = 0;
+        }
+        // Display message to user
+        $scope.info = "Please Upload an Image";
+    }
+    $scope.deleteSlide = function(slideID) {
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteSlide.php/" + slideID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Slide.";
+                var deleteID = response.data.SlideID;
+                $scope.slides = $scope.slides.filter(function(slide) {
+                    return slide.SlideID != deleteID;
+                });
+                // Think we need to reload the slides here
+                slideUtils.loadSlides($scope);
+            });
+        }
+    }
     $scope.setImage = function(fileData) {
         if (!isEmpty(fileData)) {
             name = fileData["name"];
@@ -92,6 +131,7 @@ app.controller('bannerPageController', function($http, $scope, $location, slideU
                     $scope.slideName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
                 }
                 $scope.showImage = true;
+                $scope.info = null;
             });
         }
     }

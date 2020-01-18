@@ -2,15 +2,15 @@
 
 session_start();
 
-if (isset($_POST['pushCart']) && !empty($_POST['productID']) && !empty($_POST['quantity'])) {
+if (isset($_POST['pushCart']) && !empty($_POST['itemID']) && !empty($_POST['quantity'])) {
     // Update cookie
-    $productID = intval($_POST['productID']);
+    $itemID = intval($_POST['itemID']);
     $quantity = intval($_POST['quantity']);
-    if (is_int($productID) && is_int($quantity)) {
-        if (array_key_exists($productID, $_SESSION['u_cart'])) {
-            $_SESSION['u_cart'][$productID] += $quantity;
+    if (is_int($itemID) && is_int($quantity)) {
+        if (array_key_exists($itemID, $_SESSION['u_cart'])) {
+            $_SESSION['u_cart'][$itemID] += $quantity;
         } else {
-            $_SESSION['u_cart'][$productID] = $quantity;
+            $_SESSION['u_cart'][$itemID] = $quantity;
         }
     } else {
         exit();
@@ -19,12 +19,12 @@ if (isset($_POST['pushCart']) && !empty($_POST['productID']) && !empty($_POST['q
     if (isset($_SESSION['u_id'])) {
         include "sqlConn.inc";
         $userID = $_SESSION['u_id'];
-        $productID = $_POST['productID'];
+        $itemID = $_POST['itemID'];
 	    // Create SQL Query
 	    // First see if item already in cart
-    	$sql = "SELECT Quantity FROM carts WHERE UserID = ? AND ProductID = ?";
+    	$sql = "SELECT Quantity FROM carts WHERE UserID = ? AND ItemID = ?";
     	if($stmt = $conn->prepare($sql)) {
-    	    $stmt->execute([$userID, $productID]);
+    	    $stmt->execute([$userID, $itemID]);
 
             $exists = ($stmt->rowCount() > 0);
             if ($exists) {
@@ -36,13 +36,13 @@ if (isset($_POST['pushCart']) && !empty($_POST['productID']) && !empty($_POST['q
 
     	// If row already exists, create UPDATE. Else create INSERT
     	if ($exists) {
-    		$sql = "UPDATE carts SET Quantity = ? WHERE UserID = ? AND ProductID = ?";
+    		$sql = "UPDATE carts SET Quantity = ? WHERE UserID = ? AND ItemID = ?";
     	} else {
-            $sql = "INSERT INTO carts (Quantity, UserID, ProductID) VALUES (?, ?, ?)";
+            $sql = "INSERT INTO carts (Quantity, UserID, ItemID) VALUES (?, ?, ?)";
         }
     	
     	if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$quantity, $userID, $productID]);
+            $stmt->execute([$quantity, $userID, $itemID]);
             // Error check?
     	}
     	// Successfully inserted into database

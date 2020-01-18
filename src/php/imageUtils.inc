@@ -6,6 +6,11 @@ function is_user_admin() {
     return isset($_SESSION['u_id']) && isset($_SESSION['u_isAdmin']) && $_SESSION['u_isAdmin'];
 }
 
+function return_error_code() {
+    http_response_code(404);
+    exit();
+}
+
 function get_image_name_from_db($productID) {
     // Retrieve image name
     include "sqlConn.inc";
@@ -13,6 +18,23 @@ function get_image_name_from_db($productID) {
     $sql = "SELECT Image FROM products WHERE ProductID = ?";
     if($stmt = $conn->prepare($sql)) {
         $stmt->execute([$productID]);
+
+        if ($stmt->rowCount() == 1) {
+            // output data
+            $row = $stmt->fetch();
+            $iname = $row['Image'];
+        }
+    }
+    return $iname;
+}
+
+function get_slide_image_name_from_db($slideID) {
+    // Retrieve image name
+    include "sqlConn.inc";
+    $iname = null;
+    $sql = "SELECT Image FROM slides WHERE SlideID = ?";
+    if($stmt = $conn->prepare($sql)) {
+        $stmt->execute([$slideID]);
 
         if ($stmt->rowCount() == 1) {
             // output data

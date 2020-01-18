@@ -39,29 +39,29 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
                 if ($isCart) {
                     $cart = $_SESSION['u_cart'];
                     $ids_arr = str_repeat('(?,?,?),', count($cart) - 1) . '(?,?,?)';
-                    $productsArr = array();
+                    $itemsArr = array();
                     foreach ($cart as $key => $value) {
-                        $productID = $key;
+                        $itemID = $key;
                         $quantity = $value;
-                        array_push($productsArr, $userID, $productID, $quantity);
+                        array_push($itemsArr, $userID, $itemID, $quantity);
                     }
                 }
 
                 // Query for shopping cart
-                $sql = "SELECT ProductID, Quantity FROM carts WHERE UserID = ?";
+                $sql = "SELECT ItemID, Quantity FROM carts WHERE UserID = ?";
                 if ($stmt = $conn->prepare($sql)) {
                     $stmt->execute([$_SESSION['u_id']]);
 
                     foreach($stmt as $row) {
-                        $_SESSION['u_cart'][$row['ProductID']] = $row['Quantity'];
+                        $_SESSION['u_cart'][$row['ItemID']] = $row['Quantity'];
                     }
                 }
 
                 if ($isCart) {
                     // Now insert
-                    $sql = "INSERT INTO carts(UserID, ProductID, Quantity) VALUES {$ids_arr}";
+                    $sql = "INSERT INTO carts(UserID, ItemID, Quantity) VALUES {$ids_arr}";
                     if ($stmt = $conn->prepare($sql)) {
-                        $stmt->execute($productsArr);
+                        $stmt->execute($itemsArr);
                         // Error Check?
                     }
                 }

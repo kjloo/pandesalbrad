@@ -3,11 +3,15 @@
 include "sqlConn.inc";
 
 $collection = $_GET["collection"];
+$product = $_GET["product"];
 $name = $_GET["name"];
 
 $parameters = array();
 // Create SQL Query
-if (!empty($collection)) {
+if (!empty($product)) {
+    $sql = "SELECT * FROM products WHERE ProductID = ?";
+    array_push($parameters, $product);
+} else if (!empty($collection)) {
     $sql = "SELECT * FROM products WHERE CollectionID = ?";
     array_push($parameters, $collection);
 } else if (!empty($name)) {

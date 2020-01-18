@@ -35,18 +35,18 @@
         <tbody>
             <tr ng-repeat="item in cart">
                <th scope="row"></th>
-               <td ng-if="item.ProductID != null">
+               <td ng-if="item.ItemID != null">
                    <img ng-src="/images/{{item.Image}}" class="table-sticker img-responsive"/>{{item.Name}}
                </td>
-               <td ng-if="item.ProductID != null">
+               <td ng-if="item.ItemID != null">
                    <input class="cart-quantity" ng-model="item.Quantity" ng-change="showUpdate(item)" type="number" min="1" ng-value="item.Quantity">
-                   <button ng-show="item.showUpdate" ng-click="updateQuantity(item.ProductID, item.Quantity)">Update</button>
+                   <button ng-show="item.showUpdate" ng-click="updateQuantity(item.ItemID, item.Quantity)">Update</button>
                </td>
-               <td ng-if="item.ProductID != null" class="cart-price">{{item.Total}}</td>
-               <td ng-if="item.ProductID != null" class="cart-delete" ng-click="deleteFromCart(item.ProductID)">x</td>
-               <th ng-if="item.ProductID == null">{{item.Name}}</th>
-               <th ng-if="item.ProductID == null"></th>
-               <th ng-if="item.ProductID == null" class="cart-price">{{item.Total}}</th>
+               <td ng-if="item.ItemID != null" class="cart-price">{{item.Total}}</td>
+               <td ng-if="item.ItemID != null" class="cart-delete" ng-click="deleteFromCart(item.ItemID)">x</td>
+               <th ng-if="item.ItemID == null">{{item.Name}}</th>
+               <th ng-if="item.ItemID == null"></th>
+               <th ng-if="item.ItemID == null" class="cart-price">{{item.Total}}</th>
             </tr>
         </tbody>
         </table>

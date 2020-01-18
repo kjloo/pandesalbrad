@@ -1,19 +1,9 @@
 <?php
 
 include "sqlConn.inc";
+include "slideUtils.inc";
 
-// Create SQL Query
-$sql = "SELECT * FROM slides ORDER BY SlideIndex";
-$result = $conn->query($sql);
-
-$data = array();
-
-// Get Result
-// output data of each row
-while ($row = $result->fetch()) {
-    $data[] = $row;
-}
-
+$data = load_slides();
 // Close Connection
 $conn = null;
 

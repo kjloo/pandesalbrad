@@ -13,7 +13,7 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
 
     // Create SQL Query
     $parameters = array();
-    $sql = "SELECT o.OrderID, OrderDate, s.Status, o.StatusID, pr.Image, pr.Name, p.Quantity, Total FROM orders AS o INNER JOIN packages AS p ON o.OrderID = p.OrderID INNER JOIN products AS pr ON p.ProductID = pr.ProductID INNER JOIN statuses AS s ON o.StatusID = s.StatusID";
+    $sql = "SELECT o.OrderID, OrderDate, s.Status, o.StatusID, pr.Image, pr.Name, p.Quantity, Total FROM orders AS o INNER JOIN packages AS p ON o.OrderID = p.OrderID INNER JOIN items AS i ON p.ItemID = i.ItemID INNER JOIN products AS pr ON i.ProductID = pr.ProductID INNER JOIN statuses AS s ON o.StatusID = s.StatusID";
     include "imageUtils.inc";
     if (!is_user_admin()) {
         $sql .= " WHERE UserID = ?";

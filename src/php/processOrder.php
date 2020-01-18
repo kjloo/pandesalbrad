@@ -48,11 +48,11 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
         $ids_arr = str_repeat('(?,?,?),', count($cart) - 1) . '(?,?,?)';
         $productsArr = array();
         foreach ($cart as $key => $value) {
-            $productID = $key;
+            $itemID = $key;
             $quantity = $value;
-            array_push($productsArr, $orderID, $productID, $quantity);
+            array_push($productsArr, $orderID, $itemID, $quantity);
         }
-        $sql = "INSERT INTO packages(OrderID, ProductID, Quantity) VALUES {$ids_arr}";
+        $sql = "INSERT INTO packages(OrderID, ItemID, Quantity) VALUES {$ids_arr}";
         if($stmt = $conn->prepare($sql)) {
             $stmt->execute($productsArr);
             // Error Checking?

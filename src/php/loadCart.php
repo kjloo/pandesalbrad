@@ -8,7 +8,7 @@ include "sqlConn.inc";
 $cart = array_keys($_SESSION['u_cart']);
 // Create replacement string
 $ids_arr = str_repeat('?,', count($cart) - 1) . '?';
-$sql = "SELECT Name, Price, ProductID, Image FROM products WHERE ProductID in ({$ids_arr})";
+$sql = "SELECT p.Name AS Name, i.Price AS Price, i.ItemID AS ItemID, p.Image AS Image FROM items as i INNER JOIN products AS p ON i.ProductID = p.ProductID WHERE i.ItemID in ({$ids_arr})";
 $data = array();
 
 if($stmt = $conn->prepare($sql)) {
@@ -20,7 +20,7 @@ if($stmt = $conn->prepare($sql)) {
         $grandtotal = 0;
         // output data of each row
         foreach ($stmt as $row) {
-            $id = $row['ProductID'];
+            $id = $row['ItemID'];
             $price = $row['Price'];
             $quantity = $_SESSION['u_cart'][$id];
             $total = money_format('%.2n', ($price * $quantity));
@@ -32,7 +32,7 @@ if($stmt = $conn->prepare($sql)) {
         // Final Row
         $final_row = array();
         $final_row['Name'] = "Sub Total";
-        $final_row['ProductID'] = Null;
+        $final_row['ItemID'] = Null;
         $final_row['Image'] = Null;
         $grandtotal = money_format('%.2n', $grandtotal);
         $final_row['Total'] = $grandtotal;

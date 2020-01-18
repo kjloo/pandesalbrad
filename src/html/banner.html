@@ -17,6 +17,7 @@
 <script src="/js/main.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/banner.css">
 <link rel="stylesheet" href="/style/upload.css">
 <title>Pandesal Brad</title>
 </head>
@@ -33,19 +34,20 @@
                 <h3 ng-if="slideID != null">Update Slide</h3>
             </div>
             <div class="form-group">
-                <h4>Slide Index</h4>
+                <h4 class="inline-header">Select Slide</h4>
                 <select name="category" ng-change="setSlide()" ng-model="selected" ng-options="slide.SlideIndex for slide in slides track by slide.SlideID">
                 </select>
             </div>
+            <div class="form-group" ng-show="info != null">
+                <p>{{info}}</p>
+            </div>
             <div class="image-info" ng-show="showImage">
                 <img class="product-image" ng-src="{{previewData.data}}" />
-                <div class="preview-data">
-                    <div><b>Name:</b> {{previewData.name}}</div>
-                    <div><b>Type:</b> {{previewData.type}}</div>
-                    <div><b>Size:</b> {{previewData.size}}</div>
+                <div class="action-button">
+                    <i class="fa fa-plus remove-image" title="Add Slide" ng-click=addSlide()></i> 
                 </div>
-                <div class="action-button" ng-if="slideID == null">
-                    <i class="fa fa-close remove-image" ng-click=removeInput()></i> 
+                <div class="action-button" ng-show="selected != null">
+                    <i class="fa fa-minus remove-image" title="Remove Slide" ng-click=deleteSlide(slideID)></i> 
                 </div>
             </div>
             <div class="form-group">
@@ -55,12 +57,16 @@
             <input type="hidden" ng-value="slideID" name="slideID">
             <div ng-show="showImage">
                 <div class="form-group">
+                    <h4>Slide Index</h4>
+                    <input type="number" min="0" ng-model="slideIndex" placeholder="" name="slideIndex" required>
+                </div>
+                <div class="form-group">
                     <h4>Slide Name</h4>
                     <input type="text" ng-model="slideName" placeholder="Slide Name" name="sname" required>
                 </div>
                 <div class="form-group">
                     <h4>Caption</h4>
-                    <input type="text" ng-model="caption" placeholder="Caption" name="caption" required>
+                    <input type="text" ng-model="caption" placeholder="Caption" name="caption">
                 </div>
                 <div class="form-group">
                     <h4>Image Name</h4>
@@ -68,7 +74,7 @@
                 </div>
                 <div class="form-group">
                     <h4>Link</h4>
-                    <input type="text" ng-model="link" placeholder="Link" name="link" required>
+                    <input type="text" ng-model="link" placeholder="Link" name="link">
                 </div>
                 <div class="form-group">
                     <button ng-if="slideID == null" type="submit" name="upload">Upload</button>

@@ -190,25 +190,66 @@ app.controller('collectionsPageController', function($http, $scope, shoppingCart
     $scope.loadCollections = shoppingCart.loadCollections($scope);
 });
 
-// configure existing services inside initialization blocks.
-app.controller('productsPageController', function($http, $scope, $location, $window, shoppingCart) {
-    $scope.loadProducts = function() {
+app.controller('productPageController', function($http, $scope, $location, shoppingCart) {
+    $scope.item = null;
+    $scope.selected = null;
+
+    $scope.loadProduct = function() {
         $http({
             url: '/php/loadProducts.php',
             method: "GET",
-            params: {collection: $location.search().collectionID,
-                     name: $location.search().name}
+            params: {product: $location.search().productID}
          }).then(function(response) {
             //console.log(response);
-            $scope.products = response.data;
+            // This should only return one row of data
+            if (response.data.length == 1) {
+                $scope.product = response.data[0];
+            }
         });
     };
 
-    $scope.addToCart = function(productID) {
+    $scope.loadItems = function() {
+        $http({
+            url: '/php/loadItems.php',
+            method: "GET",
+            params: {product: $location.search().productID}
+         }).then(function(response) {
+            //console.log(response);
+            $scope.items = response.data;
+        });
+    }
+
+    $scope.makeSelection = function() {
+        var productID = $location.search().productID;
+        var formatID = $scope.selected.FormatID;
+        $http({
+            url: '/php/getItem.php',
+            method: "GET",
+            params: {product: productID,
+                     format: formatID}
+         }).then(function(response) {
+            //console.log(response);
+            $scope.item = response.data;
+        });
+    }
+
+    /*$scope.setSelected = function(selection) {
+        if (Array.isArray($scope.selections) && $scope.selections.length) {
+            $scope.selected = $scope.selections[0];
+        }
+    }
+    $scope.$watchGroup(['selections'], function() {
+        for (var key in $scope.selections) {
+            var selection = $scope.selections[key];
+            $scope.setSelected(selection);
+        }
+    });*/
+
+    $scope.addToCart = function(itemID) {
         var url = "/php/pushCart.php";
         var data = {
             pushCart: true,
-            productID: productID,
+            itemID: itemID,
             quantity: 1
         };
         var config = {
@@ -220,6 +261,21 @@ app.controller('productsPageController', function($http, $scope, $location, $win
             shoppingCart.count++;
         });
     }
+});
+
+// configure existing services inside initialization blocks.
+app.controller('productsPageController', function($http, $scope, $location, $window) {
+    $scope.loadProducts = function() {
+        $http({
+            url: '/php/loadProducts.php',
+            method: "GET",
+            params: {collection: $location.search().collectionID,
+                     name: $location.search().name}
+         }).then(function(response) {
+            //console.log(response);
+            $scope.products = response.data;
+        });
+    };
 
     // Functions for product management
     $scope.openEditPage = function(productID) {
@@ -268,7 +324,7 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
         var url = "/php/updateCart.php";
         var data = {
             updateCart: true,
-            productID: productID,
+            itemID: itemID,
             quantity: quantity
         };
         var config = {
@@ -284,11 +340,11 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
         })
     }
 
-    $scope.deleteFromCart = function(productID) {
+    $scope.deleteFromCart = function(itemID) {
         var url = "/php/popCart.php";
         var data = {
             popCart: true,
-            productID: productID
+            itemID: itemID
         };
         var config = {
             headers: {
