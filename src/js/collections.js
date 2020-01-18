@@ -9,7 +9,14 @@ app.factory('shoppingCart', function($http) {
     return {
         loadCollections: function(s) {
             $http.get('/php/loadCollections.php').then(function(response) {
+                console.log(response.data);
                 s.collections = response.data;
+            });
+        },
+        loadFormats: function(s) {
+            $http.get('/php/loadFormats.php').then(function(response) {
+                console.log(response.data);
+                s.formats = response.data;
             });
         },
         count: 0,
@@ -555,6 +562,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 // configure existing services inside initialization blocks.
 app.controller('uploadPageController', function($http, $scope, $location, shoppingCart, adminUtils) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
+    $scope.loadFormats = shoppingCart.loadFormats($scope);
 
     $scope.status = $location.search().upload;
     $scope.message = $location.search().message;
@@ -568,24 +576,43 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.productName = null;
     $scope.collectionID = null;
     $scope.selected = null;
+    $scope.format = null;
 
     $scope.productID = $location.search().productID;
     $scope.getProductInfo = function() {
         if ($scope.productID != null) {
             var url = "/php/getProductInfo.php/" + $scope.productID;
             $http.get(url).then(function(response) {
-                $scope.product = response.data;
-                // Initialize ng-model definitions
-                $scope.productID = $scope.product.ProductID;
-                $scope.productPrice = $scope.product.Price;
-                $scope.imageName = $scope.product.Image;
-                $scope.productName = $scope.product.Name;
-                $scope.collectionID = $scope.product.CollectionID;
+                $scope.items = response.data;
+                $scope.setProductInfo($scope.items[0]);
 
                 // Show product image
                 $scope.showImage = true;
                 $scope.previewData['data'] = "/images/" + $scope.imageName;
             });
+        }
+    }
+
+    $scope.setProductInfo = function(product) {
+        // Initialize ng-model definitions
+        $scope.product = product;
+        $scope.productID = $scope.product.ProductID;
+        $scope.productPrice = $scope.product.Price;
+        $scope.imageName = $scope.product.Image;
+        $scope.productName = $scope.product.Name;
+        $scope.collectionID = $scope.product.CollectionID;  
+    }
+
+    $scope.setItem = function() {
+        var formatID = $scope.format.FormatID;
+        if (Array.isArray($scope.items) && $scope.items.length) {
+            for (var key in $scope.items) {
+                var item = $scope.items[key];
+                if (formatID == item.FormatID) {
+                    $scope.setProductInfo(item);
+                    break;
+                }
+            }
         }
     }
 
@@ -604,6 +631,17 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
 
     $scope.$watchGroup(['collections', 'collectionID'], function () {
         $scope.setSelected();
+    });
+
+    $scope.setFormat = function() {
+        if (Array.isArray($scope.formats) && $scope.formats.length) {
+            $scope.format = $scope.formats[0];
+            $scope.setItem();
+        }
+    }
+
+    $scope.$watchGroup(['formats', 'items'], function () {
+        $scope.setFormat();
     });
 
     $scope.setImage = function(fileData) {

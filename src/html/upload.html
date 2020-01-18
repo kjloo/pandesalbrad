@@ -20,7 +20,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="uploadPageController" ng-init="loadCollections(); getProductInfo();">
+<div class="container" ng-controller="uploadPageController" ng-init="loadCollections(); loadFormats(); getProductInfo();">
     <div class="row">
         <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadProduct.php" method="post" enctype="multipart/form-data">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
@@ -56,6 +56,10 @@
                 </div>
                 <div class="form-group">
                     <h4>Price</h4>
+                    <div class="py-3">
+                        <p class="inline-header">Item</p>
+                        <select name="format" ng-change="setItem()" ng-model="format" ng-options="format.Name for format in formats track by format.FormatID"></select>
+                    </div>
                     <input type="number" ng-model="productPrice" min="0.00" step="0.01" placeholder="5.99" name="price" required>
                 </div>
                 <div class="form-group">

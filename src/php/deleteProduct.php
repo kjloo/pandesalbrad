@@ -2,11 +2,6 @@
 
 session_start();
 
-function return_error_code() {
-    http_response_code(404);
-    exit();
-}
-
 include "imageUtils.inc";
 
 if (is_user_admin()) {

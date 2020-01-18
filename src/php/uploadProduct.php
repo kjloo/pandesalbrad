@@ -4,12 +4,13 @@ session_start();
 
 include "imageUtils.inc";
 if (is_user_admin()) {
-    if (isset($_POST['update']) && !empty($_POST['productID']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['price']) && !empty($_POST['category'])) {
+    if (isset($_POST['update']) && !empty($_POST['productID']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['category'])) {
 
         include "sqlConn.inc";
         $productID = $_POST['productID'];
         $pname = $_POST['pname'];
         $iname = $_POST['iname'];
+        $format = $_POST['format'];
         $price = $_POST['price'];
         $category = $_POST['category'];
 
@@ -35,20 +36,51 @@ if (is_user_admin()) {
             }
         }
 
+
+        // Begin Transcation
+        $conn->beginTransaction();
         // Update product info in database
         // Create SQL Query
-        $sql = "UPDATE products SET Price = ?, Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
+        $sql = "UPDATE products SET Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
         if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$price, $iname, $pname, $category, $productID]);
+            $stmt->execute([$iname, $pname, $category, $productID]);
             // Error Check?
+            $stmt->closeCursor();
         }
+        // Check if item available in table
+        $sql = "SELECT * FROM items WHERE ProductID = ? AND FormatID = ?";
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$price, $productID, $format]);
+            $exists = $stmt->rowCount() > 0;
+            // Error Check?
+            $stmt->closeCursor();
+        }
+        if ($exists) {
+            // Create SQL Query
+            $sql = "UPDATE items SET Price = ? WHERE ProductID = ? AND FormatID = ?";
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->execute([$price, $productID, $format]);
+                // Error Check?
+                $stmt->closeCursor();
+            }
+        } else {
+            $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (?, ?, ?)";
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->execute([$productID, $format, $price]);
+                // Error Check?
+                $stmt->closeCursor();
+            }
+        }
+
+        $conn->commit();
         $conn = null;
         header("Location: ../upload.html?upload=success&message=File Update Successful.");
-    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['price']) && !empty($_POST['category'])) {
+    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['category'])) {
 
         include "sqlConn.inc";
         $pname = $_POST['pname'];
         $iname = $_POST['iname'];
+        $format = $_POST['format'];
         $price = $_POST['price'];
         $category = $_POST['category'];
 
@@ -60,13 +92,23 @@ if (is_user_admin()) {
             exit();
         }
 
+        // Begin SQL Transaction
+        $conn->beginTransaction();
         // Create SQL Query
         // First see if item already in cart
-        $sql = "INSERT INTO products (Price, Image, Name, CollectionID) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO products (Image, Name, CollectionID) VALUES (?, ?, ?)";
         if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$price, $iname, $pname, $category]);
+            $stmt->execute([$iname, $pname, $category]);
             // Error Check?
+            $stmt->closeCursor();
         }
+        $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (LAST_INSERT_ID(), ?, ?)";
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$format, $price]);
+            // Error Check?
+            $stmt->closeCursor();
+        }
+        $conn->commit();
 
         $conn = null;
         header("Location: ../upload.html?upload=success&message=File Upload Successful.");
