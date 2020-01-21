@@ -24,7 +24,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
         if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id']) && !empty($_POST['addressID'])) {
             $userID = $_SESSION['u_id'];
             $addressID = $_POST['addressID'];
-            $sql = "INSERT INTO orders(UserID, OrderID, StatusID, OrderDate, AddressID, Total) VALUES(?, ?, (SELECT StatusID FROM statuses WHERE status = 'ordered'), CURDATE(), ?, ?)";
+            $sql = "INSERT INTO orders(UserID, OrderID, StatusID, OrderDate, AddressID, Total) VALUES(?, ?, (SELECT StatusID FROM statuses WHERE Status = 'ordered'), CURDATE(), ?, ?)";
             if($stmt = $conn->prepare($sql)) {
                 $stmt->execute([$userID, $orderID, $addressID, $total]);
                 // Error Checking?
@@ -34,7 +34,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
             $city = $_POST['city'];
             $state = $_POST['state'];
             $zipcode = $_POST['zipcode'];
-            $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, Address, City, State, Zipcode) VALUES(?, (SELECT StatusID FROM statuses WHERE status = 'ordered'), CURDATE(), ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, Address, City, State, Zipcode) VALUES(?, (SELECT StatusID FROM statuses WHERE Status = 'ordered'), CURDATE(), ?, ?, ?, ?, ?)";
             if($stmt = $conn->prepare($sql)) {
                 $stmt->execute([$orderID, $total, $address, $city, $state, $zipcode]);
                 // Error Checking?

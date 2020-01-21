@@ -9,13 +9,13 @@ app.factory('shoppingCart', function($http) {
     return {
         loadCollections: function(s) {
             $http.get('/php/loadCollections.php').then(function(response) {
-                console.log(response.data);
+                //console.log(response.data);
                 s.collections = response.data;
             });
         },
         loadFormats: function(s) {
             $http.get('/php/loadFormats.php').then(function(response) {
-                console.log(response.data);
+                //console.log(response.data);
                 s.formats = response.data;
             });
         },
