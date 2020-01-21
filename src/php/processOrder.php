@@ -74,6 +74,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
 
         // Processing of order succeeded
         $data['Processed'] = True;
+        $data["OrderID"] = $orderID;
     }
     // Return if process succeeded
     echo json_encode($data);

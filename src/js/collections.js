@@ -327,7 +327,7 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
         item['showUpdate'] = true;
     }
 
-    $scope.updateQuantity = function(productID, quantity) {
+    $scope.updateQuantity = function(itemID, quantity) {
         var url = "/php/updateCart.php";
         var data = {
             updateCart: true,
@@ -481,7 +481,8 @@ app.controller('usersPageController', function($http, $scope, $location) {
 
 });
 
-app.controller('receiptPageController', function($http, $scope, shoppingCart) {
+app.controller('receiptPageController', function($http, $scope, $location, shoppingCart) {
+    $scope.orderID = $location.search().order;
     $scope.shoppingCart = shoppingCart;
 });
 
@@ -548,8 +549,9 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
                 };
                 $http.post(url, jsonToURI(json), config).then(function(response) {
                     //console.log(response);
-                    if (response.data.Processed) {
-                        $window.location.href = `receipt.html`;
+                    var result = response.data;
+                    if (result.Processed) {
+                        $window.location.href = `receipt.html?order=` + result["OrderID"];
                     }
                 });
 

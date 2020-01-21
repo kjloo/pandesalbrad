@@ -50,7 +50,7 @@ if (is_user_admin()) {
         // Check if item available in table
         $sql = "SELECT * FROM items WHERE ProductID = ? AND FormatID = ?";
         if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$price, $productID, $format]);
+            $stmt->execute([$productID, $format]);
             $exists = $stmt->rowCount() > 0;
             // Error Check?
             $stmt->closeCursor();

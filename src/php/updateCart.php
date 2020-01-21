@@ -2,11 +2,11 @@
 
 session_start();
 
-if (isset($_POST['updateCart']) && !empty($_POST['productID']) && !empty($_POST['quantity'])) {
+if (isset($_POST['updateCart']) && !empty($_POST['itemID']) && !empty($_POST['quantity'])) {
 
-    $productID = $_POST['productID'];
+    $itemID = $_POST['itemID'];
     $nquantity = intval($_POST['quantity']);
-    $oquantity = $_SESSION['u_cart'][$productID];
+    $oquantity = $_SESSION['u_cart'][$itemID];
 
     if (isset($_SESSION['u_id'])) {
         // Update database
@@ -14,9 +14,9 @@ if (isset($_POST['updateCart']) && !empty($_POST['productID']) && !empty($_POST[
         $userID = $_SESSION['u_id'];
 
         // Create SQL Query
-        $sql = "UPDATE carts SET Quantity = ? WHERE UserID = ? AND ProductID = ?";
+        $sql = "UPDATE carts SET Quantity = ? WHERE UserID = ? AND ItemID = ?";
         if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$nquantity, $userID, $productID]);
+            $stmt->execute([$nquantity, $userID, $itemID]);
             // Error Check?
         }
         // Close Connection
@@ -24,7 +24,7 @@ if (isset($_POST['updateCart']) && !empty($_POST['productID']) && !empty($_POST[
     }
 
     // Update quantity of product on cookie
-    $_SESSION['u_cart'][$productID] = $nquantity;
+    $_SESSION['u_cart'][$itemID] = $nquantity;
     $data = array();
     $data['QuantityDiff'] = intval($nquantity - $oquantity);
 
