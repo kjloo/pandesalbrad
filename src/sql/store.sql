@@ -82,6 +82,10 @@ CREATE TABLE orders(
     OrderDate DATETIME NOT NULL,
     AddressID INT,
     Total DECIMAL(6,2) NOT NULL,
+    Address VARCHAR(255),
+    City VARCHAR(255),
+    State VARCHAR(2),
+    Zipcode VARCHAR(5),
     FOREIGN KEY(UserID) REFERENCES users(UserID),
     FOREIGN KEY(StatusID) REFERENCES statuses(StatusID),
     FOREIGN KEY(AddressID) REFERENCES addresses(AddressID)

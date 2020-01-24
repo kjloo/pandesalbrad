@@ -52,7 +52,7 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
             include "email.inc";
             $subject = "PandesalBrad Email Validation";
             $msg = "Click the link below to complete account creation:\r\n";
-            $msg .= "http://chingloo.zapto.org:9090/activate.html?token=" . $random_hash_token . "\r\n";
+            $msg .= "https://pandesalbradart.com/activate.html?token=" . $random_hash_token . "\r\n";
             if (!send_email($subject, $msg, $email)) {
                 // Email could not send
                 header("Location: ../signup.html?signup=fail&message=Error sending email");
