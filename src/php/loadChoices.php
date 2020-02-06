@@ -1,17 +1,20 @@
 <?php
 
 $data = array();
-if (!empty($_GET["product"])) {
+if (!empty($_GET["format"])) {
 
     include "sqlConn.inc";
 
-    $product = $_GET["product"];
+    $format = $_GET["format"];
 
     // Create SQL Query
-    $sql = "SELECT f.FormatID AS FormatID, f.Name AS Name FROM items AS i INNER JOIN formats AS f ON i.FormatID = f.FormatID WHERE i.ProductID = ? GROUP BY f.FormatID";
+    $sql = "SELECT c.Name, c.ChoiceID FROM format_options AS fo
+        INNER JOIN options AS o ON fo.OptionID = o.OptionID
+        INNER JOIN choices AS c ON o.OptionID = c.OptionID
+        WHERE fo.FormatID = ?";
 
     if($stmt = $conn->prepare($sql)) {
-        $stmt->execute([$product]);
+        $stmt->execute([$format]);
 
         // output data of each row
         if ($stmt->rowCount() > 0) {

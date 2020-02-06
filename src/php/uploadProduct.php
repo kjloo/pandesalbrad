@@ -14,6 +14,8 @@ if (is_user_admin()) {
         $price = $_POST['price'];
         $category = $_POST['category'];
 
+        $choices = $_POST['itemChoices'];
+
         // Need to get old image name to check if it changed
         $oldiname = get_image_name_from_db($productID);
 
@@ -36,9 +38,9 @@ if (is_user_admin()) {
             }
         }
 
-
         // Begin Transcation
         $conn->beginTransaction();
+
         // Update product info in database
         // Create SQL Query
         $sql = "UPDATE products SET Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
@@ -47,28 +49,58 @@ if (is_user_admin()) {
             // Error Check?
             $stmt->closeCursor();
         }
-        // Check if item available in table
-        $sql = "SELECT * FROM items WHERE ProductID = ? AND FormatID = ?";
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$productID, $format]);
-            $exists = $stmt->rowCount() > 0;
-            // Error Check?
-            $stmt->closeCursor();
-        }
-        if ($exists) {
-            // Create SQL Query
-            $sql = "UPDATE items SET Price = ? WHERE ProductID = ? AND FormatID = ?";
+
+        if (!empty($choices)) {
+            foreach ($choices as $choiceID) {
+                // Check if item available in table
+                $sql = "SELECT * FROM items WHERE ProductID = ? AND FormatID = ? AND ChoiceID = ?";
+                if($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$productID, $format, $choiceID]);
+                    $exists = $stmt->rowCount() > 0;
+                    // Error Check?
+                    $stmt->closeCursor();
+                }
+                if ($exists) {
+                    // Create SQL Query
+                    $sql = "UPDATE items SET Price = ? WHERE ProductID = ? AND FormatID = ? AND ChoiceID = ?";
+                    if($stmt = $conn->prepare($sql)) {
+                        $stmt->execute([$price, $productID, $format, $choiceID]);
+                        // Error Check?
+                        $stmt->closeCursor();
+                    }
+                } else {
+                    $sql = "INSERT INTO items (ProductID, FormatID, ChoiceID, Price) VALUES (?, ?, ?, ?)";
+                    if($stmt = $conn->prepare($sql)) {
+                        $stmt->execute([$productID, $format, $choiceID, $price]);
+                        // Error Check?
+                        $stmt->closeCursor();
+                    }
+                }
+            }   
+        } else {
+            // Check if item available in table
+            $sql = "SELECT * FROM items WHERE ProductID = ? AND FormatID = ?";
             if($stmt = $conn->prepare($sql)) {
-                $stmt->execute([$price, $productID, $format]);
+                $stmt->execute([$productID, $format]);
+                $exists = $stmt->rowCount() > 0;
                 // Error Check?
                 $stmt->closeCursor();
             }
-        } else {
-            $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (?, ?, ?)";
-            if($stmt = $conn->prepare($sql)) {
-                $stmt->execute([$productID, $format, $price]);
-                // Error Check?
-                $stmt->closeCursor();
+            if ($exists) {
+                // Create SQL Query
+                $sql = "UPDATE items SET Price = ? WHERE ProductID = ? AND FormatID = ?";
+                if($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$price, $productID, $format]);
+                    // Error Check?
+                    $stmt->closeCursor();
+                }
+            } else {
+                $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (?, ?, ?)";
+                if($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$productID, $format, $price]);
+                    // Error Check?
+                    $stmt->closeCursor();
+                }
             }
         }
 
@@ -84,6 +116,8 @@ if (is_user_admin()) {
         $price = $_POST['price'];
         $category = $_POST['category'];
 
+        $choices = $_POST['itemChoices'];
+
         // Copy file to server product directory
         $errors = upload_image($iname);
           
@@ -95,18 +129,30 @@ if (is_user_admin()) {
         // Begin SQL Transaction
         $conn->beginTransaction();
         // Create SQL Query
-        // First see if item already in cart
+        // First insert product
         $sql = "INSERT INTO products (Image, Name, CollectionID) VALUES (?, ?, ?)";
         if($stmt = $conn->prepare($sql)) {
             $stmt->execute([$iname, $pname, $category]);
             // Error Check?
             $stmt->closeCursor();
         }
-        $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (LAST_INSERT_ID(), ?, ?)";
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$format, $price]);
-            // Error Check?
-            $stmt->closeCursor();
+        $productID = $conn->lastInsertId();
+        if (!empty($choices)) {
+            foreach ($choices as $choiceID) {
+                $sql = "INSERT INTO items (ProductID, FormatID, ChoiceID, Price) VALUES (?, ?, ?, ?)";
+                if($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$productID, $format, $choiceID, $price]);
+                    // Error Check?
+                    $stmt->closeCursor();
+                }
+            }
+        } else {
+            $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (?, ?, ?)";
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->execute([$productID, $format, $price]);
+                // Error Check?
+                $stmt->closeCursor();
+            }
         }
         $conn->commit();
 

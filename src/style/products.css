@@ -13,3 +13,10 @@
 .price-label::before {
     content: "$";
 }
+
+.option-text {
+    font-size: .8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+}

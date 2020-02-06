@@ -3,7 +3,7 @@
 include "sqlConn.inc";
 
 // Create SQL Query
-$sql = "SELECT * FROM collections ORDER BY CollectionIndex";
+$sql = "SELECT * FROM states";
 $result = $conn->query($sql);
 
 $data = array();

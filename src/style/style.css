@@ -12,6 +12,15 @@
     color: white;
 }
 
+img {
+    pointer-events: none;
+}
+
+#main-background {
+    background-image: url('/images/logo1.jpeg');
+    background-repeat: repeat;
+}
+
 #logo {
   width: 150px;
   height: 60px;

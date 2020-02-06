@@ -19,6 +19,17 @@ app.factory('shoppingCart', function($http) {
                 s.formats = response.data;
             });
         },
+        loadChoices: function(s) {
+            return function(formatID) {
+                $http({
+                    url: '/php/loadChoices.php',
+                    method: "GET",
+                    params: {format: formatID}
+                 }).then(function(response) {
+                    s.choices = response.data;
+                });
+             };
+        },
         count: 0,
         userID: null,
         total: 0.00
@@ -200,6 +211,8 @@ app.controller('collectionsPageController', function($http, $scope, shoppingCart
 app.controller('productPageController', function($http, $scope, $location, shoppingCart) {
     $scope.item = null;
     $scope.selected = null;
+    $scope.options = null;
+    $scope.choiceID = null;
 
     $scope.loadProduct = function() {
         $http({
@@ -238,6 +251,37 @@ app.controller('productPageController', function($http, $scope, $location, shopp
             //console.log(response);
             $scope.item = response.data;
         });
+        $http({
+            url: '/php/getOptions.php',
+            method: "GET",
+            params: {product: productID,
+                     format: formatID}
+         }).then(function(response) {
+            //console.log(response);
+            $scope.options = response.data;
+            if ($scope.options.length > 0) {
+                $scope.setActiveOption(0, $scope.options[0].ChoiceID);
+            } else {
+
+            }
+        });
+    }
+
+    $scope.setActiveOption = function(optionIndex) {
+        $scope.activeOption = optionIndex;
+        var productID = $location.search().productID;
+        var formatID = $scope.selected.FormatID;
+        var choiceID = $scope.options[optionIndex].ChoiceID;
+        $http({
+            url: '/php/getItem.php',
+            method: "GET",
+            params: {product: productID,
+                     format: formatID,
+                     choice: choiceID}
+         }).then(function(response) {
+            //console.log(response);
+            $scope.item = response.data;
+        });
     }
 
     /*$scope.setSelected = function(selection) {
@@ -253,10 +297,12 @@ app.controller('productPageController', function($http, $scope, $location, shopp
     });*/
 
     $scope.addToCart = function(itemID) {
+        var choiceID = $scope.choiceID;
         var url = "/php/pushCart.php";
         var data = {
             pushCart: true,
             itemID: itemID,
+            choiceID: choiceID,
             quantity: 1
         };
         var config = {
@@ -565,6 +611,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 app.controller('uploadPageController', function($http, $scope, $location, shoppingCart, adminUtils) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
     $scope.loadFormats = shoppingCart.loadFormats($scope);
+    $scope.loadChoices = shoppingCart.loadChoices($scope);
 
     $scope.status = $location.search().upload;
     $scope.message = $location.search().message;
@@ -579,6 +626,7 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.collectionID = null;
     $scope.selected = null;
     $scope.format = null;
+    $scope.choices = null;
 
     $scope.productID = $location.search().productID;
     $scope.getProductInfo = function() {
@@ -607,6 +655,7 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
 
     $scope.setItem = function() {
         var formatID = $scope.format.FormatID;
+        $scope.loadChoices(formatID);
         if (Array.isArray($scope.items) && $scope.items.length) {
             for (var key in $scope.items) {
                 var item = $scope.items[key];

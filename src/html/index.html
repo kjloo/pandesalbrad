@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="/style/style.css">
 <title>Pandesal Brad</title>
 </head>
-<body ng-app="mainPage">
+<body ng-app="mainPage" id="main-background">
     <div ng-include="'navbar.html'">
     </div>
     <div ng-controller="mainPageController" ng-init="loadSlides()">
@@ -36,7 +36,8 @@
     </div>
     <div class="container">
         <div class="row">
-            <img src="/images/logo.jpeg" class="img-fluid" alt="pandesalbrad">
+            <div class="col-12 py-3 white-space">
+            </div>
         </div>
     </div>
 </body>

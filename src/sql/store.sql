@@ -21,10 +21,19 @@ CREATE TABLE users(
 CREATE TABLE collections(
     CollectionID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
-    Image VARCHAR(255) NOT NULL
+    Image VARCHAR(255) NOT NULL,
+    CollectionIndex INT NOT NULL
 );
 
-INSERT INTO collections(Name, Image) VALUES("Anime", "Anime.png"), ("Cartoons", "Cartoons.png"), ("Comics", "Comics.png"), ("Illustrations", "Illustrations.png"), ("Video Games", "VideoGames.png");
+INSERT INTO collections(Name, Image)
+VALUES("Disney", "Disney.png", 0),
+("Pokemon", "Pokemon.png", 1),
+("Star Wars", "StarWars.png", 2),
+("Anime", "Anime.png", 3),
+("Cartoons", "Cartoons.png", 4),
+("Comics", "Comics.png", 5),
+("Illustrations", "Illustrations.png", 6),
+("Video Games", "VideoGames.png", 7);
 
 CREATE TABLE products(
     ProductID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -36,26 +45,49 @@ CREATE TABLE products(
 
 CREATE TABLE options(
     OptionID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    Choices JSON
+    Name VARCHAR(255) NOT NULL
 );
+
+INSERT INTO options(Name) Values("Size"), ("Color");
+
+CREATE TABLE choices(
+    ChoiceID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    OptionID INT NOT NULL,
+    FOREIGN KEY(OptionID) REFERENCES options(OptionID) ON DELETE CASCADE
+);
+
+INSERT INTO choices(Name, OptionID) VALUES("Small", (SELECT OptionID FROM options WHERE Name = "Size"));
+INSERT INTO choices(Name, OptionID) VALUES("Medium", (SELECT OptionID FROM options WHERE Name = "Size"));
+INSERT INTO choices(Name, OptionID) VALUES("Large", (SELECT OptionID FROM options WHERE Name = "Size"));
+INSERT INTO choices(Name, OptionID) VALUES("Extra Large", (SELECT OptionID FROM options WHERE Name = "Size"));
 
 CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    OptionID INT,
-    FOREIGN KEY(OptionID) REFERENCES options(OptionID)
+    Name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE format_options(
+    FormatID INT NOT NULL,
+    OptionID INT NOT NULL,
+    FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE,
+    FOREIGN KEY(OptionID) REFERENCES options(OptionID) ON DELETE CASCADE
 );
 
 INSERT INTO formats(Name) VALUES("Sticker"), ("T-Shirt");
+
+INSERT INTO format_options(FormatID, OptionID)
+VALUES((SELECT FormatID FROM formats WHERE Name = "T-Shirt"), (SELECT OptionID FROM options WHERE Name = "Size"));
 
 CREATE TABLE items(
     ItemID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     ProductID INT NOT NULL,
     FormatID INT NOT NULL,
+    ChoiceID INT,
     Price DECIMAL(6,2) NOT NULL,
     FOREIGN KEY(ProductID) REFERENCES products(ProductID) ON DELETE CASCADE,
-    FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE
+    FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE,
+    FOREIGN KEY(ChoiceID) REFERENCES choices(ChoiceID) ON DELETE CASCADE
 );
 
 CREATE TABLE addresses(
@@ -115,3 +147,61 @@ CREATE TABLE slides(
     Caption VARCHAR(255),
     Link VARCHAR(255)
 );
+
+CREATE TABLE states(
+    StateID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(14) NOT NULL UNIQUE,
+    Abbreviation VARCHAR(2) NOT NULL UNIQUE
+);
+
+INSERT INTO states(Name, Abbreviation)
+VALUES("Alabama", "AL"),
+("Alaska", "AK"),
+("Arizona", "AZ"),
+("Arkansas", "AR"),
+("California", "CA"),
+("Colorado", "CO"),
+("Connecticut", "CT"),
+("Delaware", "DE"),
+("Florida", "FL"),
+("Georgia", "GA"),
+("Hawaii", "HI"),
+("Idaho", "ID"),
+("Illinois", "IL"),
+("Indiana", "IN"),
+("Iowa", "IA"),
+("Kansas", "KS"),
+("Kentucky", "KY"),
+("Louisiana", "LA"),
+("Maine", "ME"),
+("Maryland", "MD"),
+("Massachusetts", "MA"),
+("Michigan", "MI"),
+("Minnesota", "MN"),
+("Mississippi", "MS")
+("Missouri", "MO"),
+("Montana", "MT"),
+("Nebraska", "NE"),
+("Nevada", "NV"),
+("New Hampshire", "NH"),
+("New Jersey", "NJ"),
+("New Mexico", "NM"),
+("New York", "NY"),
+("North Carolina", "NC"),
+("North Dakota", "ND"),
+("Ohio", "OH"),
+("Oklahoma", "OK"),
+("Oregon", "OR"),
+("Pennsylvania", "PA"),
+("Rhode Island", "RI"),
+("South Carolina", "SC"),
+("South Dakota", "SD"),
+("Tennessee", "TN"),
+("Texas", "TX"),
+("Utah", "UT"),
+("Vermont", "VT"),
+("Virginia", "VA"),
+("Washington", "WA"),
+("West Virginia", "WV"),
+("Wisconsin", "WI"),
+("Wyoming", "WY");
