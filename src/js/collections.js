@@ -5,6 +5,21 @@ app.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
+app.directive('tooltip', function(){
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs){
+            element.hover(function(){
+                // on mouseenter
+                element.tooltip('show');
+            }, function(){
+                // on mouseleave
+                element.tooltip('hide');
+            });
+        }
+    };
+});
+
 app.factory('shoppingCart', function($http) {
     return {
         loadCollections: function(s) {
@@ -68,40 +83,57 @@ app.factory('adminUtils', function($http) {
 
 app.factory('accountLoader', function($http, $window) {
     return {
+        getAccountInfo: function(s) {
+            $http.get('/php/getAccountInfo.php').then(function(response) {
+                s.account = response.data;
+                if (s.account == "null") {
+                    s.account = {
+                        "Firstname": "",
+                        "Lastname": "",
+                        "Email": "",
+                    }
+                }
+            });
+        },
         getShippingInfo: function(s) {
             $http.get('/php/getShippingInfo.php').then(function(response) {
                 //console.log(response.data);
-                s.account = response.data;
+                s.shipping = response.data;
                 // If nothing is returned, initialize empty values to allow for use in ng-model
                 // For some reason "null" string is returned...
-                if (s.account == "null") {
-                    s.account = {
+                if (s.shipping == "null") {
+                    s.shipping = {
                         'Address': "",
                         'City': "",
-                        'State': "",
+                        'State': [],
+                        'StateID': null,
                         'Zipcode': null,
                         'AddressID': null
                     };
                 }
             });
         },
+        loadStates: function(s) {
+            $http.get('/php/loadStates.php').then(function(response) {
+                //console.log(response.data);
+                s.states = response.data;
+            });
+        },
         setAddress: function(s, redirect) {
             // Only if something changed
-            if (!s.shipping.$dirty) {
+            if (!s.shippingInfo.$dirty) {
                 return;
             }
             var url = "/php/setAddress.php";
             var data = {
                 setAddress: true,
-                address: s.account.Address,
-                city: s.account.City,
-                state: s.account.State,
-                zipcode: s.account.Zipcode,
+                address: s.shipping.Address,
+                city: s.shipping.City,
+                stateID: s.shipping.State.StateID,
+                zipcode: s.shipping.Zipcode,
             };
-            if (s.account.AddressID != null) {
-                data.push({
-                    addressID: s.account.AddressID
-                });
+            if (s.shipping.AddressID != null) {
+                data.addressID = s.shipping.AddressID;
             }
             var config = {
                 headers: {
@@ -111,6 +143,8 @@ app.factory('accountLoader', function($http, $window) {
             $http.post(url, jsonToURI(data), config).then(function(response) {
                 if (redirect) {
                     $window.location.href = response.data.href;
+                } else {
+                    s.message = "Shipping Information Updated."
                 }
             })
         }
@@ -424,6 +458,12 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
 app.controller('ordersPageController', function($http, $scope, $location, adminUtils) {
     $scope.message = $location.search().message;
     $scope.isAdmin = adminUtils.isAdmin($scope);
+
+    // Initialize tooltips
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();   
+    });
+
     $scope.loadStatuses = function() {
         $http({
             url: "/php/loadStatuses.php",
@@ -440,7 +480,7 @@ app.controller('ordersPageController', function($http, $scope, $location, adminU
             params: {orderID: searchString,
                      statusID: statusID}
          }).then(function(response) {
-            //console.log(response);
+            console.log(response);
             $scope.orders = response.data;
         });
     };
@@ -532,31 +572,78 @@ app.controller('receiptPageController', function($http, $scope, $location, shopp
     $scope.shoppingCart = shoppingCart;
 });
 
-app.controller('accountPageController', function($http, $scope) {
-    $scope.getAccountInfo = function() {
-        $http.get('/php/getAccountInfo.php').then(function(response) {
-            $scope.account = response.data;
-        });
-    };
+app.controller('accountPageController', function($http, $scope, accountLoader) {
+    $scope.getAccountInfo = accountLoader.getAccountInfo($scope);
 });
 
 app.controller('shippingPageController', function($http, $scope, accountLoader) {
     $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
+    $scope.loadStates = accountLoader.loadStates($scope);
     $scope.setAddress = function(redirect) {
         accountLoader.setAddress($scope, redirect);
     }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.states) && $scope.states.length) {
+            $scope.selected = $scope.states[0];
+            for (var key in $scope.states) {
+                var state = $scope.states[key];
+                if ($scope.shipping.StateID == state.StateID) {
+                    $scope.shipping.State = state;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.$watchGroup(['states', 'shipping.StateID'], function () {
+        $scope.setSelected();
+    });
 });
 
 app.controller('checkoutPageController', function($http, $scope, $window, accountLoader, shoppingCart) {
+    $scope.message = null;
+    $scope.getAccountInfo = accountLoader.getAccountInfo($scope);
     $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
+    $scope.loadStates = accountLoader.loadStates($scope);
     $scope.setAddress = function(redirect) {
         accountLoader.setAddress($scope, redirect);
     }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.states) && $scope.states.length) {
+            $scope.selected = $scope.states[0];
+            for (var key in $scope.states) {
+                var state = $scope.states[key];
+                if ($scope.shipping.StateID == state.StateID) {
+                    $scope.shipping.State = state;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.$watchGroup(['states', 'shipping.StateID'], function () {
+        $scope.setSelected();
+    });
     // Render the PayPal button into #paypal-button-container
     // This seems to be protected by CORB
     paypal.Buttons({
         style: {
             layout: 'horizontal'
+        },
+        onInit: function(data, actions) {
+            // Disable the buttons
+            actions.disable();
+            paypalActions = actions;
+            $scope.$watchGroup(['shippingInfo.$valid', 'accountInfo.$valid'], function () {
+                var submittable = $scope.shippingInfo.$valid && $scope.accountInfo.$valid;
+                if (submittable) {
+                    paypalActions.enable();
+                } else {
+                    paypalActions.disable();
+                }
+            });
         },
         // Set up the transaction
         createOrder: function(data, actions) {
@@ -572,21 +659,19 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
         onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
                 var url = "/php/processOrder.php";
-                if (!$scope.account.AddressID) {
-                    var json = {
-                            orderID: data.orderID,
-                            address: $scope.account.Address,
-                            city: $scope.account.City,
-                            state: $scope.account.State,
-                            zipcode: $scope.account.Zipcode,
-                            processOrder: true
-                    };
-                } else {
-                    var json = {
-                        orderID: data.orderID,
-                        addressID: $scope.account.AddressID,
-                        processOrder: true
-                    };
+                var json = {
+                    orderID: data.orderID,
+                    fname: $scope.account.Firstname,
+                    lname: $scope.account.Lastname,
+                    email: $scope.account.Email,
+                    address: $scope.shipping.Address,
+                    city: $scope.shipping.City,
+                    stateID: $scope.shipping.State.StateID,
+                    zipcode: $scope.shipping.Zipcode,
+                    processOrder: true
+                };
+                if ($scope.shipping.AddressID) {
+                    json.addressID = $scope.shipping.AddressID;
                 }
                 var config = {
                     headers: {

@@ -10,7 +10,12 @@ if (count($cart)) {
     include "sqlConn.inc";
     // Create replacement string
     $ids_arr = str_repeat('?,', count($cart) - 1) . '?';
-    $sql = "SELECT p.Name AS Name, i.Price AS Price, i.ItemID AS ItemID, p.Image AS Image FROM items as i INNER JOIN products AS p ON i.ProductID = p.ProductID WHERE i.ItemID in ({$ids_arr})";
+    $sql = "SELECT p.Name AS Name, i.Price AS Price, i.ItemID AS ItemID, p.Image AS Image, f.Name AS Format, c.Name AS Choice
+            FROM items as i
+            INNER JOIN products AS p ON i.ProductID = p.ProductID
+            INNER JOIN formats AS f ON i.FormatID = f.FormatID
+            LEFT JOIN choices AS c ON i.ChoiceID = c.ChoiceID
+            WHERE i.ItemID in ({$ids_arr})";
 
     if($stmt = $conn->prepare($sql)) {
 

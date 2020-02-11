@@ -6,13 +6,13 @@
 <base href="/">
 <link rel="shortcut icon" href="/images/favicon.ico?" type="image/x-icon">
 <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
-<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <script src="https://kit.fontawesome.com/5257f58f1b.js"></script>
 <script src="/js/collections.js"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
 <link rel="stylesheet" href="/style/orders.css">
 <title>Pandesal Brad</title>
@@ -42,11 +42,19 @@
     </div>
     <div class="container order-box my-5" ng-repeat="order in orders">
         <div class="order-header my-2 row">
-          <div class="col">Order ID: {{order.OrderID}}</div>
-          <div class="col">Date: {{order.OrderDate}}</div>
-          <div class="col">Total: ${{order.Total}}</div>
-          <div class="col" ng-if="!isUserAdmin">Status: {{order.Status}}</div>
-          <div class="col" ng-if="isUserAdmin">Status: 
+          <div class="col-3">Order ID: {{order.OrderID}}</div>
+          <div class="col-2">Date: {{order.OrderDate}}</div>
+          <div class="col-2">Total: ${{order.Total}}</div>
+          <div class="col-3">
+              <span>
+                  Ship To:
+              </span>
+              <a href="#" tooltip data-toggle="tooltip" data-placement="bottom" data-html="true" title="<h6>Address</h6><p class='m-0'>{{order.Address}}</p><p class='m-0'>{{order.City}}, {{order.State}} {{order.Zipcode}}</p>">
+                  {{order.Firstname}} {{order.Lastname}}
+              </a>
+          </div>
+          <div class="col-2" ng-if="!isUserAdmin">Status: {{order.Status}}</div>
+          <div class="col-2" ng-if="isUserAdmin">Status: 
               <form action="/php/editOrderStatus.php" method="post">
                   <select name="statusID" ng-model="order.selected" ng-options="status.Status for status in statuses track by status.StatusID">
                   </select>
@@ -69,7 +77,16 @@
               <tr ng-repeat="product in order.Products">
                  <th scope="row"></th>
                  <td>
-                     <img ng-src="/images/{{product.Image}}" class="order-sticker img-responsive"/>{{product.Name}}
+                    <div class="item-icon" data-toggle="collapse" data-target="#details{{$index}}" aria-expanded="false" aria-controls="details{{$index}}">
+                        <img ng-src="/images/{{product.Image}}" class="order-sticker img-responsive"/>{{product.Name}}
+                    </div>
+                    <div class="collapse" id="details{{$index}}">
+                      <div class="card card-body">
+                          <h5>Details</h5>
+                          <p class="m-0">{{product.Format}}</p>
+                          <p class="m-0">{{product.Choice}}</p>
+                      </div>
+                    </div>
                  </td>
                  <td>{{product.Quantity}}</td>
                  <th scope="row"></th>

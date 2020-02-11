@@ -3,7 +3,7 @@
 include "sqlConn.inc";
 
 // Create SQL Query
-$sql = "SELECT * FROM states";
+$sql = "SELECT * FROM states ORDER BY Abbreviation";
 $result = $conn->query($sql);
 
 $data = array();

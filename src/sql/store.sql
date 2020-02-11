@@ -33,7 +33,10 @@ VALUES("Disney", "Disney.png", 0),
 ("Cartoons", "Cartoons.png", 4),
 ("Comics", "Comics.png", 5),
 ("Illustrations", "Illustrations.png", 6),
-("Video Games", "VideoGames.png", 7);
+("Video Games", "VideoGames.png", 7),
+("TV Shows", "TVShows.png", 8),
+("Filipino", "Filipino.png", 9),
+("Hawaii", "Hawaii.png", 10);
 
 CREATE TABLE products(
     ProductID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -94,10 +97,11 @@ CREATE TABLE addresses(
     AddressID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Address VARCHAR(255) NOT NULL,
     City VARCHAR(255) NOT NULL,
-    State VARCHAR(2) NOT NULL,
+    StateID INT NOT NULL,
     Zipcode VARCHAR(5) NOT NULL,
     UserID INT,
-    FOREIGN KEY(UserID) REFERENCES users(UserID) ON DELETE CASCADE
+    FOREIGN KEY(UserID) REFERENCES users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY(StateID) REFERENCES states(StateID) ON DELETE CASCADE
 );
 
 CREATE TABLE statuses(
@@ -112,15 +116,17 @@ CREATE TABLE orders(
     UserID INT,
     StatusID INT NOT NULL,
     OrderDate DATETIME NOT NULL,
-    AddressID INT,
     Total DECIMAL(6,2) NOT NULL,
-    Address VARCHAR(255),
-    City VARCHAR(255),
-    State VARCHAR(2),
-    Zipcode VARCHAR(5),
+    Address VARCHAR(255) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    StateID INT NOT NULL,
+    Zipcode VARCHAR(5) NOT NULL,
+    Firstname VARCHAR(255) NOT NULL,
+    Lastname VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) NOT NULL,
     FOREIGN KEY(UserID) REFERENCES users(UserID),
     FOREIGN KEY(StatusID) REFERENCES statuses(StatusID),
-    FOREIGN KEY(AddressID) REFERENCES addresses(AddressID)
+    FOREIGN KEY(StateID) REFERENCES states(StateID) ON DELETE CASCADE
 );
 
 CREATE TABLE packages(

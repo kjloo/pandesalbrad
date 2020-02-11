@@ -22,3 +22,14 @@
 .order-box form {
     display: inline-block;
 }
+
+.tooltip-inner {
+    max-width: 200px;
+    padding: 3px 8px;
+    color: #000;
+    text-align: left;
+    background-color: #fff;
+    border-radius: .25rem;
+    border: solid;
+    border-width: 1px;
+}

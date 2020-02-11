@@ -9,12 +9,20 @@ function error_exit($message) {
 
 session_start();
 
-if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
+if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['stateID']) && !empty($_POST['zipcode']) && !empty($_POST['fname']) && !empty($_POST['lname']) && !empty($_POST['email'])) {
     $data = array();
     $data['Processed'] = False;
 
     $orderID = $_POST['orderID'];
     $total = $_SESSION['u_total'];
+
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $email = $_POST['email'];
+    $address = $_POST['address'];
+    $city = $_POST['city'];
+    $stateID = $_POST['stateID'];
+    $zipcode = $_POST['zipcode'];
     // Call PayPal to get transaction details
     $client = PayPalClient::client();
     $response = PayPalClient::order($client, $orderID);
@@ -26,44 +34,27 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
         include "sqlConn.inc";
         // Create SQL Query
         // Check if user has account
+        $isUserAccount = isset($_SESSION['u_id']) && !empty($_SESSION['u_id']);
+
         $parameters = array();
         // Begin Transcation
         $conn->beginTransaction();
-        if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
+        if ($isUserAccount) {
             $userID = $_SESSION['u_id'];
             if (empty($_POST['addressID'])) {
-                if (!empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode'])) {
-                    $address = $_POST['address'];
-                    $city = $_POST['city'];
-                    $state = $_POST['state'];
-                    $zipcode = $_POST['zipcode'];
-                    $sql = "INSERT INTO addresses (Address, City, State, Zipcode, UserID) VALUES (?, ?, ?, ?, ?)";
-                    $input = [$address, $city, $state, $zipcode, $userID];
-                    if ($stmt = $conn->prepare($sql)) {
-                        $stmt->execute($input);
-                        // Error Checking?
-                        $stmt->closeCursor();
-                    }
-                    $sql = "INSERT INTO orders(UserID, OrderID, StatusID, OrderDate, AddressID, Total) VALUES(?, ?, (SELECT StatusID FROM statuses WHERE Status = 'Ordered'), CURDATE(), LAST_INSERT_ID(), ?)";
-                    array_push($parameters, $userID, $orderID, $total);
-                } else {
-                    error_exit("Shipping Information Not Complete.");
+                $sql = "INSERT INTO addresses (Address, City, State, Zipcode, UserID) VALUES (?, ?, ?, ?, ?)";
+                $input = [$address, $city, $state, $zipcode, $userID];
+                if ($stmt = $conn->prepare($sql)) {
+                    $stmt->execute($input);
+                    // Error Checking?
+                    $stmt->closeCursor();
                 }
-            } else {
-                $addressID = $_POST['addressID'];
-                $sql = "INSERT INTO orders(UserID, OrderID, StatusID, OrderDate, AddressID, Total) VALUES(?, ?, (SELECT StatusID FROM statuses WHERE Status = 'Ordered'), CURDATE(), ?, ?)";
-                array_push($parameters, $userID, $orderID, $addressID, $total);
             }
-        } else if (!empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zipcode'])) {
-            $address = $_POST['address'];
-            $city = $_POST['city'];
-            $state = $_POST['state'];
-            $zipcode = $_POST['zipcode'];
-            $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, Address, City, State, Zipcode) VALUES(?, (SELECT StatusID FROM statuses WHERE Status = 'Ordered'), CURDATE(), ?, ?, ?, ?, ?)";
-            array_push($parameters, $orderID, $total, $address, $city, $state, $zipcode);
-        } else {
-            error_exit("Shipping Information Not Complete.");
         }
+        $userID = $isUserAccount ? $_SESSION['u_id'] : NULL;
+        # Process Order into Table
+        $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, UserID, Firstname, Lastname, Email, Address, City, StateID, Zipcode) VALUES(?, (SELECT StatusID FROM statuses WHERE Status = 'Ordered'), CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        array_push($parameters, $orderID, $total, $userID, $fname, $lname, $email, $address, $city, $stateID, $zipcode);
 
         if ($stmt = $conn->prepare($sql)) {
             $stmt->execute($parameters);
@@ -113,7 +104,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID'])) {
     // Display Receipt Page
     // header("Location: ../receipt.html");
 } else {
-    exit();
+    error_exit("Invalid Information!");
 }
 
 ?>

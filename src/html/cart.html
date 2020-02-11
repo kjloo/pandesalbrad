@@ -34,19 +34,28 @@
         </thead>
         <tbody>
             <tr ng-repeat="item in cart">
-               <th scope="row"></th>
-               <td ng-if="item.ItemID != null">
-                   <img ng-src="/images/{{item.Image}}" class="table-sticker img-responsive"/>{{item.Name}}
-               </td>
-               <td ng-if="item.ItemID != null">
+                <th scope="row"></th>
+                <td ng-if="item.ItemID != null">
+                    <div class="item-icon" data-toggle="collapse" data-target="#details{{$index}}" aria-expanded="false" aria-controls="details{{$index}}">
+                        <img ng-src="/images/{{item.Image}}" class="table-sticker img-responsive"/>{{item.Name}}
+                    </div>
+                    <div class="collapse" id="details{{$index}}">
+                      <div class="card card-body">
+                          <h5>Details</h5>
+                          <p class="m-0">{{item.Format}}</p>
+                          <p class="m-0">{{item.Choice}}</p>
+                      </div>
+                    </div>
+                </td>
+                <td ng-if="item.ItemID != null">
                    <input class="cart-quantity" ng-model="item.Quantity" ng-change="showUpdate(item)" type="number" min="1" ng-value="item.Quantity">
                    <button ng-show="item.showUpdate" ng-click="updateQuantity(item.ItemID, item.Quantity)">Update</button>
-               </td>
-               <td ng-if="item.ItemID != null" class="cart-price">{{item.Total}}</td>
-               <td ng-if="item.ItemID != null" class="cart-delete" ng-click="deleteFromCart(item.ItemID)">x</td>
-               <th ng-if="item.ItemID == null">{{item.Name}}</th>
-               <th ng-if="item.ItemID == null"></th>
-               <th ng-if="item.ItemID == null" class="cart-price">{{item.Total}}</th>
+                </td>
+                <td ng-if="item.ItemID != null" class="cart-price">{{item.Total}}</td>
+                <td ng-if="item.ItemID != null" class="cart-delete" ng-click="deleteFromCart(item.ItemID)">x</td>
+                <th ng-if="item.ItemID == null">{{item.Name}}</th>
+                <th ng-if="item.ItemID == null"></th>
+                <th ng-if="item.ItemID == null" class="cart-price">{{item.Total}}</th>
             </tr>
         </tbody>
         </table>
