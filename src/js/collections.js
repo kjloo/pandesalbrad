@@ -504,8 +504,10 @@ app.controller('ordersPageController', function($http, $scope, $location, adminU
     });
 });
 
-app.controller('usersPageController', function($http, $scope, $location) {
+app.controller('usersPageController', function($http, $scope, $location, adminUtils) {
     $scope.message = $location.search().message;
+
+    $scope.isAdmin = adminUtils.isAdmin($scope);
     $scope.loadUsers = function() {
         $http({
             url: '/php/loadUsers.php',
@@ -526,6 +528,20 @@ app.controller('usersPageController', function($http, $scope, $location) {
         });
     };
 
+    $scope.getUser = function(searchString) {
+        // Textbox is undefined when empty
+        if (searchString === undefined) {
+            searchString = "";
+        }
+        $http({
+            url: '/php/loadUsers.php/' + searchString,
+            method: "GET",
+         }).then(function(response) {
+            //console.log(response);
+            $scope.users = response.data;
+        });
+    };
+
     $scope.deleteUser = function(userID) {
         // Prompt user with warning
         if (confirm("Are You Sure You Want To Delete?")) {
@@ -537,10 +553,23 @@ app.controller('usersPageController', function($http, $scope, $location) {
             };
             $http.delete(url, config).then(function(response) {
                 $scope.message = "Successfully Deleted User.";
-                var deleteID = response.data.UserID;
-                $scope.users = $scope.users.filter(function(user) {
-                    return user.UserID != deleteID;
-                });
+                $scope.loadUsers();
+            });
+        }
+    }
+
+    $scope.deleteInactiveUsers = function() {
+        // Prompt user with warning
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteUser.php/";
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Inactive Users.";
+                $scope.loadUsers();
             });
         }
     }

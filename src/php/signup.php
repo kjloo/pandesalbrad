@@ -59,7 +59,7 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
                 exit();
             } else {
                 // Create SQL Query
-                $sql = "INSERT INTO users (Firstname, Lastname, Username, Password, Email, Activated, Token, RoleID) SELECT ?, ?, ?, ?, ?, FALSE, ?, RoleID FROM roles WHERE Role = '$role'";
+                $sql = "INSERT INTO users (Firstname, Lastname, Username, Password, Email, SignupDate, Activated, Token, RoleID) SELECT ?, ?, ?, ?, ?, CURDATE(), FALSE, ?, RoleID FROM roles WHERE Role = '$role'";
 
                 if($stmt = $conn->prepare($sql)) {
                     $hash = password_hash($password, PASSWORD_BCRYPT);

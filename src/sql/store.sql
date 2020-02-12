@@ -12,6 +12,7 @@ CREATE TABLE users(
     Lastname VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(60) NOT NULL,
+    SignupDate DATETIME NOT NULL,
     Activated BOOLEAN NOT NULL,
     Token VARCHAR(255),
     RoleID INT NOT NULL,
@@ -67,7 +68,8 @@ INSERT INTO choices(Name, OptionID) VALUES("Extra Large", (SELECT OptionID FROM 
 
 CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL
+    Name VARCHAR(255) NOT NULL,
+    Shipping DECIMAL(6,2)
 );
 
 CREATE TABLE format_options(
@@ -77,7 +79,7 @@ CREATE TABLE format_options(
     FOREIGN KEY(OptionID) REFERENCES options(OptionID) ON DELETE CASCADE
 );
 
-INSERT INTO formats(Name) VALUES("Sticker"), ("T-Shirt");
+INSERT INTO formats(Name, Shipping) VALUES("Sticker", 7.00), ("T-Shirt", 0.49);
 
 INSERT INTO format_options(FormatID, OptionID)
 VALUES((SELECT FormatID FROM formats WHERE Name = "T-Shirt"), (SELECT OptionID FROM options WHERE Name = "Size"));

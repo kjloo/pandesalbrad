@@ -20,37 +20,61 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="usersPageController" ng-init="loadUsers()">
-    <div class="row">
-        <div class="alert alert-success" ng-if="message != null">{{message}}</div>
-        <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Username</th>
-                <th scope="col">Role</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="user in users">
-               <th scope="row"></th>
-               <td ng-if="user.UserID != null">
-                   {{user.Username}}
-               </td>
-               <td>
-                   <form action="/php/editPermissions.php" method="post">
-                      <select name="roleID" ng-init="loadRoles()" ng-model="user.selected" ng-options="role.Role for role in roles track by role.RoleID">
-                      </select>
-                      <input type="hidden" ng-value="user.UserID" name="userID">
-                      <button class="btn btn-primary btn-xs" type="submit" name="permissions"><i class="fas fa-check"></i></button>
-                   </form>
-               </td>
-               <td class="user-delete" ng-click="deleteUser(user.UserID)">x</td>
-            </tr>
-        </tbody>
-        </table>
+<div ng-controller="usersPageController" ng-init="loadUsers(); isAdmin();">
+    <div class="container mt-5 control-panel">
+      <div class="alert alert-success" ng-if="message != null">{{message}}</div>
+        <form ng-submit="getUser(searchString)">
+            <div class="d-flex search-menu mb-2">
+               <input class="form-control form-control-sm" type="search" placeholder="Search Username"
+               aria-label="Search" ng-model="searchString">
+               <button type="submit" class="icon-button"><i class="fas fa-search px-1" aria-hidden="true"></i></button>
+            </div>
+      </form>
     </div>
+    <div class="container mb-2 d-flex admin-panel" ng-if="isUserAdmin">
+        <div class="ml-auto">
+            <button class="btn btn-info" ng-click="deleteInactiveUsers()">Delete Inactive Users</button>
+        </div>
+    </div>
+    <div class="container">
+      <div class="row">
+          <table class="table">
+          <thead>
+              <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Username</th>
+                  <th scope="col">Active</th>
+                  <th scope="col">Signup Date</th>
+                  <th scope="col">Role</th>
+                  <th scope="col"></th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr ng-repeat="user in users">
+                 <th scope="row"></th>
+                 <td ng-if="user.UserID != null">
+                     {{user.Username}}
+                 </td>
+                 <td>
+                     {{user.Activated ? "Y" : "N"}}
+                 </td>
+                 <td>
+                     {{user.SignupDate}}
+                 </td>
+                 <td>
+                     <form action="/php/editPermissions.php" method="post">
+                        <select name="roleID" ng-init="loadRoles()" ng-model="user.selected" ng-options="role.Role for role in roles track by role.RoleID">
+                        </select>
+                        <input type="hidden" ng-value="user.UserID" name="userID">
+                        <button class="btn btn-primary btn-xs" type="submit" name="permissions"><i class="fas fa-check"></i></button>
+                     </form>
+                 </td>
+                 <td class="user-delete" ng-click="deleteUser(user.UserID)">x</td>
+              </tr>
+          </tbody>
+          </table>
+      </div>
+  </div>
 </div>
 </body>
 <footer>

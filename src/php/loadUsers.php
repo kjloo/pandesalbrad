@@ -7,12 +7,19 @@ $data = array();
 if (is_user_admin()) {
     $method = $_SERVER['REQUEST_METHOD'];
     if ($method == 'GET') {
-
         $parameters = array();
         // Create SQL Query
-        $sql = "SELECT * FROM users";
+        $sqlArr = ["SELECT UserID, Username, Firstname, Lastname, Email, Activated, RoleID, DATE_FORMAT(SignupDate, '%M %d, %Y') AS SignupDate FROM users"];
+
+        if (!empty($_SERVER['PATH_INFO'])) {
+            $username = $_SERVER['PATH_INFO'];
+            array_push($parameters, "%$username%");
+            array_push($sqlArr, "WHERE Username LIKE ?");
+        }
 
         $data = array();
+
+        $sql = join(" ", $sqlArr);
         if($stmt = $conn->prepare($sql)) {
             $stmt->execute($parameters);
 
