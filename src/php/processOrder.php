@@ -7,14 +7,16 @@ function error_exit($message) {
     exit();
 }
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['stateID']) && !empty($_POST['zipcode']) && !empty($_POST['fname']) && !empty($_POST['lname']) && !empty($_POST['email'])) {
+    include "cartUtils.inc";
     $data = array();
     $data['Processed'] = False;
 
     $orderID = $_POST['orderID'];
-    $total = $_SESSION['u_total'];
 
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
@@ -23,6 +25,9 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
     $city = $_POST['city'];
     $stateID = $_POST['stateID'];
     $zipcode = $_POST['zipcode'];
+
+    $total = getGrandTotal($stateID);
+
     // Call PayPal to get transaction details
     $client = PayPalClient::client();
     $response = PayPalClient::order($client, $orderID);

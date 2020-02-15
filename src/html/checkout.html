@@ -17,66 +17,104 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AYCTlwOZjiBLNKvMt_l9T76fEctPt2w_cu6b_Og6r11nX0loNmKH7HO9axw4z2-RuYIGTdvHUJBtaxTy&currency=USD"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/checkout.css">
 <title>Pandesal Brad</title>
 </head>
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="checkoutPageController" ng-init="getAccountInfo(); getShippingInfo(); loadStates()">
+<div class="container" ng-controller="checkoutPageController" ng-init="getCheckoutTotal(); getAccountInfo(); getShippingInfo(); loadStates();">
+    <div class="row mt-5">
+        <div class="step-header">
+            <h4>1. Customer Information</h4>
+        </div>
+    </div>
     <div class="row">
-        <form name="accountInfo" class="user-form my-5 mx-auto py-3" novalidate class="css-form">
+        <form name="accountInfo" class="user-form"  ng-show="accountInfo.$invalid || customerFlag" novalidate class="css-form">
             <div class="form-group">
-                <h3>Confirm Customer Information</h3>
-            </div>
-            <div class="form-group">
-                <h4>Firstname</h4>
+                <h5>Firstname</h5>
                 <input type="text" placeholder="Firstname" ng-model="account.Firstname" required>
             </div>
             <div class="form-group">
-                <h4>Lastname</h4>
+                <h5>Lastname</h5>
                 <input type="text" placeholder="Lastname" ng-model="account.Lastname" required>
             </div>
             <div class="form-group">
-                <h4>Email</h4>
+                <h5>Email</h5>
                 <input type="text" placeholder="Email" ng-model="account.Email" required>
             </div>
+            <div class="form-group">
+                <input type="submit" name="setCustomer" ng-disabled="accountInfo.$invalid" ng-click="editCustomer(false)" value="Next"/>
+            </div>
         </form>
-        <form name="shippingInfo" class="user-form my-5 mx-auto py-3" novalidate class="css-form">
+        <div class="border border-dark p-2" ng-show="accountInfo.$valid && !customerFlag">
+            <p class="m-0">{{account.Firstname}} {{account.Lastname}}</p>
+            <p class="m-0">{{account.Email}}</p>
+            <div class="text-right">
+                <a href="#" class="text-primary" ng-click="editCustomer(true)">Change</a>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row mt-5">
+        <div class="step-header">
+            <h4>2. Shipping Information</h4>
+        </div>
+    </div>
+    <div class="row">
+        <form name="shippingInfo" class="user-form" ng-show="shippingInfo.$invalid || shippingFlag" novalidate class="css-form">
             <div class="alert alert-success" ng-if="message != null"><b>{{message}}</b></div>
             <div class="form-group">
-                <h3>Confirm Shipping Information</h3>
-            </div>
-            <div class="form-group">
-                <h4>Address</h4>
+                <h5>Address</h5>
                 <input type="text" placeholder="Address" ng-model="shipping.Address" required>
             </div>
             <div class="form-group">
-                <h4>City</h4>
+                <h5>City</h5>
                 <input type="text" placeholder="City" ng-model="shipping.City" required>
             </div>
             <div class="form-group">
-                <h4>State</h4>
+                <h5>State</h5>
                     <select ng-model="shipping.State" ng-options="state.Abbreviation for state in states track by state.StateID" required></select>                
             </div>
             <div class="form-group">
-                <h4>ZIP Code</h4>
+                <h5>ZIP Code</h5>
                 <input type="text" placeholder="ZIP Code" ng-model="shipping.Zipcode" required>
             </div>
             <input type="hidden" ng-model="shipping.AddressID">
             <div class="form-group">
-                <input type="submit" name="setAddress" ng-click="setAddress(false)" value="Use This Address"/>
+                <input type="submit" name="setAddress" ng-disabled="shippingInfo.$invalid" ng-click="setAddress(false); editShipping(false)" value="Use This Address"/>
             </div>
         </form>
+        <div class="border border-dark p-2" ng-show="shippingInfo.$valid && !shippingFlag">
+            <p class="m-0">{{shipping.Address}}</p>
+            <p class="m-0">{{shipping.City}}, {{shipping.Abbreviation}} {{shipping.Zipcode}}</p>
+            <div class="text-right">
+                <div class="text-right">
+                    <a href="#" class="text-primary" ng-click="editShipping(true)">Change</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="row">
-        <div class="summary my-5 mx-auto py-3">
-            <h3>Confirm Order Total</h3>
-            <p>Total: ${{shoppingCart.total}}</p>
+    <hr>
+    <div class="row mt-5">
+        <div class="step-header">
+            <h4>3. Confirm Total</h4>
+        </div>
+    </div>
+    <hr>
+    <div class="row mb-5">
+        <div class="summary user-form" ng-show="!customerFlag && !shippingFlag && accountInfo.$valid && shippingInfo.$valid">
+            <h4>Confirm Order Total</h4>
+            <p>Item Total: ${{shoppingCart.total | number : fractionSize}}</p>
+            <p>Shipping: ${{shippingTotal | number : fractionSize}}</p>
+            <p>Tax: ${{taxTotal | number : fractionSize}}</p>
+            <hr>
+            <p>Order Total: ${{subtotal | number : fractionSize}}</p>
             <br>
             <!-- Set up a container element for the button -->
             <div id="paypal-button-container"></div>
-            <div class="text-danger" ng-show="shippingInfo.$invalid || accountInfo.$invalid">Please Fill In Customer and Shipping Information!</div>
         </div>
+        <div class="text-danger" ng-show="shippingInfo.$invalid || accountInfo.$invalid">Please Fill In Customer and Shipping Information!</div>
     </div>
 </div>
 </body>

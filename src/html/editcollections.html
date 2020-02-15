@@ -17,24 +17,25 @@
 <script src="/js/main.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/banner.css">
 <link rel="stylesheet" href="/style/upload.css">
 <title>Pandesal Brad</title>
 </head>
 <body ng-app="mainPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="bannerPageController" ng-init="loadSlides()">
+<div class="container" ng-controller="collectionsPageController" ng-init="loadCollections()">
     <div class="row">
-        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadSlide.php" method="post" enctype="multipart/form-data">
+        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadCollection.php" method="post" enctype="multipart/form-data">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
             <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
             <div class="form-group">
-                <h3 ng-if="slideID == null">Upload Slide</h3>
-                <h3 ng-if="slideID != null">Update Slide</h3>
+                <h3 ng-if="collectionID == null">Upload Collection</h3>
+                <h3 ng-if="collectionID != null">Update Collection</h3>
             </div>
             <div class="form-group">
-                <h4 class="inline-header">Select Slide</h4>
-                <select name="category" ng-change="setSlide()" ng-model="selected" ng-options="slide.SlideIndex for slide in slides track by slide.SlideID">
+                <h4 class="inline-header">Select Collection</h4>
+                <select name="category" ng-change="setCollection()" ng-model="selected" ng-options="collection.CollectionIndex for collection in collections track by collection.CollectionID">
                 </select>
             </div>
             <div class="form-group" ng-show="info != null">
@@ -43,41 +44,33 @@
             <div class="image-info" ng-show="showImage">
                 <img class="product-image" ng-src="{{previewData.data}}" />
                 <div class="action-button">
-                    <i class="fa fa-plus remove-image" title="Add Slide" ng-click=addSlide()></i> 
+                    <i class="fa fa-plus remove-image" title="Add Collection" ng-click=addCollection()></i> 
                 </div>
                 <div class="action-button" ng-show="selected != null">
-                    <i class="fa fa-minus remove-image" title="Remove Slide" ng-click=deleteSlide(slideID)></i> 
+                    <i class="fa fa-minus remove-image" title="Remove Collection" ng-click=deleteCollection(collectionID)></i> 
                 </div>
             </div>
             <div class="form-group">
                 <input type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="uploadedImage" accept="image/png, image/jpeg"/>
             </div>
             <!-- Hidden field to send product ID if needed -->
-            <input type="hidden" ng-value="slideID" name="slideID">
+            <input type="hidden" ng-value="collectionID" name="collectionID">
             <div ng-show="showImage">
                 <div class="form-group">
-                    <h4>Slide Index</h4>
-                    <input type="number" min="0" ng-model="slideIndex" placeholder="" name="slideIndex" required>
+                    <h4>Collection Index</h4>
+                    <input type="number" min="0" ng-model="collectionIndex" placeholder="" name="collectionIndex" required>
                 </div>
                 <div class="form-group">
-                    <h4>Slide Name</h4>
-                    <input type="text" ng-model="slideName" placeholder="Slide Name" name="sname" required>
-                </div>
-                <div class="form-group">
-                    <h4>Caption</h4>
-                    <input type="text" ng-model="caption" placeholder="Caption" name="caption">
+                    <h4>Collection Name</h4>
+                    <input type="text" ng-model="collectionName" placeholder="Collection Name" name="cname" required>
                 </div>
                 <div class="form-group">
                     <h4>Image Name</h4>
                     <input type="text" ng-model="imageName" placeholder="Image Name" name="iname" required>
                 </div>
                 <div class="form-group">
-                    <h4>Link</h4>
-                    <input type="text" ng-model="link" placeholder="Link" name="link">
-                </div>
-                <div class="form-group">
-                    <button ng-if="slideID == null" type="submit" name="upload">Upload</button>
-                    <button ng-if="slideID != null" type="submit" name="update">Update</button>
+                    <button ng-if="collectionID == null" type="submit" name="upload">Upload</button>
+                    <button ng-if="collectionID != null" type="submit" name="update">Update</button>
                 </div>
             </div>
         </form>

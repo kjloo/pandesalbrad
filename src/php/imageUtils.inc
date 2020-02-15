@@ -45,6 +45,23 @@ function get_slide_image_name_from_db($slideID) {
     return $iname;
 }
 
+function get_collection_image_name_from_db($collectionID) {
+    // Retrieve image name
+    include "sqlConn.inc";
+    $iname = null;
+    $sql = "SELECT Image FROM collections WHERE CollectionID = ?";
+    if($stmt = $conn->prepare($sql)) {
+        $stmt->execute([$collectionID]);
+
+        if ($stmt->rowCount() == 1) {
+            // output data
+            $row = $stmt->fetch();
+            $iname = $row['Image'];
+        }
+    }
+    return $iname;
+}
+
 function get_images_dir() {
     return dirname(dirname(__FILE__)) . "/images/";
 }

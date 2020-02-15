@@ -66,10 +66,20 @@ INSERT INTO choices(Name, OptionID) VALUES("Medium", (SELECT OptionID FROM optio
 INSERT INTO choices(Name, OptionID) VALUES("Large", (SELECT OptionID FROM options WHERE Name = "Size"));
 INSERT INTO choices(Name, OptionID) VALUES("Extra Large", (SELECT OptionID FROM options WHERE Name = "Size"));
 
+CREATE TABLE shipping(
+    ShippingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(32) NOT NULL,
+    Cost DECIMAL(6,2) NOT NULL,
+    Bundle INT NOT NULL
+);
+
+INSERT INTO shipping(Name, Cost, Bundle) VALUES("Clothes", 7.00, 2), ("Sticker", 0.49, 0);
+
 CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
-    Shipping DECIMAL(6,2)
+    ShippingID INT NOT NULL,
+    FOREIGN KEY(ShippingID) REFERENCES shipping(ShippingID)
 );
 
 CREATE TABLE format_options(
@@ -103,7 +113,7 @@ CREATE TABLE addresses(
     Zipcode VARCHAR(5) NOT NULL,
     UserID INT,
     FOREIGN KEY(UserID) REFERENCES users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY(StateID) REFERENCES states(StateID) ON DELETE CASCADE
+    FOREIGN KEY(StateID) REFERENCES states(StateID)
 );
 
 CREATE TABLE statuses(
@@ -128,7 +138,7 @@ CREATE TABLE orders(
     Email VARCHAR(255) NOT NULL,
     FOREIGN KEY(UserID) REFERENCES users(UserID),
     FOREIGN KEY(StatusID) REFERENCES statuses(StatusID),
-    FOREIGN KEY(StateID) REFERENCES states(StateID) ON DELETE CASCADE
+    FOREIGN KEY(StateID) REFERENCES states(StateID)
 );
 
 CREATE TABLE packages(
@@ -159,57 +169,58 @@ CREATE TABLE slides(
 CREATE TABLE states(
     StateID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(14) NOT NULL UNIQUE,
-    Abbreviation VARCHAR(2) NOT NULL UNIQUE
+    Abbreviation VARCHAR(2) NOT NULL UNIQUE,
+    Tax DECIMAL(6,3) NOT NULL,
 );
 
-INSERT INTO states(Name, Abbreviation)
-VALUES("Alabama", "AL"),
-("Alaska", "AK"),
-("Arizona", "AZ"),
-("Arkansas", "AR"),
-("California", "CA"),
-("Colorado", "CO"),
-("Connecticut", "CT"),
-("Delaware", "DE"),
-("Florida", "FL"),
-("Georgia", "GA"),
-("Hawaii", "HI"),
-("Idaho", "ID"),
-("Illinois", "IL"),
-("Indiana", "IN"),
-("Iowa", "IA"),
-("Kansas", "KS"),
-("Kentucky", "KY"),
-("Louisiana", "LA"),
-("Maine", "ME"),
-("Maryland", "MD"),
-("Massachusetts", "MA"),
-("Michigan", "MI"),
-("Minnesota", "MN"),
-("Mississippi", "MS")
-("Missouri", "MO"),
-("Montana", "MT"),
-("Nebraska", "NE"),
-("Nevada", "NV"),
-("New Hampshire", "NH"),
-("New Jersey", "NJ"),
-("New Mexico", "NM"),
-("New York", "NY"),
-("North Carolina", "NC"),
-("North Dakota", "ND"),
-("Ohio", "OH"),
-("Oklahoma", "OK"),
-("Oregon", "OR"),
-("Pennsylvania", "PA"),
-("Rhode Island", "RI"),
-("South Carolina", "SC"),
-("South Dakota", "SD"),
-("Tennessee", "TN"),
-("Texas", "TX"),
-("Utah", "UT"),
-("Vermont", "VT"),
-("Virginia", "VA"),
-("Washington", "WA"),
-("West Virginia", "WV"),
-("Wisconsin", "WI"),
-("Wyoming", "WY");
+INSERT INTO states(Name, Abbreviation, Tax)
+VALUES("Alabama", "AL", 4),
+("Alaska", "AK", 0),
+("Arizona", "AZ", 5.6),
+("Arkansas", "AR", 6.5),
+("California", "CA", 7.25),
+("Colorado", "CO", 2.9),
+("Connecticut", "CT", 6.35),
+("Delaware", "DE", 0),
+("Florida", "FL", 6),
+("Georgia", "GA", 4),
+("Hawaii", "HI", 4),
+("Idaho", "ID", 6),
+("Illinois", "IL", 6.25),
+("Indiana", "IN", 7),
+("Iowa", "IA", 6),
+("Kansas", "KS", 6.5),
+("Kentucky", "KY", 6),
+("Louisiana", "LA", 4.45),
+("Maine", "ME", 5.5),
+("Maryland", "MD", 6),
+("Massachusetts", "MA", 6.25),
+("Michigan", "MI", 6),
+("Minnesota", "MN", 6.875),
+("Mississippi", "MS", 7),
+("Missouri", "MO", 4.225),
+("Montana", "MT", 0),
+("Nebraska", "NE", 5.5),
+("Nevada", "NV", 6.85),
+("New Hampshire", "NH", 0),
+("New Jersey", "NJ", 6.625),
+("New Mexico", "NM", 5.125),
+("New York", "NY", 4),
+("North Carolina", "NC", 4.750),
+("North Dakota", "ND", 5),
+("Ohio", "OH", 5.75),
+("Oklahoma", "OK", 4.5),
+("Oregon", "OR", 0),
+("Pennsylvania", "PA", 6),
+("Rhode Island", "RI", 7),
+("South Carolina", "SC", 6),
+("South Dakota", "SD", 4.5),
+("Tennessee", "TN", 7),
+("Texas", "TX", 6.25),
+("Utah", "UT", 4.85),
+("Vermont", "VT", 6),
+("Virginia", "VA",4.3),
+("Washington", "WA", 6.5),
+("West Virginia", "WV", 6),
+("Wisconsin", "WI", 5),
+("Wyoming", "WY", 4);

@@ -80,7 +80,7 @@ if (is_user_admin()) {
         $errors = insert_slide($slide);
 
         if (empty($errors) != true) {
-            header("Location: ../bannder.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 

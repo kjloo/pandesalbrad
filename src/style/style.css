@@ -26,6 +26,10 @@ img {
   height: 60px;
 }
 
+.inline-header {
+    display: inline;
+}
+
 .trim {
     background-color: #330011;
     padding: 0px;
@@ -152,6 +156,7 @@ hr.dark {
     border-color: black;
     border-style: solid;
     border-width: 1px;
+    padding-top: 1rem;
 }
 
 .user-form .form-group {

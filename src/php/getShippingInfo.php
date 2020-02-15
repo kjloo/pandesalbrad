@@ -25,6 +25,6 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
     $conn = null;
 }
 
-echo json_encode($data);
+echo json_encode($data, JSON_NUMERIC_CHECK);
 
 ?>

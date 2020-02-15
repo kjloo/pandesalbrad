@@ -84,40 +84,46 @@ app.factory('adminUtils', function($http) {
 app.factory('accountLoader', function($http, $window) {
     return {
         getAccountInfo: function(s) {
-            $http.get('/php/getAccountInfo.php').then(function(response) {
-                s.account = response.data;
-                if (s.account == "null") {
-                    s.account = {
-                        "Firstname": "",
-                        "Lastname": "",
-                        "Email": "",
+            return function() {
+                $http.get('/php/getAccountInfo.php').then(function(response) {
+                    s.account = response.data;
+                    if (s.account == "null") {
+                        s.account = {
+                            "Firstname": "",
+                            "Lastname": "",
+                            "Email": "",
+                        }
                     }
-                }
-            });
+                });
+            }
         },
         getShippingInfo: function(s) {
-            $http.get('/php/getShippingInfo.php').then(function(response) {
-                //console.log(response.data);
-                s.shipping = response.data;
-                // If nothing is returned, initialize empty values to allow for use in ng-model
-                // For some reason "null" string is returned...
-                if (s.shipping == "null") {
-                    s.shipping = {
-                        'Address': "",
-                        'City': "",
-                        'State': [],
-                        'StateID': null,
-                        'Zipcode': null,
-                        'AddressID': null
-                    };
-                }
-            });
+            return function() {
+                $http.get('/php/getShippingInfo.php').then(function(response) {
+                    //console.log(response.data);
+                    s.shipping = response.data;
+                    // If nothing is returned, initialize empty values to allow for use in ng-model
+                    // For some reason "null" string is returned...
+                    if (s.shipping == "null") {
+                        s.shipping = {
+                            'Address': "",
+                            'City': "",
+                            'State': [],
+                            'StateID': null,
+                            'Zipcode': null,
+                            'AddressID': null,
+                        };
+                    }
+                });
+            }
         },
         loadStates: function(s) {
-            $http.get('/php/loadStates.php').then(function(response) {
-                //console.log(response.data);
-                s.states = response.data;
-            });
+            return function() {
+                $http.get('/php/loadStates.php').then(function(response) {
+                    //console.log(response.data);
+                    s.states = response.data;
+                });
+            }
         },
         setAddress: function(s, redirect) {
             // Only if something changed
@@ -238,8 +244,126 @@ app.controller('loginPageController', function($http, $scope, $location) {
 });
 
 // configure existing services inside initialization blocks.
-app.controller('collectionsPageController', function($http, $scope, shoppingCart) {
+app.controller('collectionsPageController', function($http, $scope, $location, adminUtils, shoppingCart) {
     $scope.loadCollections = shoppingCart.loadCollections($scope);
+
+    $scope.status = $location.search().upload;
+    $scope.message = $location.search().message;
+
+    $scope.info = null;
+
+    $scope.resetScope = function() {
+        $scope.previewData = [];
+
+        $scope.showImage = false;
+        $scope.collectionID = null;
+        $scope.collectionName = null;
+        $scope.imageName = null;
+        $scope.collectionIndex = null;
+        $scope.selected = null;
+    }
+
+    $scope.resetScope();
+
+    $scope.setCollection = function() {
+        if (Array.isArray($scope.collections) && $scope.collections.length) {
+            for (var key in $scope.collections) {
+                var collection = $scope.collections[key];
+                if ($scope.selected.CollectionIndex == collection.CollectionIndex) {
+                    $scope.collectionID = collection.CollectionID;
+                    $scope.collectionName = collection.Name;
+                    $scope.imageName = collection.Image;
+                    $scope.image = collection.Image;
+                    $scope.collectionIndex = collection.CollectionIndex;
+
+                    // Show product image
+                    $scope.showImage = true;
+                    $scope.previewData['data'] = "/images/" + $scope.image;
+                }
+            }
+        }
+    }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.collections) && $scope.collections.length) {
+            $scope.selected = $scope.collections[0];
+            for (var key in $scope.collections) {
+                var collection = $scope.collections[key];
+                if ($scope.collectionID == collection.CollectionID) {
+                    $scope.selected = collection;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.$watchGroup(['collections'], function () {
+        if (Array.isArray($scope.collections) && $scope.collections.length) {
+            $scope.collectionID = $scope.collections[0]["CollectionID"];
+            $scope.collectionIndex = $scope.collections[0]["CollectionIndex"];
+            $scope.setSelected();
+            $scope.setCollection();
+        }
+    });
+
+    $scope.addCollection = function() {
+        $scope.resetScope();
+        if (Array.isArray($scope.collections)) {
+            $scope.collectionIndex = $scope.collections.length;
+        } else {
+            $scope.collectionIndex = 0;
+        }
+        // Display message to user
+        $scope.info = "Please Upload an Image";
+    }
+    $scope.deleteCollection = function(collectionID) {
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteCollection.php/" + collectionID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Collection.";
+                var deleteID = response.data.CollectionID;
+                $scope.collections = $scope.collections.filter(function(collection) {
+                    return collection.CollectionID != deleteID;
+                });
+                // Think we need to reload the slides here
+                slideUtils.loadSlides($scope);
+            });
+        }
+    }
+    $scope.setImage = function(fileData) {
+        if (!isEmpty(fileData)) {
+            name = fileData["name"];
+            $scope.previewData = fileData;
+            // Utilizing non angular event call so must inform angular that scope variables are changing.
+            $scope.$apply(function() {
+                if ($scope.imageName == null) {
+                    $scope.imageName = name;
+                }
+                if ($scope.collectionName == null) {
+                    $scope.collectionName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
+                }
+                $scope.showImage = true;
+                $scope.info = null;
+            });
+        }
+    }
+    $scope.removeInput = function() {
+        // Unload file
+        $("input[type='file']").val("");
+        $scope.previewData = [];
+        $scope.showImage = false;
+    }
+    $scope.readInput = function(input) {
+        adminUtils.readInput(input, {
+            success: $scope.setImage,
+            fail: function() {$scope.$apply($scope.removeInput())}
+        });
+    }    
 });
 
 app.controller('productPageController', function($http, $scope, $location, shoppingCart) {
@@ -632,11 +756,41 @@ app.controller('shippingPageController', function($http, $scope, accountLoader) 
 
 app.controller('checkoutPageController', function($http, $scope, $window, accountLoader, shoppingCart) {
     $scope.message = null;
+    // Display 2 decimal places
+    $scope.fractionSize = 2;
+
+    // Notify changes
+    $scope.customerFlag = false;
+    $scope.shippingFlag = false;
+
     $scope.getAccountInfo = accountLoader.getAccountInfo($scope);
     $scope.getShippingInfo = accountLoader.getShippingInfo($scope);
     $scope.loadStates = accountLoader.loadStates($scope);
+
+    $scope.roundMoney = function(value) {
+        return Math.round(value * 100) / 100;
+    }
+
+    $scope.calculateTotals = function() {
+        // Totals
+        if ($scope.shipping != null) {
+            $scope.taxTotal = $scope.roundMoney(($scope.total + $scope.shippingTotal) * ($scope.shipping.State.Tax / 100));
+            $scope.subtotal = $scope.roundMoney($scope.total + $scope.shippingTotal + $scope.taxTotal);
+        }
+    }
+
+    $scope.getCheckoutTotal = function() {
+        $http.get('/php/getCheckoutTotal.php').then(function(response) {
+            //console.log(response.data);
+            $scope.shippingTotal = response.data.Shipping;
+            $scope.total = response.data.Total;
+        });
+    }
+
     $scope.setAddress = function(redirect) {
-        accountLoader.setAddress($scope, redirect);
+        if (shoppingCart.userID != null) {
+            accountLoader.setAddress($scope, redirect);
+        }
     }
 
     $scope.setSelected = function() {
@@ -655,6 +809,18 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
     $scope.$watchGroup(['states', 'shipping.StateID'], function () {
         $scope.setSelected();
     });
+
+    $scope.$watchGroup(['shipping.State', 'total', 'shippingTotal'], $scope.calculateTotals);
+
+    // Set flags
+    $scope.editCustomer = function(flag) {
+        $scope.customerFlag = flag;
+    }
+
+    $scope.editShipping = function(flag) {
+        $scope.shippingFlag = flag;
+    }
+
     // Render the PayPal button into #paypal-button-container
     // This seems to be protected by CORB
     paypal.Buttons({
@@ -663,7 +829,12 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
         },
         onInit: function(data, actions) {
             // Disable the buttons
-            actions.disable();
+            var submittable = $scope.shippingInfo.$valid && $scope.accountInfo.$valid;
+            if (submittable) {
+                actions.enable();
+            } else {
+                actions.disable();
+            }
             paypalActions = actions;
             $scope.$watchGroup(['shippingInfo.$valid', 'accountInfo.$valid'], function () {
                 var submittable = $scope.shippingInfo.$valid && $scope.accountInfo.$valid;
@@ -679,7 +850,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
             return actions.order.create({
                 purchase_units: [{
                     amount: {
-                        value: shoppingCart.total
+                        value: $scope.subtotal
                     }
                 }]
             });

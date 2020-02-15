@@ -17,5 +17,5 @@
     if (isset($_SESSION['u_total'])) {
         $data["Total"] = $_SESSION['u_total'];
     }
-    echo json_encode($data);
+    echo json_encode($data, JSON_NUMERIC_CHECK);
 ?>
