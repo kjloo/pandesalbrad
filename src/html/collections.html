@@ -20,7 +20,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="collectionsPageController" ng-init="loadCollections()">
+<div class="body container" ng-controller="collectionsPageController" ng-init="loadCollections()">
     <div class="row">
         <div class="col-md-3 col-sm-6" ng-repeat="collection in collections">
             <a ng-href="products.html?collectionID={{collection.CollectionID}}" target="_self"><img ng-src="/images/{{collection.Image}}" class="sticker mx-auto img-responsive"/></a>
@@ -28,8 +28,6 @@
         </div>
     </div>
 </div>
-</body>
-<footer>
 <div ng-include="'footer.html'"></div>
-</footer>
+</body>
 </html>

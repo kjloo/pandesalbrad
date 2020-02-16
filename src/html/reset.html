@@ -19,7 +19,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="signupPageController">
+<div class="body container" ng-controller="signupPageController">
     <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
     <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
     <div class="row">
@@ -47,8 +47,6 @@
         </form>
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

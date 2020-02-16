@@ -19,7 +19,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="recoveryPageController">
+<div class="body container" ng-controller="recoveryPageController">
     <div class="row">
         <form class="user-form my-5 mx-auto py-3" action="/php/passwordRecovery.php" method="post">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
@@ -37,8 +37,6 @@
         </form>
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

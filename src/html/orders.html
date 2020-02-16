@@ -20,7 +20,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div ng-controller="ordersPageController" ng-init="getOrders(); loadStatuses();">
+<div class="body" ng-controller="ordersPageController" ng-init="getOrders(); loadStatuses();">
     <div class="container mt-5 control-panel">
         <div class="alert alert-success" ng-if="message != null">{{message}}</div>
         <form ng-submit="getOrders(searchString)">
@@ -96,8 +96,6 @@
         </div>
     </div>
 </div>
-</body>
-<footer>
 <div ng-include="'footer.html'"></div>
-</footer>
+</body>
 </html>

@@ -19,14 +19,12 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="activatePageController" ng-init="activateUser()">
+<div class="body container" ng-controller="activatePageController" ng-init="activateUser()">
     <div class="row">
         <div class="alert alert-secondary" ng-if="message != null">{{message}}</div>
         <img src="/images/logo.jpeg" class="img-fluid" alt="">
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

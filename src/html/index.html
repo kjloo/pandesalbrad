@@ -20,28 +20,28 @@
 <title>Pandesal Brad</title>
 </head>
 <body ng-app="mainPage" id="main-background">
-    <div ng-include="'navbar.html'">
-    </div>
-    <div ng-controller="mainPageController" ng-init="loadSlides()">
-        <div uib-carousel interval="sleep">
-          <div uib-slide ng-repeat="slide in slides track by slide.SlideID" index="$index">
-            <a class="nav-link" ng-href="{{slide.Link}}" target="_self">
-                <img class="slide-img img-fluid" ng-src="/images/{{slide.Image}}" alt="{{slide.Name}}">
-                <div class="carousel-caption">
-                  <p>{{slide.Caption}}</p>
-                </div>
-            </a>
-          </div>
+    <div class="body">
+        <div ng-include="'navbar.html'">
         </div>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-12 py-3 white-space">
+        <div ng-controller="mainPageController" ng-init="loadSlides()">
+            <div uib-carousel interval="sleep">
+              <div uib-slide ng-repeat="slide in slides track by slide.SlideID" index="$index">
+                <a class="nav-link" ng-href="{{slide.Link}}" target="_self">
+                    <img class="slide-img img-fluid" ng-src="/images/{{slide.Image}}" alt="{{slide.Name}}">
+                    <div class="carousel-caption">
+                      <p>{{slide.Caption}}</p>
+                    </div>
+                </a>
+              </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 py-3 white-space">
+                </div>
             </div>
         </div>
     </div>
-</body>
-<footer>
     <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

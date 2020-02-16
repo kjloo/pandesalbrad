@@ -23,7 +23,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="checkoutPageController" ng-init="getCheckoutTotal(); getAccountInfo(); getShippingInfo(); loadStates();">
+<div class="body container" ng-controller="checkoutPageController" ng-init="getCheckoutTotal(); getAccountInfo(); getShippingInfo(); loadStates();">
     <div class="row mt-5">
         <div class="step-header">
             <h4>1. Customer Information</h4>
@@ -117,8 +117,6 @@
         <div class="text-danger" ng-show="shippingInfo.$invalid || accountInfo.$invalid">Please Fill In Customer and Shipping Information!</div>
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

@@ -21,7 +21,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="productsPageController" ng-init="loadProducts()">
+<div class="body container" ng-controller="productsPageController" ng-init="loadProducts()">
     <div class="row">
         <div class="col-md-4 col-sm-6 p-2" ng-repeat="product in products">
             <a class="nav-link" ng-href="product.html?productID={{product.ProductID}}" target="_self">
@@ -34,8 +34,6 @@
         </div>
     </div>
 </div>
+<div ng_include="'footer.html'"></div>
 </body>
-<footer>
-<div ng-include="'footer.html'"></div>
-</footer>
 </html>

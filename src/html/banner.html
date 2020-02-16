@@ -23,7 +23,7 @@
 <body ng-app="mainPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="bannerPageController" ng-init="loadSlides()">
+<div class="body container" ng-controller="bannerPageController" ng-init="loadSlides()">
     <div class="row">
         <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadSlide.php" method="post" enctype="multipart/form-data">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
@@ -83,8 +83,6 @@
         </form>
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

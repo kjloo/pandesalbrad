@@ -20,7 +20,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="cartPageController" ng-init="loadCart()">
+<div class="body container" ng-controller="cartPageController" ng-init="loadCart()">
     <div class="row">
     	<table class="table">
         <thead>
@@ -64,8 +64,6 @@
         <button class="my-3" ng-click="openCheckoutPage()">Proceed To Checkout</button>
     </div>
 </div>
-</body>
-<footer>
 <div ng-include="'footer.html'"></div>
-</footer>
+</body>
 </html>

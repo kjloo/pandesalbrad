@@ -19,7 +19,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="shippingPageController" ng-init="getShippingInfo(); loadStates()">
+<div class="body container" ng-controller="shippingPageController" ng-init="getShippingInfo(); loadStates()">
     <div class="row">
         <form name="shippingInfo" class="user-form my-5 mx-auto py-3" novalidate class="css-form">
             <div class="form-group">
@@ -48,8 +48,6 @@
         </form>
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>

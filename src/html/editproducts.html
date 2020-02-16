@@ -19,7 +19,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="container" ng-controller="productsPageController" ng-init="loadProducts()">
+<div class="body container" ng-controller="productsPageController" ng-init="loadProducts()">
     <div class="row">
         <div class="alert alert-success" ng-if="message != null">{{message}}</div>
         <table class="table">
@@ -47,8 +47,6 @@
         </table>
     </div>
 </div>
-</body>
-<footer>
 <div ng_include="'footer.html'"></div>
-</footer>
+</body>
 </html>
