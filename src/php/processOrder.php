@@ -58,8 +58,8 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
         if ($isUserAccount) {
             $userID = $_SESSION['u_id'];
             if (empty($_POST['addressID'])) {
-                $sql = "INSERT INTO addresses (Address, City, State, Zipcode, UserID) VALUES (?, ?, ?, ?, ?)";
-                $input = [$address, $city, $state, $zipcode, $userID];
+                $sql = "INSERT INTO addresses (Address, City, StateID, Zipcode, UserID) VALUES (?, ?, ?, ?, ?)";
+                $input = [$address, $city, $stateID, $zipcode, $userID];
                 if ($stmt = $conn->prepare($sql)) {
                     $stmt->execute($input);
                     // Error Checking?
