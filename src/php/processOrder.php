@@ -36,6 +36,17 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
     if ($total != $response->result->purchase_units[0]->amount->value) {
         $data['Processed'] = False;
     } else {
+        // Send confirmation email
+        include "email.inc";
+        $subject = "PandesalBrad Order Confirmation";
+        $msg = "Thank you for your order.\r\n";
+        $msg .= "Order Summary:\r\n";
+        $msg .= "Total: " . $total . "\r\n";
+        $msg .= "Order ID: " . $orderID . "\r\n";
+        $errors = send_email($subject, $msg, $email);
+        if(empty($errors) != true) {
+            error_exit(join(",", $errors));
+        }
         include "sqlConn.inc";
         // Create SQL Query
         // Check if user has account

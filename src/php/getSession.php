@@ -13,6 +13,8 @@
     }
     if (isset($_SESSION['u_cart'])) {
         $data["Cart"] = $_SESSION['u_cart'];
+    } else {
+        $_SESSION['u_cart'] = array();
     }
     if (isset($_SESSION['u_total'])) {
         $data["Total"] = $_SESSION['u_total'];

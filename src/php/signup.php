@@ -53,9 +53,9 @@ if (isset($_POST['signup']) && !empty($_POST['fname']) && !empty($_POST['lname']
             $subject = "PandesalBrad Email Validation";
             $msg = "Click the link below to complete account creation:\r\n";
             $msg .= "https://pandesalbradart.com/activate.html?token=" . $random_hash_token . "\r\n";
-            if (!send_email($subject, $msg, $email)) {
-                // Email could not send
-                header("Location: ../signup.html?signup=fail&message=Error sending email");
+            $errors = send_email($subject, $msg, $email);
+            if(empty($errors) != true) {
+                header("Location: ../signup.html?signup=fail&message=" . join(",", $errors));
                 exit();
             } else {
                 // Create SQL Query

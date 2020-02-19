@@ -1,6 +1,8 @@
 <?php
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 function is_user_admin() {
     return isset($_SESSION['u_id']) && isset($_SESSION['u_isAdmin']) && $_SESSION['u_isAdmin'];

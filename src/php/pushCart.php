@@ -1,16 +1,20 @@
 <?php
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (isset($_POST['pushCart']) && !empty($_POST['itemID']) && !empty($_POST['quantity'])) {
     // Update cookie
     $itemID = intval($_POST['itemID']);
     $quantity = intval($_POST['quantity']);
     if (is_int($itemID) && is_int($quantity)) {
-        if (array_key_exists($itemID, $_SESSION['u_cart'])) {
-            $_SESSION['u_cart'][$itemID] += $quantity;
-        } else {
-            $_SESSION['u_cart'][$itemID] = $quantity;
+        if (isset($_SESSION['u_cart'])) {
+            if (array_key_exists($itemID, $_SESSION['u_cart'])) {
+                $_SESSION['u_cart'][$itemID] += $quantity;
+            } else {
+                $_SESSION['u_cart'][$itemID] = $quantity;
+            }
         }
     } else {
         exit();

@@ -7,7 +7,7 @@ if (!empty($_GET["product"]) && !empty($_GET["format"])) {
 
     $product = $_GET["product"];
     $format = $_GET["format"];
-    $choice = $_GET["choice"];
+    $choice = isset($_GET["choice"]) ? $_GET["choice"] : null;
 
     $parameters = array();
     // Create SQL Query
