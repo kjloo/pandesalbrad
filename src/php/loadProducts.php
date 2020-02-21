@@ -2,9 +2,11 @@
 
 include "sqlConn.inc";
 
-$collection = isset($_GET["product"]) ? $_GET["collection"] : null;
+$collection = isset($_GET["collection"]) ? $_GET["collection"] : null;
 $product = isset($_GET["product"]) ? $_GET["product"] : null;
 $name = isset($_GET["name"]) ? $_GET["name"] : null;
+
+echo $product;
 
 $parameters = array();
 // Create SQL Query
