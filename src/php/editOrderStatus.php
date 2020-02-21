@@ -3,6 +3,8 @@
 session_start();
 
 include "imageUtils.inc";
+require_once "adminUtils.inc";
+
 if (is_user_admin()) {
     if (isset($_POST['status']) && !empty($_POST['orderID']) && !empty($_POST['statusID'])) {
 

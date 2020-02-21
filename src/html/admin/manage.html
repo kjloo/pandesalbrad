@@ -19,25 +19,25 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container">
+<div class="body container" ng-controller="managePageController" ng-init="adminPermissions()">
     <div class="row">
         <div class="summary my-5 col-12 offset-md-1 col-md-4 py-3">
             <h4>Product Management</h4>
-            <a class="nav-link" ng-href="upload.html" target="_self">Upload Product</a>
+            <a class="nav-link" ng-href="admin/upload.html" target="_self">Upload Product</a>
 
-            <a class="nav-link" ng-href="editproducts.html" target="_self">Edit Products</a>
-            <a class="nav-link" ng-href="editcollections.html" target="_self">Edit Collections</a>
+            <a class="nav-link" ng-href="admin/editproducts.html" target="_self">Edit Products</a>
+            <a class="nav-link" ng-href="admin/editcollections.html" target="_self">Edit Collections</a>
         </div>
         <div class="summary my-5 col-12 offset-md-2 col-md-4 py-3">
             <h4>Announcement Management</h4>
-            <a class="nav-link" ng-href="banner.html" target="_self">Edit Banner</a>
+            <a class="nav-link" ng-href="admin/banner.html" target="_self">Edit Banner</a>
         </div>
     </div>
     <div class="row">
         <div class="summary mb-5 col-12 offset-md-1 col-md-4 py-3">
             <h4>User Management</h4>
-            <a class="nav-link" ng-href="editusers.html" target="_self">Edit Users</a>
-            <a class="nav-link" ng-href="email.html" target="_self">Email Users</a>
+            <a class="nav-link" ng-href="admin/editusers.html" target="_self">Edit Users</a>
+            <a class="nav-link" ng-href="admin/email.html" target="_self">Email Users</a>
             <a class="nav-link" ng-href="orders.html" target="_self">View Orders</a>
         </div>
     </div>

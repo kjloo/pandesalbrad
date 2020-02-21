@@ -217,6 +217,11 @@ footer {
         right: -5.0em;
     }
 
+    #main-background {
+        background-image: url('/images/logo2.jpeg');
+        background-repeat: repeat;
+    }
+
     .slide-img {
         height: 300px;
     }

@@ -12,10 +12,10 @@ if (isset($_POST['send']) && !empty($_POST['subject']) && !empty($_POST['email']
     $email = $_POST['email'];
     $errors = send_email($subject, $msg, $email);
     if(empty($errors) != true) {
-        header("Location: ../email.html?message=" . join(",", $errors));
+        header("Location: ../admin/email.html?message=" . join(",", $errors));
         exit();
     }
-    header("Location: ../email.html?message=Email Sent");
+    header("Location: ../admin/email.html?message=Email Sent");
 }
 
 ?>

@@ -25,6 +25,7 @@ app.controller('mainPageController', function($http, $scope, slideUtils) {
 });
 
 app.controller('bannerPageController', function($http, $scope, $location, slideUtils, adminUtils) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.loadSlides = slideUtils.loadSlides($scope);
     $scope.status = $location.search().upload;
     $scope.message = $location.search().message;

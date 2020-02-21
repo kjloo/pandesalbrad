@@ -1,8 +1,11 @@
 <?php
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 include "imageUtils.inc";
+require_once "adminUtils.inc";
 include "collectionUtils.inc";
 
 if (is_user_admin()) {

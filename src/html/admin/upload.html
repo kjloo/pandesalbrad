@@ -9,75 +9,73 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js" crossorigin="anonymous"></script>
-<script src="https://code.angularjs.org/1.7.9/angular-animate.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="//morgul.github.io/ui-bootstrap4/ui-bootstrap-tpls-3.0.6.js"></script>
 <script src="https://kit.fontawesome.com/5257f58f1b.js"></script>
 <script src="/js/collections.js"></script>
-<script src="/js/main.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
 <link rel="stylesheet" href="/style/upload.css">
 <title>Pandesal Brad</title>
 </head>
-<body ng-app="mainPage">
+<body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container" ng-controller="bannerPageController" ng-init="loadSlides()">
+<div class="body container" ng-controller="uploadPageController" ng-init="adminPermissions(); loadCollections(); loadFormats(); getProductInfo();">
     <div class="row">
-        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadSlide.php" method="post" enctype="multipart/form-data">
+        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadProduct.php" method="post" enctype="multipart/form-data">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
             <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
             <div class="form-group">
-                <h3 ng-if="slideID == null">Upload Slide</h3>
-                <h3 ng-if="slideID != null">Update Slide</h3>
-            </div>
-            <div class="form-group">
-                <h4 class="inline-header">Select Slide</h4>
-                <select name="category" ng-change="setSlide()" ng-model="selected" ng-options="slide.SlideIndex for slide in slides track by slide.SlideID">
-                </select>
-            </div>
-            <div class="form-group" ng-show="info != null">
-                <p>{{info}}</p>
+                <h3 ng-if="productID == null">Upload Product</h3>
+                <h3 ng-if="productID != null">Update Product</h3>
             </div>
             <div class="image-info" ng-show="showImage">
                 <img class="product-image" ng-src="{{previewData.data}}" />
-                <div class="action-button">
-                    <i class="fa fa-plus remove-image" title="Add Slide" ng-click=addSlide()></i> 
+                <div class="preview-data">
+                    <div><b>Name:</b> {{previewData.name}}</div>
+                    <div><b>Type:</b> {{previewData.type}}</div>
+                    <div><b>Size:</b> {{previewData.size}}</div>
                 </div>
-                <div class="action-button" ng-show="selected != null">
-                    <i class="fa fa-minus remove-image" title="Remove Slide" ng-click=deleteSlide(slideID)></i> 
+                <div class="action-button" ng-if="productID == null">
+                    <i class="fa fa-close remove-image" ng-click=removeInput()></i> 
                 </div>
             </div>
             <div class="form-group">
                 <input type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="uploadedImage" accept="image/png, image/jpeg"/>
             </div>
             <!-- Hidden field to send product ID if needed -->
-            <input type="hidden" ng-value="slideID" name="slideID">
+            <input type="hidden" ng-value="productID" name="productID">
             <div ng-show="showImage">
                 <div class="form-group">
-                    <h4>Slide Index</h4>
-                    <input type="number" min="0" ng-model="slideIndex" placeholder="" name="slideIndex" required>
-                </div>
-                <div class="form-group">
-                    <h4>Slide Name</h4>
-                    <input type="text" ng-model="slideName" placeholder="Slide Name" name="sname" required>
-                </div>
-                <div class="form-group">
-                    <h4>Caption</h4>
-                    <input type="text" ng-model="caption" placeholder="Caption" name="caption">
+                    <h4>Product Name</h4>
+                    <input type="text" ng-model="productName" placeholder="Product Name" name="pname" required>
                 </div>
                 <div class="form-group">
                     <h4>Image Name</h4>
                     <input type="text" ng-model="imageName" placeholder="Image Name" name="iname" required>
                 </div>
                 <div class="form-group">
-                    <h4>Link</h4>
-                    <input type="text" ng-model="link" placeholder="Link" name="link">
+                    <h4>Price</h4>
+                    <div class="py-3">
+                        <p class="inline-header">Item</p>
+                        <select name="format" ng-change="setItem()" ng-model="format" ng-options="format.Name for format in formats track by format.FormatID"></select>
+                    </div>
+                    <div ng-show="choices != null">
+                        <div ng-repeat="choice in choices" class="form-check form-check-inline">
+                            <input ng-value="choice.ChoiceID" class="form-check-input" type="checkbox" name="itemChoices[]">
+                            <label class="form-check-label">{{choice.Name}}</label>
+                        </div>
+                    </div>
+                    <input type="number" ng-model="productPrice" min="0.00" step="0.01" placeholder="5.99" name="price" required>
                 </div>
                 <div class="form-group">
-                    <button ng-if="slideID == null" type="submit" name="upload">Upload</button>
-                    <button ng-if="slideID != null" type="submit" name="update">Update</button>
+                    <h4>Category</h4>
+                    <select name="category" ng-model="selected" ng-options="collection.Name for collection in collections track by collection.CollectionID">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button ng-if="productID == null" type="submit" name="upload">Upload</button>
+                    <button ng-if="productID != null" type="submit" name="update">Update</button>
                 </div>
             </div>
         </form>

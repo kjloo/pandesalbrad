@@ -3,6 +3,7 @@
 session_start();
 
 include "imageUtils.inc";
+require_once "adminUtils.inc";
 if (is_user_admin()) {
     if (isset($_POST['update']) && !empty($_POST['productID']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['category'])) {
 
@@ -26,14 +27,14 @@ if (is_user_admin()) {
             // Upload new Image
             $errors = upload_image($iname);
             if(empty($errors) != true) {
-                header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../admin/upload.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         } else if ($iname != $oldiname) {
             $errors = move_image($oldiname, $iname);
           
             if(empty($errors) != true) {
-                header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../admin/upload.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         }
@@ -106,7 +107,7 @@ if (is_user_admin()) {
 
         $conn->commit();
         $conn = null;
-        header("Location: ../upload.html?upload=success&message=File Update Successful.");
+        header("Location: ../admin/upload.html?upload=success&message=File Update Successful.");
     } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['category'])) {
 
         include "sqlConn.inc";
@@ -122,7 +123,7 @@ if (is_user_admin()) {
         $errors = upload_image($iname);
           
         if (empty($errors) != true) {
-            header("Location: ../upload.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/upload.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 
@@ -157,13 +158,13 @@ if (is_user_admin()) {
         $conn->commit();
 
         $conn = null;
-        header("Location: ../upload.html?upload=success&message=File Upload Successful.");
+        header("Location: ../admin/upload.html?upload=success&message=File Upload Successful.");
     } else {
-        header("Location: ../upload.html?upload=fail&message=Incorrect Parameters.");
+        header("Location: ../admin/upload.html?upload=fail&message=Incorrect Parameters.");
         exit();
     }
 } else {
-    header("Location: ../upload.html?upload=fail&message=Insufficient Permissions.");
+    header("Location: ../admin/upload.html?upload=fail&message=Insufficient Permissions.");
     exit();
 }
 

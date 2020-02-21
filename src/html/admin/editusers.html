@@ -20,7 +20,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div ng-controller="usersPageController" ng-init="loadUsers(); isAdmin();">
+<div ng-controller="usersPageController" ng-init="adminPermissions(); loadUsers(); isAdmin();">
     <div class="container mt-5 control-panel">
       <div class="alert alert-success" ng-if="message != null">{{message}}</div>
         <form ng-submit="getUser(searchString)">

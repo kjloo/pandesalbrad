@@ -51,12 +51,23 @@ app.factory('shoppingCart', function($http) {
     }
 });
 
-app.factory('adminUtils', function($http) {
+app.factory('adminUtils', function($http, $window) {
     return {
         isAdmin: function(s) {
-            $http.get('/php/isAdmin.php').then(function(response) {
-                s.isUserAdmin = response.data.IsAdmin;
-            })
+            return function() {
+                $http.get('/php/isAdmin.php').then(function(response) {
+                    s.isUserAdmin = response.data.IsAdmin;
+                });
+            }
+        },
+        adminPermissions: function() {
+            return function() {
+                $http.get('/php/adminPermissions.php').then(function(response) {
+                    if (response.data) {
+                        $window.location.href = response.data.href;
+                    }
+                });
+            }
         },
         readInput: function(input, callback) {
             fileData = {};
@@ -245,6 +256,7 @@ app.controller('loginPageController', function($http, $scope, $location) {
 
 // configure existing services inside initialization blocks.
 app.controller('collectionsPageController', function($http, $scope, $location, adminUtils, shoppingCart) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.loadCollections = shoppingCart.loadCollections($scope);
 
     $scope.status = $location.search().upload;
@@ -475,7 +487,8 @@ app.controller('productPageController', function($http, $scope, $location, shopp
 });
 
 // configure existing services inside initialization blocks.
-app.controller('productsPageController', function($http, $scope, $location, $window) {
+app.controller('productsPageController', function($http, $scope, $location, $window, adminUtils) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.loadProducts = function() {
         $http({
             url: '/php/loadProducts.php',
@@ -490,7 +503,7 @@ app.controller('productsPageController', function($http, $scope, $location, $win
 
     // Functions for product management
     $scope.openEditPage = function(productID) {
-        var url = "upload.html?productID=" + productID;
+        var url = "admin/upload.html?productID=" + productID;
         $window.location.href = url;
     }
 
@@ -629,6 +642,7 @@ app.controller('ordersPageController', function($http, $scope, $location, adminU
 });
 
 app.controller('usersPageController', function($http, $scope, $location, adminUtils) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.message = $location.search().message;
 
     $scope.isAdmin = adminUtils.isAdmin($scope);
@@ -894,6 +908,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 
 // configure existing services inside initialization blocks.
 app.controller('uploadPageController', function($http, $scope, $location, shoppingCart, adminUtils) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.loadCollections = shoppingCart.loadCollections($scope);
     $scope.loadFormats = shoppingCart.loadFormats($scope);
     $scope.loadChoices = shoppingCart.loadChoices($scope);
@@ -1024,9 +1039,14 @@ app.controller('activatePageController', function($http, $scope, $location) {
     };
 });
 
-app.controller('emailPageController', function($http, $scope, $location) {
+app.controller('emailPageController', function($http, $scope, $location, adminUtils) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.message = $location.search().message;
     $scope.submittable = true;
+});
+
+app.controller('managePageController', function($http, $scope, adminUtils) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
 });
 
 app.controller('recoveryPageController', function($http, $scope, $location) {

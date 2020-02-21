@@ -4,6 +4,7 @@ session_start();
 
 include "imageUtils.inc";
 include "collectionUtils.inc";
+require_once "adminUtils.inc";
 if (is_user_admin()) {
     if (isset($_POST['update']) && !empty($_POST['collectionID']) && !empty($_POST['cname']) && !empty($_POST['iname']) && isset($_POST['collectionIndex'])) {
 
@@ -23,14 +24,14 @@ if (is_user_admin()) {
             // Upload new Image
             $errors = upload_image($iname);
             if(empty($errors) != true) {
-                header("Location: ../editcollections.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../admin/editcollections.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         } else if ($iname != $oldiname) {
             $errors = move_image($oldiname, $iname);
           
             if(empty($errors) != true) {
-                header("Location: ../editcollections.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../admin/editcollections.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         }
@@ -43,11 +44,11 @@ if (is_user_admin()) {
         $errors = insert_collection($collection);
 
         if (empty($errors) != true) {
-            header("Location: ../editcollections.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/editcollections.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
         $conn = null;
-        header("Location: ../editcollections.html?upload=success&message=Slide Update Successful.");
+        header("Location: ../admin/editcollections.html?upload=success&message=Slide Update Successful.");
     } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['cname']) && !empty($_POST['iname']) && isset($_POST['collectionIndex'])) {
 
         include "sqlConn.inc";
@@ -70,18 +71,18 @@ if (is_user_admin()) {
         $errors = insert_collection($collection);
 
         if (empty($errors) != true) {
-            header("Location: ../editcollections.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/editcollections.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 
         $conn = null;
-        header("Location: ../editcollections.html?upload=success&message=Slide Upload Successful.");
+        header("Location: ../admin/editcollections.html?upload=success&message=Slide Upload Successful.");
     } else {
-        header("Location: ../editcollections.html?upload=fail&message=Incorrect Parameters.");
+        header("Location: ../admin/editcollections.html?upload=fail&message=Incorrect Parameters.");
         exit();
     }
 } else {
-    header("Location: ../editcollections.html?upload=fail&message=Insufficient Permissions.");
+    header("Location: ../admin/editcollections.html?upload=fail&message=Insufficient Permissions.");
     exit();
 }
 

@@ -4,6 +4,7 @@ session_start();
 
 include "imageUtils.inc";
 include "slideUtils.inc";
+require_once "adminUtils.inc";
 if (is_user_admin()) {
     if (isset($_POST['update']) && !empty($_POST['slideID']) && !empty($_POST['sname']) && !empty($_POST['iname']) && isset($_POST['slideIndex'])) {
 
@@ -26,14 +27,14 @@ if (is_user_admin()) {
             // Upload new Image
             $errors = upload_image($iname);
             if(empty($errors) != true) {
-                header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../admin/banner.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         } else if ($iname != $oldiname) {
             $errors = move_image($oldiname, $iname);
           
             if(empty($errors) != true) {
-                header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
+                header("Location: ../admin/banner.html?upload=fail&message=" . join(",", $errors));
                 exit();
             }
         }
@@ -48,11 +49,11 @@ if (is_user_admin()) {
         $errors = insert_slide($slide);
 
         if (empty($errors) != true) {
-            header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/banner.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
         $conn = null;
-        header("Location: ../banner.html?upload=success&message=Slide Update Successful.");
+        header("Location: ../admin/banner.html?upload=success&message=Slide Update Successful.");
     } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['sname']) && !empty($_POST['iname']) && isset($_POST['slideIndex'])) {
 
         include "sqlConn.inc";
@@ -67,7 +68,7 @@ if (is_user_admin()) {
         $errors = upload_image($iname);
           
         if (empty($errors) != true) {
-            header("Location: ../bannder.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/banner.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 
@@ -80,18 +81,18 @@ if (is_user_admin()) {
         $errors = insert_slide($slide);
 
         if (empty($errors) != true) {
-            header("Location: ../banner.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/banner.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 
         $conn = null;
-        header("Location: ../banner.html?upload=success&message=Slide Upload Successful.");
+        header("Location: ../admin/banner.html?upload=success&message=Slide Upload Successful.");
     } else {
-        header("Location: ../banner.html?upload=fail&message=Incorrect Parameters.");
+        header("Location: ../admin/banner.html?upload=fail&message=Incorrect Parameters.");
         exit();
     }
 } else {
-    header("Location: ../banner.html?upload=fail&message=Insufficient Permissions.");
+    header("Location: ../admin/banner.html?upload=fail&message=Insufficient Permissions.");
     exit();
 }
 

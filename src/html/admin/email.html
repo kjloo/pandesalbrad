@@ -19,7 +19,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container" ng-controller="emailPageController">
+<div class="body container" ng-controller="emailPageController" ng-init="adminPermissions();">
     <div class="row">
         <div class="alert alert-success mx-auto pt-3" ng-if="message != null">
             {{message}}!

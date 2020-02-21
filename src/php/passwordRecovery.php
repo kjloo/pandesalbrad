@@ -1,6 +1,8 @@
 <?php
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (isset($_POST['recovery']) && !empty($_POST['email'])) {
     $email = $_POST['email'];
@@ -22,16 +24,15 @@ if (isset($_POST['recovery']) && !empty($_POST['email'])) {
                 $msg = "Click the link below to reset your password:\r\n";
                 $msg .= "http://chingloo.zapto.org:9090/reset.html?token=" . $random_hash_token . "\r\n";
                 $email = $_POST['email'];
-                if (!send_email($subject, $msg, $email)) {
-                    // Email could not send
-                    header("Location: ../recovery.html?status=fail&message=Error sending email");
+                $errors = send_email($subject, $msg, $email);
+                if(empty($errors) != true) {
+                    header("Location: ../recovery.html?status=fail&message=" . join(",", $errors));
                     exit();
                 } else {
                     // Create SQL Query
                     $sql = "UPDATE users SET Token = ? WHERE email = ?";
 
                     if($stmt = $conn->prepare($sql)) {
-                        $hash = password_hash($password, PASSWORD_BCRYPT);
                         $stmt->execute([$random_hash_token, $email]);
                         // Error check?
                     }

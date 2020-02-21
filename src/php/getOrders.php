@@ -23,6 +23,7 @@ if (isset($_SESSION['u_id']) && !empty($_SESSION['u_id'])) {
         INNER JOIN states AS st ON o.StateID = st.StateID";
 
     include "imageUtils.inc";
+    require_once "adminUtils.inc";
     if (!is_user_admin()) {
         $sql .= " WHERE UserID = ?";
         $addAnd = True;

@@ -3,6 +3,7 @@
 session_start();
 
 include "imageUtils.inc";
+require_once "adminUtils.inc";
 include "slideUtils.inc";
 
 if (is_user_admin()) {

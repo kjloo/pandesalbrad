@@ -3,6 +3,7 @@
 session_start();
 
 include "imageUtils.inc";
+require_once "adminUtils.inc";
 
 if (is_user_admin()) {
     # ProductID will be stored in the path_info from nginx server

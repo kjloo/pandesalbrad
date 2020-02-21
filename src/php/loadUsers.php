@@ -1,6 +1,7 @@
 <?php
 
 include "sqlConn.inc";
+require_once "adminUtils.inc";
 
 include "imageUtils.inc";
 $data = array();

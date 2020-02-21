@@ -3,6 +3,8 @@
 session_start();
 
 include "imageUtils.inc";
+require_once "adminUtils.inc";
+
 if (is_user_admin()) {
     if (isset($_POST['permissions']) && !empty($_POST['userID']) && !empty($_POST['roleID'])) {
 
@@ -18,10 +20,10 @@ if (is_user_admin()) {
             // Error Check?
         }
         $conn = null;
-        header("Location: ../editusers.html?action=success&message=Operation Successful.");
+        header("Location: ../admin/editusers.html?action=success&message=Operation Successful.");
     }
 } else {
-    header("Location: ../editusers.html?action=fail&message=Insufficient Permissions.");
+    header("Location: ../admin/editusers.html?action=fail&message=Insufficient Permissions.");
     exit();
 }
 

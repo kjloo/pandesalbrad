@@ -3,8 +3,8 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
-//use PayPalCheckoutSdk\Core\ProductionEnvironment;
-use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Core\ProductionEnvironment;
+//use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Orders\OrdersGetRequest;
 
 ini_set('error_reporting', E_ALL); // or error_reporting(E_ALL);
@@ -20,7 +20,7 @@ class PayPalClient
      */
     public static function client()
     {
-        return new PayPalHttpClient(self::sbenvironment());
+        return new PayPalHttpClient(self::environment());
     }
 
     public static function order($client, $orderID)
