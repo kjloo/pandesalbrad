@@ -5,6 +5,71 @@ CREATE TABLE roles(
 
 INSERT INTO roles(Role) VALUES("Admin"), ("Customer");
 
+CREATE TABLE states(
+    StateID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(14) NOT NULL UNIQUE,
+    Abbreviation VARCHAR(2) NOT NULL UNIQUE,
+    Tax DECIMAL(6,3) NOT NULL,
+);
+
+INSERT INTO states(Name, Abbreviation, Tax)
+VALUES("Alabama", "AL", 4),
+("Alaska", "AK", 0),
+("Arizona", "AZ", 5.6),
+("Arkansas", "AR", 6.5),
+("California", "CA", 7.25),
+("Colorado", "CO", 2.9),
+("Connecticut", "CT", 6.35),
+("Delaware", "DE", 0),
+("Florida", "FL", 6),
+("Georgia", "GA", 4),
+("Hawaii", "HI", 4),
+("Idaho", "ID", 6),
+("Illinois", "IL", 6.25),
+("Indiana", "IN", 7),
+("Iowa", "IA", 6),
+("Kansas", "KS", 6.5),
+("Kentucky", "KY", 6),
+("Louisiana", "LA", 4.45),
+("Maine", "ME", 5.5),
+("Maryland", "MD", 6),
+("Massachusetts", "MA", 6.25),
+("Michigan", "MI", 6),
+("Minnesota", "MN", 6.875),
+("Mississippi", "MS", 7),
+("Missouri", "MO", 4.225),
+("Montana", "MT", 0),
+("Nebraska", "NE", 5.5),
+("Nevada", "NV", 6.85),
+("New Hampshire", "NH", 0),
+("New Jersey", "NJ", 6.625),
+("New Mexico", "NM", 5.125),
+("New York", "NY", 4),
+("North Carolina", "NC", 4.750),
+("North Dakota", "ND", 5),
+("Ohio", "OH", 5.75),
+("Oklahoma", "OK", 4.5),
+("Oregon", "OR", 0),
+("Pennsylvania", "PA", 6),
+("Rhode Island", "RI", 7),
+("South Carolina", "SC", 6),
+("South Dakota", "SD", 4.5),
+("Tennessee", "TN", 7),
+("Texas", "TX", 6.25),
+("Utah", "UT", 4.85),
+("Vermont", "VT", 6),
+("Virginia", "VA",4.3),
+("Washington", "WA", 6.5),
+("West Virginia", "WV", 6),
+("Wisconsin", "WI", 5),
+("Wyoming", "WY", 4);
+
+CREATE TABLE coupons(
+    Code VARCHAR(32) NOT NULL PRIMARY KEY,
+    Discount DECIMAL(6,3) NOT NULL,
+    Active BOOLEAN NOT NULL
+);
+
 CREATE TABLE users(
     UserID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(255) NOT NULL,
@@ -136,9 +201,11 @@ CREATE TABLE orders(
     Firstname VARCHAR(255) NOT NULL,
     Lastname VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL,
+    Coupon VARCHAR(32),
     FOREIGN KEY(UserID) REFERENCES users(UserID),
     FOREIGN KEY(StatusID) REFERENCES statuses(StatusID),
-    FOREIGN KEY(StateID) REFERENCES states(StateID)
+    FOREIGN KEY(StateID) REFERENCES states(StateID),
+    FOREIGN KEY(Coupon) REFERENCES coupons(Code)
 );
 
 CREATE TABLE packages(
@@ -165,62 +232,3 @@ CREATE TABLE slides(
     Caption VARCHAR(255),
     Link VARCHAR(255)
 );
-
-CREATE TABLE states(
-    StateID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(14) NOT NULL UNIQUE,
-    Abbreviation VARCHAR(2) NOT NULL UNIQUE,
-    Tax DECIMAL(6,3) NOT NULL,
-);
-
-INSERT INTO states(Name, Abbreviation, Tax)
-VALUES("Alabama", "AL", 4),
-("Alaska", "AK", 0),
-("Arizona", "AZ", 5.6),
-("Arkansas", "AR", 6.5),
-("California", "CA", 7.25),
-("Colorado", "CO", 2.9),
-("Connecticut", "CT", 6.35),
-("Delaware", "DE", 0),
-("Florida", "FL", 6),
-("Georgia", "GA", 4),
-("Hawaii", "HI", 4),
-("Idaho", "ID", 6),
-("Illinois", "IL", 6.25),
-("Indiana", "IN", 7),
-("Iowa", "IA", 6),
-("Kansas", "KS", 6.5),
-("Kentucky", "KY", 6),
-("Louisiana", "LA", 4.45),
-("Maine", "ME", 5.5),
-("Maryland", "MD", 6),
-("Massachusetts", "MA", 6.25),
-("Michigan", "MI", 6),
-("Minnesota", "MN", 6.875),
-("Mississippi", "MS", 7),
-("Missouri", "MO", 4.225),
-("Montana", "MT", 0),
-("Nebraska", "NE", 5.5),
-("Nevada", "NV", 6.85),
-("New Hampshire", "NH", 0),
-("New Jersey", "NJ", 6.625),
-("New Mexico", "NM", 5.125),
-("New York", "NY", 4),
-("North Carolina", "NC", 4.750),
-("North Dakota", "ND", 5),
-("Ohio", "OH", 5.75),
-("Oklahoma", "OK", 4.5),
-("Oregon", "OR", 0),
-("Pennsylvania", "PA", 6),
-("Rhode Island", "RI", 7),
-("South Carolina", "SC", 6),
-("South Dakota", "SD", 4.5),
-("Tennessee", "TN", 7),
-("Texas", "TX", 6.25),
-("Utah", "UT", 4.85),
-("Vermont", "VT", 6),
-("Virginia", "VA",4.3),
-("Washington", "WA", 6.5),
-("West Virginia", "WV", 6),
-("Wisconsin", "WI", 5),
-("Wyoming", "WY", 4);

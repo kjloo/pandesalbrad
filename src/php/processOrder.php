@@ -26,7 +26,12 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
     $stateID = $_POST['stateID'];
     $zipcode = $_POST['zipcode'];
 
-    $total = getGrandTotal($stateID);
+    // Get coupon code. Might be empty. If empty leave as null
+    $coupon = !empty($_POST['coupon']) ? $_POST['coupon'] : null;
+    // Validate coupon not used
+    $coupon = !isCouponUsed($coupon, $address, $city, $stateID, $zipcode) ? $coupon : null;
+
+    $total = getGrandTotal($stateID, $coupon);
 
     // Call PayPal to get transaction details
     $client = PayPalClient::client();
@@ -36,17 +41,6 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
     if ($total != $response->result->purchase_units[0]->amount->value) {
         $data['Processed'] = False;
     } else {
-        // Send confirmation email
-        include "email.inc";
-        $subject = "PandesalBrad Order Confirmation";
-        $msg = "Thank you for your order.\r\n";
-        $msg .= "Order Summary:\r\n";
-        $msg .= "Total: " . $total . "\r\n";
-        $msg .= "Order ID: " . $orderID . "\r\n";
-        $errors = send_email($subject, $msg, $email);
-        if(empty($errors) != true) {
-            error_exit(join(",", $errors));
-        }
         include "sqlConn.inc";
         // Create SQL Query
         // Check if user has account
@@ -69,8 +63,8 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
         }
         $userID = $isUserAccount ? $_SESSION['u_id'] : NULL;
         # Process Order into Table
-        $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, UserID, Firstname, Lastname, Email, Address, City, StateID, Zipcode) VALUES(?, (SELECT StatusID FROM statuses WHERE Status = 'Ordered'), CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        array_push($parameters, $orderID, $total, $userID, $fname, $lname, $email, $address, $city, $stateID, $zipcode);
+        $sql = "INSERT INTO orders(OrderID, StatusID, OrderDate, Total, UserID, Firstname, Lastname, Email, Address, City, StateID, Zipcode, Coupon) VALUES(?, (SELECT StatusID FROM statuses WHERE Status = 'Ordered'), CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        array_push($parameters, $orderID, $total, $userID, $fname, $lname, $email, $address, $city, $stateID, $zipcode, $coupon);
 
         if ($stmt = $conn->prepare($sql)) {
             $stmt->execute($parameters);
@@ -80,7 +74,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
         $conn->commit();
 
         // Successfully inserted into database
-        // Update data base to reflect order
+        // Update database to reflect order
         // Create an array where a table row is every three elements
         $cart = $_SESSION['u_cart'];
         $ids_arr = str_repeat('(?,?,?),', count($cart) - 1) . '(?,?,?)';
@@ -94,6 +88,17 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
         if($stmt = $conn->prepare($sql)) {
             $stmt->execute($productsArr);
             // Error Checking?
+        }
+        // Send confirmation email
+        include "email.inc";
+        $subject = "PandesalBrad Order Confirmation";
+        $msg = "Thank you for your order.\r\n";
+        $msg .= "Order Summary:\r\n";
+        $msg .= "Total: " . $total . "\r\n";
+        $msg .= "Order ID: " . $orderID . "\r\n";
+        $errors = send_email($subject, $msg, $email);
+        if(empty($errors) != true) {
+            error_exit(join(",", $errors));
         }
         // Empty Cart
         $_SESSION['u_cart'] = array();

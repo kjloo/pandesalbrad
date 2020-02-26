@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/">
+<link rel="shortcut icon" href="/images/favicon.ico?" type="image/x-icon">
+<base href="/">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/5257f58f1b.js"></script>
+<script src="/js/collections.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/coupons.css">
+<title>Pandesal Brad</title>
+</head>
+<body ng-app="collectionsPage">
+<div ng-include="'navbar.html'">
+</div>
+<div ng-controller="couponsPageController" ng-init="adminPermissions(); loadCoupons();">
+    <div class="container mt-5 control-panel">
+      <div class="alert alert-success" ng-if="message != null">{{message}}</div>
+        <form ng-submit="getCoupons(searchString)">
+            <div class="d-flex search-menu mb-2">
+               <input class="form-control form-control-sm" type="search" placeholder="Search Coupon"
+               aria-label="Search" ng-model="searchString">
+               <button type="submit" class="icon-button"><i class="fas fa-search px-1" aria-hidden="true"></i></button>
+            </div>
+      </form>
+    </div>
+    <div class="container mb-2 d-flex admin-panel">
+        <div class="ml-auto">
+            <select name="status" ng-model="filter" ng-options="status.Display for status in statuses">
+                <option value="">-- Coupon Status --</option>
+            </select>
+            <button class="btn btn-primary" ng-click="getCoupons(undefined, filter)">Apply Filter</button>
+            <button class="btn btn-info" ng-click="newCoupon()">New Coupon</button>
+        </div>
+    </div>
+    <div class="body container">
+      <div class="row">
+          <table class="table">
+          <thead>
+              <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Code</th>
+                  <th scope="col">Discount</th>
+                  <th scope="col">Active</th>
+                  <th scope="col"></th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr ng-repeat="coupon in coupons">
+                 <th scope="row"></th>
+                 <td ng-if="coupon.new === false">
+                     {{coupon.Code}}
+                 </td>
+                  <td ng-if="coupon.new === true">
+                     <input class="coupon-entry" ng-model="coupon.Code" type="string">
+                 </td>
+                 <td>
+                   <input class="coupon-entry" ng-model="coupon.Discount" ng-change="showUpdate(coupon)" type="number" min="0.00" step="0.01" max="100">%
+                   <button ng-show="coupon.showUpdate && coupon.new === false" ng-click="updateCoupon(coupon.Code, coupon.Discount)">Update</button>
+                 </td>
+                 <td>
+                     <button ng-if="coupon.new === false" ng-click="activateCoupon(coupon)">{{coupon.Active ? "Deactivate" : "Activate"}}</button>
+                 </td>
+                 <td ng-if="coupon.new === false" class="coupon-delete" ng-click="deleteCoupon(coupon.Code)">x</td>
+                 <td ng-if="coupon.new === true" class="coupon-delete" ng-click="addCoupon(coupon)">+</td>
+              </tr>
+          </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+<div ng_include="'footer.html'"></div>
+</body>
+</html>

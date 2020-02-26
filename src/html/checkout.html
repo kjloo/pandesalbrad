@@ -104,8 +104,10 @@
     <hr>
     <div class="row mb-5">
         <div class="summary user-form" ng-show="!customerFlag && !shippingFlag && accountInfo.$valid && shippingInfo.$valid">
+            <div class="alert alert-success" ng-if="payMessage != null"><b>{{payMessage}}</b></div>
             <h4>Confirm Order Total</h4>
             <p>Item Total: ${{shoppingCart.total | number : fractionSize}}</p>
+            <p ng-show="discountTotal > 0">Discount Total: -${{discountTotal | number : fractionSize}}</p>
             <p>Shipping: ${{shippingTotal | number : fractionSize}}</p>
             <p>Tax: ${{taxTotal | number : fractionSize}}</p>
             <hr>
@@ -113,6 +115,12 @@
             <br>
             <!-- Set up a container element for the button -->
             <div id="paypal-button-container"></div>
+            <div class="p-2">
+                <form ng-submit="applyCoupon()">
+                    <input type="string" ng-model="coupon" placeholder="Coupon Code"><button type="submit">Apply</button>
+                    <p class="text-small text-right">{{couponMessage}}</p>
+                </form>
+            </div>
         </div>
         <div class="text-danger" ng-show="shippingInfo.$invalid || accountInfo.$invalid">Please Fill In Customer and Shipping Information!</div>
     </div>

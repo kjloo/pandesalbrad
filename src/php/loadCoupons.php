@@ -9,12 +9,16 @@ if (is_user_admin()) {
     if ($method == 'GET') {
         $parameters = array();
         // Create SQL Query
-        $sqlArr = ["SELECT UserID, Username, Firstname, Lastname, Email, Activated, RoleID, DATE_FORMAT(SignupDate, '%M %d, %Y') AS SignupDate FROM users"];
+        $sqlArr = ["SELECT * FROM coupons"];
 
-        if (!empty($_SERVER['PATH_INFO'])) {
-            $username = $_SERVER['PATH_INFO'];
-            array_push($parameters, "%$username%");
-            array_push($sqlArr, "WHERE Username LIKE ?");
+        if (!empty($_GET['code'])) {
+            $code = $_GET['code'];
+            array_push($parameters, "%$code%");
+            array_push($sqlArr, "WHERE Code LIKE ?");
+        } else if (!empty($_GET['status'])) {
+            $status = intval($_GET['status'] === 'true' ? True : False);
+            array_push($parameters, "$status");
+            array_push($sqlArr, "WHERE Active = ?");
         }
 
         $data = array();
@@ -35,6 +39,6 @@ if (is_user_admin()) {
     }
 }
 
-echo json_encode($data);
+echo json_encode($data, JSON_NUMERIC_CHECK);
 
 ?>

@@ -22,7 +22,7 @@ if (isset($_POST['recovery']) && !empty($_POST['email'])) {
                 include "email.inc";
                 $subject = "PandesalBrad Forgot Password";
                 $msg = "Click the link below to reset your password:\r\n";
-                $msg .= "http://chingloo.zapto.org:9090/reset.html?token=" . $random_hash_token . "\r\n";
+                $msg .= "https://pandesalbradart.com/reset.html?token=" . $random_hash_token . "\r\n";
                 $email = $_POST['email'];
                 $errors = send_email($subject, $msg, $email);
                 if(empty($errors) != true) {

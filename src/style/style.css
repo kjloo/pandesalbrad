@@ -35,6 +35,10 @@ img {
     pointer-events: none;
 }
 
+.text-small {
+    font-size: smaller;
+}
+
 #main-background {
     background-image: url('/images/logo1.jpeg');
     background-repeat: repeat;

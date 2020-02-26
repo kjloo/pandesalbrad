@@ -378,7 +378,7 @@ app.controller('collectionsPageController', function($http, $scope, $location, a
     }    
 });
 
-app.controller('productPageController', function($http, $scope, $location, shoppingCart) {
+app.controller('productPageController', function($http, $scope, $location, $window, shoppingCart) {
     $scope.item = null;
     $scope.selected = null;
     $scope.options = null;
@@ -482,6 +482,8 @@ app.controller('productPageController', function($http, $scope, $location, shopp
         };
         $http.post(url, jsonToURI(data), config).then(function(response) {
             shoppingCart.count++;
+            var url = "cart.html";
+            $window.location.href = url;
         });
     }
 });
@@ -557,7 +559,7 @@ app.controller('cartPageController', function($http, $scope, $window, shoppingCa
             }
         };
         $http.post(url, jsonToURI(data), config).then(function(response) {
-            var quantity = response.data.QuantityDiff;;
+            var quantity = response.data.QuantityDiff;
             shoppingCart.count += quantity;
             // Reload cart to get new total
             $scope.loadCart();
@@ -617,7 +619,7 @@ app.controller('ordersPageController', function($http, $scope, $location, adminU
             params: {orderID: searchString,
                      statusID: statusID}
          }).then(function(response) {
-            console.log(response);
+            //console.log(response);
             $scope.orders = response.data;
         });
     };
@@ -773,6 +775,11 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
     // Display 2 decimal places
     $scope.fractionSize = 2;
 
+    // Discount
+    $scope.coupon = "";
+    $scope.discount = 0;
+    $scope.discountTotal = 0;
+
     // Notify changes
     $scope.customerFlag = false;
     $scope.shippingFlag = false;
@@ -785,11 +792,16 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
         return Math.round(value * 100) / 100;
     }
 
+    $scope.calculateDiscount = function() {
+        $scope.discountTotal = $scope.roundMoney($scope.total * ($scope.discount / 100));
+    }
+
     $scope.calculateTotals = function() {
         // Totals
         if ($scope.shipping != null) {
-            $scope.taxTotal = $scope.roundMoney(($scope.total + $scope.shippingTotal) * ($scope.shipping.State.Tax / 100));
-            $scope.subtotal = $scope.roundMoney($scope.total + $scope.shippingTotal + $scope.taxTotal);
+            $scope.calculateDiscount();
+            $scope.taxTotal = $scope.roundMoney(($scope.total - $scope.discountTotal + $scope.shippingTotal) * ($scope.shipping.State.Tax / 100));
+            $scope.subtotal = $scope.roundMoney($scope.total - $scope.discountTotal + $scope.shippingTotal + $scope.taxTotal);
         }
     }
 
@@ -882,6 +894,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
                     city: $scope.shipping.City,
                     stateID: $scope.shipping.State.StateID,
                     zipcode: $scope.shipping.Zipcode,
+                    coupon: $scope.coupon,
                     processOrder: true
                 };
                 if ($scope.shipping.AddressID) {
@@ -897,12 +910,38 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
                     var result = response.data;
                     if (result.Processed) {
                         $window.location.href = `receipt.html?order=` + result["OrderID"];
+                    } else {
+                        $scope.payMessage = "Processing Failure!";
                     }
                 });
 
             });
         }
     }).render('#paypal-button-container');
+
+    $scope.applyCoupon = function() {
+        if ($scope.shippingInfo.invalid || $scope.accountInfo.invalid) {
+            $scope.couponMessage = "Please Complete Steps 1 and 2 First."
+            return;
+        }
+        $http({
+            url: '/php/getCoupon.php',
+            method: "GET",
+            params: {
+                code: $scope.coupon,
+                address: $scope.shipping.Address,
+                city: $scope.shipping.City,
+                stateID: $scope.shipping.State.StateID,
+                zipcode: $scope.shipping.Zipcode
+            }
+         }).then(function(response) {
+            //console.log(response);
+            $scope.discount = response.data.Discount;
+            $scope.couponMessage = response.data.Message;
+            $scope.calculateTotals();
+        });
+    }
+
     $scope.shoppingCart = shoppingCart;
 });
 
@@ -1052,4 +1091,129 @@ app.controller('managePageController', function($http, $scope, adminUtils) {
 app.controller('recoveryPageController', function($http, $scope, $location) {
     $scope.message = $location.search().message;
     $scope.status = $location.search().status;
+});
+
+app.controller('couponsPageController', function($http, $scope) {
+    $scope.message = null;
+    // Define dictionary
+    $scope.statuses = [{'Display': 'Active', 'Value': true}, {'Display': 'Inactive', 'Value': false}];
+
+    $scope.loadCoupons = function() {
+        $http({
+            url: '/php/loadCoupons.php',
+            method: "GET"
+         }).then(function(response) {
+            //console.log(response);
+            $scope.coupons = response.data;
+            $scope.coupons.forEach(function(coupon, index) {
+                coupon['showUpdate'] = false;
+                coupon['new'] = false;
+            });
+        });
+    }
+
+    $scope.getCoupons = function(searchString, status) {
+        // Textbox is undefined when empty
+        if (searchString === undefined) {
+            searchString = "";
+        }
+        $http({
+            url: '/php/loadCoupons.php',
+            method: "GET",
+            params: {
+                code: searchString,
+                status: status.Value
+            }
+         }).then(function(response) {
+            //console.log(response);
+            $scope.coupons = response.data;
+        });
+    };
+
+    $scope.newCoupon = function() {
+        var coupon = {
+            Code: null,
+            Discount: 0,
+            Active: false,
+            showUpdate: false,
+            new: true
+        };
+        $scope.coupons.push(coupon);
+    }
+
+    $scope.addCoupon = function(coupon) {
+        var url = "/php/pushCoupons.php";
+        var data = {
+            pushCoupons: true,
+            code: coupon.Code,
+            discount: coupon.Discount
+        };
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        $http.post(url, jsonToURI(data), config).then(function(response) {
+            //console.log(response);
+            $scope.message = response.data.Message;
+            $scope.loadCoupons();
+        })
+    }
+
+    $scope.showUpdate = function(coupon) {
+        coupon['showUpdate'] = true;
+    }
+
+    $scope.updateCoupon = function(code, discount) {
+        var url = "/php/updateCoupon.php";
+        var data = {
+            updateCoupon: true,
+            code: code,
+            discount: discount
+        };
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        $http.post(url, jsonToURI(data), config).then(function(response) {
+            //console.log(response);
+            $scope.message = response.data.Message;
+        })
+    }
+
+    $scope.activateCoupon = function(coupon) {
+        var url = "/php/updateCoupon.php";
+        var data = {
+            updateCoupon: true,
+            code: coupon.Code,
+            active: !coupon.Active
+        };
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        };
+        $http.post(url, jsonToURI(data), config).then(function(response) {
+            //console.log(response);
+            $scope.message = response.data.Message;
+            coupon.Active = !coupon.Active;
+        })
+    }
+
+    $scope.deleteCoupon = function(code) {
+        // Prompt user with warning
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteCoupon.php/" + code;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Coupon.";
+                $scope.loadCoupons();
+            });
+        }
+    }
 });

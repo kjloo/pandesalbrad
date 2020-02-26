@@ -93,15 +93,57 @@ function getTaxRate($stateID) {
     return 0;
 }
 
-function getGrandTotal($stateID) {
+function isCouponUsed($code, $address, $city, $stateID, $zipcode) {
+    if (!empty($code)) {
+        include "sqlConn.inc";
+        $sql = "SELECT OrderID 
+                FROM orders 
+                WHERE Coupon = ?
+                AND Address = ?
+                AND City = ?
+                AND StateID = ?
+                AND Zipcode = ?";
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$code, $address, $city, $stateID, $zipcode]);
+
+            // output data of each row
+            if ($stmt->rowCount() > 0) {
+                return True;
+            }
+        }
+    }
+    return False;
+}
+
+function getDiscountRate($code) {
+    if (!empty($code)) {
+        include "sqlConn.inc";
+        $sql = "SELECT Discount FROM coupons WHERE Code = ? and Active = TRUE";
+
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$code]);
+
+            // output data of each row
+            if ($stmt->rowCount() == 1) {
+                $data = $stmt->fetch();
+                return $data['Discount'];
+            }
+        }
+    }
+    return 0;
+}
+
+function getGrandTotal($stateID, $code) {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
 
     // Calculate checkout total
+    $discountRate = getDiscountRate($code);
     $cart = getCheckoutTotal();
+    $discount = round($cart['Total'] * ($discountRate / 100), 2);
     $tax = getTaxRate($stateID);
-    $total = round(($cart['Total'] + $cart['Shipping']) * (1 + ($tax / 100)), 2);
+    $total = round(($cart['Total'] - $discount + $cart['Shipping']) * (1 + ($tax / 100)), 2);
 
     // Save grand total in session
     $_SESSION['u_total'] = $total;
