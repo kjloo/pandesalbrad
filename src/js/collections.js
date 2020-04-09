@@ -28,6 +28,12 @@ app.factory('shoppingCart', function($http) {
                 s.collections = response.data;
             });
         },
+        loadCategories: function(s) {
+            $http.get('/php/loadCategories.php').then(function(response) {
+                //console.log(response.data);
+                s.categories = response.data;
+            });
+        },
         loadFormats: function(s) {
             $http.get('/php/loadFormats.php').then(function(response) {
                 //console.log(response.data);
@@ -949,6 +955,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 app.controller('uploadPageController', function($http, $scope, $location, shoppingCart, adminUtils) {
     $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.loadCollections = shoppingCart.loadCollections($scope);
+    $scope.loadCategories = shoppingCart.loadCategories($scope);
     $scope.loadFormats = shoppingCart.loadFormats($scope);
     $scope.loadChoices = shoppingCart.loadChoices($scope);
 
@@ -967,7 +974,32 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.format = null;
     $scope.choices = null;
 
+    $scope.openCategories = [];
+    $scope.selectedCategories = [];
+
     $scope.productID = $location.search().productID;
+    $scope.getCategories = function() {
+        if ($scope.productID != null) {
+            var url = "/php/getCategories.php/" + $scope.productID;
+            $http.get(url).then(function(response) {
+                $scope.selectedCategories = response.data;
+                // Add non used categories to open categories
+                $scope.openCategories = $scope.categories.filter(it => {
+                    if (it === null) {
+                        return false;
+                    }
+                    for (var i = 0; i < $scope.selectedCategories.length; i++) {
+                        var category = $scope.selectedCategories[i];
+                        if (it.CategoryID === category.CategoryID) {
+                            // If a match is found, filter it out
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            });
+        }
+    }
     $scope.getProductInfo = function() {
         if ($scope.productID != null) {
             var url = "/php/getProductInfo.php/" + $scope.productID;
@@ -1022,6 +1054,35 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.$watchGroup(['collections', 'collectionID'], function () {
         $scope.setSelected();
     });
+
+    $scope.$watch('categories', function() {
+        $scope.getCategories();
+    });
+
+    // Handle Dual List Box Logic
+    $scope.moveRight = function(category) {
+        if (category !== null) {
+            $scope.openCategories = $scope.openCategories.filter(function(it) {
+                if (it === null) {
+                    return false;
+                }
+                return it.CategoryID != category.CategoryID;
+            });
+            $scope.selectedCategories.push(category);            
+        }
+    }
+
+    $scope.moveLeft = function(category) {
+        if (category !== null) {
+            $scope.selectedCategories = $scope.selectedCategories.filter(function(it) {
+                if (it === null) {
+                    return false;
+                }
+                return it.CategoryID != category.CategoryID;
+            });
+            $scope.openCategories.push(category);
+        }
+    }
 
     $scope.setFormat = function() {
         if (Array.isArray($scope.formats) && $scope.formats.length) {

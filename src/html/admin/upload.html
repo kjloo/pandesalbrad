@@ -20,7 +20,7 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container" ng-controller="uploadPageController" ng-init="adminPermissions(); loadCollections(); loadFormats(); getProductInfo();">
+<div class="body container" ng-controller="uploadPageController" ng-init="adminPermissions(); loadCollections(); loadCategories(); loadFormats(); getProductInfo();">
     <div class="row">
         <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadProduct.php" method="post" enctype="multipart/form-data">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
@@ -69,9 +69,29 @@
                     <input type="number" ng-model="productPrice" min="0.00" step="0.01" placeholder="5.99" name="price" required>
                 </div>
                 <div class="form-group">
-                    <h4>Category</h4>
-                    <select name="category" ng-model="selected" ng-options="collection.Name for collection in collections track by collection.CollectionID">
+                    <h4>Collection</h4>
+                    <select name="collection" ng-model="selected" ng-options="collection.Name for collection in collections track by collection.CollectionID">
                     </select>
+                </div>
+                <div class="form-group">
+                    <h4>Categories</h4>
+                    <div class="form-inline dual-box">
+                        <div class="col-6 list-box">
+                            <p>Available</p>
+                            <ul class="list-group">
+                                <li ng-click="moveRight(category)" ng-repeat="category in openCategories">{{category.Name}}</li>
+                            </ul>
+                        </div>
+                        <div class="col-6 list-box">
+                            <p>Selected</p>
+                            <ul class="list-group">
+                                <li ng-click="moveLeft(category)" ng-repeat="category in selectedCategories">{{category.Name}}</li>
+                            </ul>
+                        </div>
+                        <!-- Render items as hidden inputs -->
+                        <input type="hidden" ng-value="category.CategoryID" ng-repeat="category in openCategories" name="removeCategories[]">
+                        <input type="hidden" ng-value="category.CategoryID" ng-repeat="category in selectedCategories" name="categoryChoices[]">
+                    </div>
                 </div>
                 <div class="form-group">
                     <button ng-if="productID == null" type="submit" name="upload">Upload</button>

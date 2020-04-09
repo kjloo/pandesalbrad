@@ -5,7 +5,7 @@ session_start();
 include "imageUtils.inc";
 require_once "adminUtils.inc";
 if (is_user_admin()) {
-    if (isset($_POST['update']) && !empty($_POST['productID']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['category'])) {
+    if (isset($_POST['update']) && !empty($_POST['productID']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['collection'])) {
 
         include "sqlConn.inc";
         $productID = $_POST['productID'];
@@ -13,9 +13,12 @@ if (is_user_admin()) {
         $iname = $_POST['iname'];
         $format = $_POST['format'];
         $price = $_POST['price'];
-        $category = $_POST['category'];
+        $collection = $_POST['collection'];
 
         $choices = $_POST['itemChoices'];
+
+        $categories = $_POST['categoryChoices'];
+        $removeCategories = $_POST['removeCategories'];
 
         // Need to get old image name to check if it changed
         $oldiname = get_image_name_from_db($productID);
@@ -46,7 +49,7 @@ if (is_user_admin()) {
         // Create SQL Query
         $sql = "UPDATE products SET Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
         if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$iname, $pname, $category, $productID]);
+            $stmt->execute([$iname, $pname, $collection, $productID]);
             // Error Check?
             $stmt->closeCursor();
         }
@@ -105,19 +108,44 @@ if (is_user_admin()) {
             }
         }
 
+        // Remove any categories no longer associated with product
+        if (!empty($removeCategories)) {
+            // Create replacement string
+            $ids_arr = str_repeat('?,', count($removeCategories) - 1) . '?';
+            $sql = "DELETE FROM product_categories WHERE ProductID = ? AND CategoryID in ({$ids_arr})";
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->execute(array_merge([$productID], $removeCategories));
+                // Error Check?
+                $stmt->closeCursor();
+            }
+        }
+        // Map Product to Categories
+        if (!empty($categories)) {
+            foreach ($categories as $categoryID) {
+                $sql = "INSERT IGNORE INTO product_categories (ProductID, CategoryID) VALUES (?, ?)";
+                if($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$productID, $categoryID]);
+                    // Error Check?
+                    $stmt->closeCursor();
+                }
+            }
+        }
+
         $conn->commit();
         $conn = null;
         header("Location: ../admin/upload.html?upload=success&message=File Update Successful.");
-    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['category'])) {
+    } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['pname']) && !empty($_POST['iname']) && !empty($_POST['format']) && !empty($_POST['price']) && !empty($_POST['collection'])) {
 
         include "sqlConn.inc";
         $pname = $_POST['pname'];
         $iname = $_POST['iname'];
         $format = $_POST['format'];
         $price = $_POST['price'];
-        $category = $_POST['category'];
+        $collection = $_POST['collection'];
 
         $choices = $_POST['itemChoices'];
+
+        $categories = $_POST['categoryChoices'];
 
         // Copy file to server product directory
         $errors = upload_image($iname);
@@ -132,16 +160,19 @@ if (is_user_admin()) {
         // Create SQL Query
         // First insert product
         $sql = "INSERT INTO products (Image, Name, CollectionID) VALUES (?, ?, ?)";
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$iname, $pname, $category]);
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$iname, $pname, $collection]);
             // Error Check?
             $stmt->closeCursor();
         }
+
+        // Store inserted id as the new productID
         $productID = $conn->lastInsertId();
+
         if (!empty($choices)) {
             foreach ($choices as $choiceID) {
                 $sql = "INSERT INTO items (ProductID, FormatID, ChoiceID, Price) VALUES (?, ?, ?, ?)";
-                if($stmt = $conn->prepare($sql)) {
+                if ($stmt = $conn->prepare($sql)) {
                     $stmt->execute([$productID, $format, $choiceID, $price]);
                     // Error Check?
                     $stmt->closeCursor();
@@ -149,12 +180,25 @@ if (is_user_admin()) {
             }
         } else {
             $sql = "INSERT INTO items (ProductID, FormatID, Price) VALUES (?, ?, ?)";
-            if($stmt = $conn->prepare($sql)) {
+            if ($stmt = $conn->prepare($sql)) {
                 $stmt->execute([$productID, $format, $price]);
                 // Error Check?
                 $stmt->closeCursor();
             }
         }
+
+        // Map product to categories
+        if (!empty($categories)) {
+            foreach ($categories as $categoryID) {
+                $sql = "INSERT INTO product_categories (ProductID, CategoryID) VALUES (?, ?)";
+                if ($stmt = $conn->prepare($sql)) {
+                    $stmt->execute([$productID, $categoryID]);
+                    // Error Check?
+                    $stmt->closeCursor();
+                }
+            }
+        }
+
         $conn->commit();
 
         $conn = null;

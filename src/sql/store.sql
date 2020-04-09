@@ -92,24 +92,42 @@ CREATE TABLE collections(
 );
 
 INSERT INTO collections(Name, Image)
-VALUES("Disney", "Disney.png", 0),
-("Pokemon", "Pokemon.png", 1),
+VALUES("Happa Shakas", "HappaShaka.png", 0),
+("Head Hunter", "HeadHunter.png", 1),
 ("Star Wars", "StarWars.png", 2),
-("Anime", "Anime.png", 3),
-("Cartoons", "Cartoons.png", 4),
-("Comics", "Comics.png", 5),
-("Illustrations", "Illustrations.png", 6),
-("Video Games", "VideoGames.png", 7),
-("TV Shows", "TVShows.png", 8),
-("Filipino", "Filipino.png", 9),
-("Hawaii", "Hawaii.png", 10);
+("Illustrations", "Illustrations.png", 3),
+
+CREATE TABLE categories(
+    CategoryID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Image VARCHAR(255) NOT NULL
+);
+INSERT INTO categories(Name, Image)
+VALUES("Disney", "Disney.png"),
+("Pokemon", "Pokemon.png"),
+("Star Wars", "StarWars.png"),
+("Anime", "Anime.png"),
+("Cartoons", "Cartoons.png"),
+("Comics", "Comics.png"),
+("Video Games", "VideoGames.png"),
+("TV Shows", "TVShows.png"),
+("Filipino", "Filipino.png"),
+("Hawaii", "Hawaii.png");
 
 CREATE TABLE products(
     ProductID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
     Image VARCHAR(255) NOT NULL,
     CollectionID INT NOT NULL,
-    FOREIGN KEY(CollectionID) REFERENCES collections(CollectionID) ON DELETE CASCADE
+    FOREIGN KEY(CollectionID) REFERENCES collections(CollectionID)
+);
+
+CREATE TABLE product_categories(
+    ProductID INT NOT NULL,
+    CategoryID INT NOT NULL,
+    PRIMARY KEY(ProductID, CategoryID),
+    FOREIGN KEY(ProductID) REFERENCES products(ProductID) ON DELETE CASCADE,
+    FOREIGN KEY(CategoryID) REFERENCES categories(CategoryID) ON DELETE CASCADE
 );
 
 CREATE TABLE options(
@@ -165,7 +183,7 @@ CREATE TABLE items(
     FormatID INT NOT NULL,
     ChoiceID INT,
     Price DECIMAL(6,2) NOT NULL,
-    FOREIGN KEY(ProductID) REFERENCES products(ProductID) ON DELETE CASCADE,
+    FOREIGN KEY(ProductID) REFERENCES products(ProductID),
     FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE,
     FOREIGN KEY(ChoiceID) REFERENCES choices(ChoiceID) ON DELETE CASCADE
 );
