@@ -1,20 +1,11 @@
 <?php
 
-include "sqlConn.inc";
+include "categoryUtils.inc";
 
 // Create SQL Query
-$sql = "SELECT * FROM categories";
-$result = $conn->query($sql);
+$data = load_categories();
 
-$data = array();
-
-// Get Result
-// output data of each row
-while ($row = $result->fetch()) {
-    $data[] = $row;
-}
-
-// Close Connection
+// Close Connection from sql
 $conn = null;
 
 echo json_encode($data);

@@ -62,6 +62,23 @@ function get_collection_image_name_from_db($collectionID) {
     return $iname;
 }
 
+function get_category_image_name_from_db($categoryID) {
+    // Retrieve image name
+    include "sqlConn.inc";
+    $iname = null;
+    $sql = "SELECT Image FROM categories WHERE CategoryID = ?";
+    if($stmt = $conn->prepare($sql)) {
+        $stmt->execute([$categoryID]);
+
+        if ($stmt->rowCount() == 1) {
+            // output data
+            $row = $stmt->fetch();
+            $iname = $row['Image'];
+        }
+    }
+    return $iname;
+}
+
 function get_images_dir() {
     return dirname(dirname(__FILE__)) . "/images/";
 }

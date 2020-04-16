@@ -20,3 +20,11 @@
     overflow: hidden;
     cursor: pointer;
 }
+
+.filter-box {
+    position: fixed;
+    overflow: auto;
+    align-items: flex-start;
+    height: auto;
+    z-index: 1;
+}

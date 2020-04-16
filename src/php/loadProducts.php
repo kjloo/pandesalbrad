@@ -8,33 +8,49 @@ $name = isset($_GET["name"]) ? $_GET["name"] : null;
 
 $parameters = array();
 // Create SQL Query
+// Base Quersy
+$sql_arr = ["SELECT p.ProductID, p.Name, p.Image, p.CollectionID, pc.CategoryID FROM products AS p 
+        INNER JOIN product_categories AS pc ON p.ProductID = pc.ProductID"];
 if (!empty($product)) {
-    $sql = "SELECT * FROM products WHERE ProductID = ?";
+    array_push($sql_arr, "WHERE p.ProductID = ?");
     array_push($parameters, $product);
 } else if (!empty($collection)) {
-    $sql = "SELECT * FROM products WHERE CollectionID = ?";
+    array_push($sql_arr, "WHERE p.CollectionID = ?");
     array_push($parameters, $collection);
 } else if (!empty($name)) {
-    $sql = "SELECT * FROM products WHERE Name LIKE ?";
+    array_push($sql_arr, "WHERE p.Name LIKE ?");
     array_push($parameters, "%$name%");
-} else {
-    $sql = "SELECT * FROM products";
 }
 
-$data = array();
+$products = array();
+$sql = join(" ", $sql_arr);
 if($stmt = $conn->prepare($sql)) {
     $stmt->execute($parameters);
-
     // output data of each row
     if ($stmt->rowCount() > 0) {
         foreach ($stmt as $row) {
-            $data[] = $row;
+            // Analyze row
+            $productID = $row["ProductID"];
+            if (array_key_exists($productID, $products)) {
+                // Add to categories list
+                $categoryID = $row["CategoryID"];
+                array_push($products[$productID]["Categories"], $categoryID);
+            } else {
+                // New product
+                $product = array();
+                $product["ProductID"] = $row["ProductID"];
+                $product["Name"] = $row["Name"];
+                $product["Image"] = $row["Image"];
+                $product["CollectionID"] = $row["CollectionID"];
+                $product["Categories"] = [$row["CategoryID"]];
+                $products[$productID] = $product;
+            }
         }
     }
 }
 // Close Connection
 $conn = null;
 
-echo json_encode($data);
+echo json_encode(array_values($products));
 
 ?>

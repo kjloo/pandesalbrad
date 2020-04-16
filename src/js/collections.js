@@ -284,22 +284,15 @@ app.controller('collectionsPageController', function($http, $scope, $location, a
     $scope.resetScope();
 
     $scope.setCollection = function() {
-        if (Array.isArray($scope.collections) && $scope.collections.length) {
-            for (var key in $scope.collections) {
-                var collection = $scope.collections[key];
-                if ($scope.selected.CollectionIndex == collection.CollectionIndex) {
-                    $scope.collectionID = collection.CollectionID;
-                    $scope.collectionName = collection.Name;
-                    $scope.imageName = collection.Image;
-                    $scope.image = collection.Image;
-                    $scope.collectionIndex = collection.CollectionIndex;
+        $scope.collectionID = $scope.selected.CollectionID;
+        $scope.collectionName = $scope.selected.Name;
+        $scope.imageName = $scope.selected.Image;
+        $scope.image = $scope.selected.Image;
+        $scope.collectionIndex = $scope.selected.CollectionIndex;
 
-                    // Show product image
-                    $scope.showImage = true;
-                    $scope.previewData['data'] = "/images/" + $scope.image;
-                }
-            }
-        }
+        // Show product image
+        $scope.showImage = true;
+        $scope.previewData['data'] = "/images/" + $scope.image;
     }
 
     $scope.setSelected = function() {
@@ -313,6 +306,7 @@ app.controller('collectionsPageController', function($http, $scope, $location, a
                 }
             }
         }
+        $scope.setCollection();
     }
 
     $scope.$watchGroup(['collections'], function () {
@@ -320,7 +314,6 @@ app.controller('collectionsPageController', function($http, $scope, $location, a
             $scope.collectionID = $scope.collections[0]["CollectionID"];
             $scope.collectionIndex = $scope.collections[0]["CollectionIndex"];
             $scope.setSelected();
-            $scope.setCollection();
         }
     });
 
@@ -384,6 +377,117 @@ app.controller('collectionsPageController', function($http, $scope, $location, a
     }    
 });
 
+// configure existing services inside initialization blocks.
+app.controller('categoriesPageController', function($http, $scope, $location, adminUtils, shoppingCart) {
+    $scope.adminPermissions = adminUtils.adminPermissions();
+    $scope.loadCategories = shoppingCart.loadCategories($scope);
+
+    $scope.status = $location.search().upload;
+    $scope.message = $location.search().message;
+
+    $scope.info = null;
+
+    $scope.resetScope = function() {
+        $scope.previewData = [];
+
+        $scope.showImage = false;
+        $scope.categoryID = null;
+        $scope.categoryName = null;
+        $scope.imageName = null;
+        $scope.selected = null;
+    }
+
+    $scope.resetScope();
+
+    $scope.setCategory = function() {  
+        $scope.categoryID = $scope.selected.CategoryID;
+        $scope.categoryName = $scope.selected.Name;
+        $scope.imageName = $scope.selected.Image;
+        $scope.image = $scope.selected.Image;
+
+        // Show category image
+        $scope.showImage = true;
+        $scope.previewData['data'] = "/images/" + $scope.image;
+    }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.categories) && $scope.categories.length) {
+            $scope.selected = $scope.categories[0];
+            for (var key in $scope.categories) {
+                var category = $scope.categories[key];
+                if ($scope.categoryID === category.CategoryID) {
+                    $scope.selected = category;
+                    break;
+                }
+            }
+        }
+        $scope.setCategory();
+    }
+
+    $scope.$watchGroup(['categories'], function () {
+        if (Array.isArray($scope.categories) && $scope.categories.length) {
+            $scope.categoryID = $scope.categories[0]["CategoryID"];
+            $scope.setSelected();
+        }
+    });
+
+    $scope.addCategory = function() {
+        $scope.resetScope();
+        // Display message to user
+        $scope.info = "Please Upload an Image";
+    }
+    $scope.deleteCategory = function(categoryID) {
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteCategory.php/" + categoryID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Category.";
+                var deleteID = response.data.CategoryID;
+                $scope.categories = $scope.categories.filter(function(category) {
+                    return category.CategoryID != deleteID;
+                });
+                // Think we need to reload the slides here
+                slideUtils.loadSlides($scope);
+            });
+        }
+    }
+
+    // Need to refactor this
+    $scope.setImage = function(fileData) {
+        if (!isEmpty(fileData)) {
+            name = fileData["name"];
+            $scope.previewData = fileData;
+            // Utilizing non angular event call so must inform angular that scope variables are changing.
+            $scope.$apply(function() {
+                if ($scope.imageName == null) {
+                    $scope.imageName = name;
+                }
+                if ($scope.categoryName == null) {
+                    $scope.categoryName = name.substring(0, name.lastIndexOf('.')).replace(/_/g, " ");
+                }
+                $scope.showImage = true;
+                $scope.info = null;
+            });
+        }
+    }
+    $scope.removeInput = function() {
+        // Unload file
+        $("input[type='file']").val("");
+        $scope.previewData = [];
+        $scope.showImage = false;
+    }
+    $scope.readInput = function(input) {
+        adminUtils.readInput(input, {
+            success: $scope.setImage,
+            fail: function() {$scope.$apply($scope.removeInput())}
+        });
+    }    
+});
+
 app.controller('productPageController', function($http, $scope, $location, $window, shoppingCart) {
     $scope.item = null;
     $scope.selected = null;
@@ -391,10 +495,11 @@ app.controller('productPageController', function($http, $scope, $location, $wind
     $scope.choiceID = null;
 
     $scope.loadProduct = function() {
+        var productID = $location.search().productID;
         $http({
             url: '/php/loadProducts.php',
             method: "GET",
-            params: {product: $location.search().productID}
+            params: {product: productID}
          }).then(function(response) {
             //console.log(response);
             // This should only return one row of data
@@ -495,7 +600,7 @@ app.controller('productPageController', function($http, $scope, $location, $wind
 });
 
 // configure existing services inside initialization blocks.
-app.controller('productsPageController', function($http, $scope, $location, $window, adminUtils) {
+app.controller('productsPageController', function($http, $scope, $location, $window, adminUtils, shoppingCart) {
     $scope.adminPermissions = adminUtils.adminPermissions();
     $scope.loadProducts = function() {
         $http({
@@ -506,14 +611,36 @@ app.controller('productsPageController', function($http, $scope, $location, $win
          }).then(function(response) {
             //console.log(response);
             $scope.products = response.data;
+            $scope.showProducts = $scope.products;
         });
+    };
+
+    $scope.loadCategories = shoppingCart.loadCategories($scope);
+
+    $scope.filterCategories = function() {
+        // Hide products that do not match
+        var filterArr = new Array();
+        $scope.categories.forEach(category => {
+            if (category.Checked) {
+                filterArr.push(category.CategoryID);
+            }
+        });
+        if (filterArr.length == 0) {
+            $scope.showProducts = $scope.products;
+        } else {
+            $scope.showProducts = $scope.products.filter(product => {
+                return product.Categories.some(category => {
+                    return filterArr.includes(category);
+                });
+            });
+        }
     };
 
     // Functions for product management
     $scope.openEditPage = function(productID) {
         var url = "admin/upload.html?productID=" + productID;
         $window.location.href = url;
-    }
+    };
 
     $scope.deleteProduct = function(productID) {
         // Prompt user with warning
@@ -527,7 +654,7 @@ app.controller('productsPageController', function($http, $scope, $location, $win
             $http.delete(url, config).then(function(response) {
                 $scope.message = "Successfully Deleted Product.";
                 var deleteID = response.data.ProductID;
-                $scope.products = $scope.products.filter(function(product) {
+                $scope.showProducts = $scope.products.filter(function(product) {
                     return product.ProductID != deleteID;
                 });
             });
@@ -998,6 +1125,8 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
                     return true;
                 });
             });
+        } else {
+            $scope.openCategories = $scope.categories;
         }
     }
     $scope.getProductInfo = function() {

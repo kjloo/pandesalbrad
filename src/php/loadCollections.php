@@ -1,20 +1,11 @@
 <?php
 
-include "sqlConn.inc";
+include "collectionUtils.inc";
 
 // Create SQL Query
-$sql = "SELECT * FROM collections ORDER BY CollectionIndex";
-$result = $conn->query($sql);
+$data = load_collections();
 
-$data = array();
-
-// Get Result
-// output data of each row
-while ($row = $result->fetch()) {
-    $data[] = $row;
-}
-
-// Close Connection
+// Close Connection from sql
 $conn = null;
 
 echo json_encode($data);

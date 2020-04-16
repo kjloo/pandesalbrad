@@ -23,18 +23,18 @@
 <body ng-app="mainPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container" ng-controller="collectionsPageController" ng-init="adminPermissions(); loadCollections()">
+<div class="body container" ng-controller="categoriesPageController" ng-init="adminPermissions(); loadCategories()">
     <div class="row">
-        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadCollection.php" method="post" enctype="multipart/form-data">
+        <form class="user-form mt-5 mb-5 mx-auto py-3" action="/php/uploadCategory.php" method="post" enctype="multipart/form-data">
             <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
             <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
             <div class="form-group">
-                <h3 ng-if="collectionID == null">Upload Collection</h3>
-                <h3 ng-if="collectionID != null">Update Collection</h3>
+                <h3 ng-if="categoryID == null">Upload Category</h3>
+                <h3 ng-if="categoryID != null">Update Category</h3>
             </div>
             <div class="form-group">
-                <h4 class="inline-header">Select Collection</h4>
-                <select name="category" ng-change="setCollection()" ng-model="selected" ng-options="collection.CollectionIndex for collection in collections track by collection.CollectionID">
+                <h4 class="inline-header">Select Category</h4>
+                <select name="category" ng-change="setCategory()" ng-model="selected" ng-options="category.Name for category in categories track by category.CategoryID">
                 </select>
             </div>
             <div class="form-group" ng-show="info != null">
@@ -43,33 +43,29 @@
             <div class="image-info" ng-show="showImage">
                 <img class="product-image" ng-src="{{previewData.data}}" />
                 <div class="action-button">
-                    <i class="fa fa-plus remove-image" title="Add Collection" ng-click=addCollection()></i> 
+                    <i class="fa fa-plus remove-image" title="Add Category" ng-click=addCategory()></i> 
                 </div>
                 <div class="action-button" ng-show="selected != null">
-                    <i class="fa fa-minus remove-image" title="Remove Collection" ng-click=deleteCollection(collectionID)></i> 
+                    <i class="fa fa-minus remove-image" title="Remove Category" ng-click=deleteCategory(categoryID)></i> 
                 </div>
             </div>
             <div class="form-group">
                 <input type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="uploadedImage" accept="image/png, image/jpeg"/>
             </div>
             <!-- Hidden field to send product ID if needed -->
-            <input type="hidden" ng-value="collectionID" name="collectionID">
+            <input type="hidden" ng-value="categoryID" name="categoryID">
             <div ng-show="showImage">
                 <div class="form-group">
-                    <h4>Collection Index</h4>
-                    <input type="number" min="0" ng-model="collectionIndex" placeholder="" name="collectionIndex" required>
-                </div>
-                <div class="form-group">
-                    <h4>Collection Name</h4>
-                    <input type="text" ng-model="collectionName" placeholder="Collection Name" name="cname" required>
+                    <h4>Category Name</h4>
+                    <input type="text" ng-model="categoryName" placeholder="Category Name" name="cname" required>
                 </div>
                 <div class="form-group">
                     <h4>Image Name</h4>
                     <input type="text" ng-model="imageName" placeholder="Image Name" name="iname" required>
                 </div>
                 <div class="form-group">
-                    <button ng-if="collectionID == null" type="submit" name="upload">Upload</button>
-                    <button ng-if="collectionID != null" type="submit" name="update">Update</button>
+                    <button ng-if="categoryID == null" type="submit" name="upload">Upload</button>
+                    <button ng-if="categoryID != null" type="submit" name="update">Update</button>
                 </div>
             </div>
         </form>

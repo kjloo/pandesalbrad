@@ -21,16 +21,29 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container" ng-controller="productsPageController" ng-init="loadProducts()">
-    <div class="row">
-        <div class="col-md-4 col-sm-6 p-2" ng-repeat="product in products">
-            <a class="nav-link" ng-href="product.html?productID={{product.ProductID}}" target="_self">
-                <img ng-src="/images/{{product.Image}}" class="sticker mx-auto img-responsive"/>
-                <h4 class="name-label text-info">{{product.Name}}</h4>
-                <!--<h4 class="price-label text-danger">{{product.Price}}</h4>-->
-                <!--<input type="button" name="add_to_cart" ng-click="addToCart(product.ProductID)" class="btn btn-success form-control" value="Add to Cart"/>-->
-                <input type="button" name="see_details" ng-click="addToCart(product.ProductID)" class="btn btn-success form-control" value="See Details"/>
-            </a>
+<div class="body" ng-controller="productsPageController" ng-init="loadProducts(); loadCategories();">
+    <button class="navbar-toggler" data-toggle="collapse" data-target="#filter-target">
+        <h5 class="inline-header">Filter</h5>
+        <i class="fa fa-caret-square-o-down" aria-hidden="true"></i>
+    </button>
+    <nav id="filter-target" class="collapse navbar-collapse navbar navbar-dark bg-dark filter-box">
+        <ul class="nav flex-column">
+            <li class="nav-item form-check" ng-repeat="category in categories">
+                <label class="form-check-label" for="check{{$index}}">
+                    <input type="checkbox" id="check{{$index}}" class="form-check-input" ng-change="filterCategories()" ng-model="category.Checked">{{category.Name}}
+                </label>
+            </li>
+        </ul>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 p-2" ng-repeat="product in showProducts">
+                <a class="nav-link" ng-href="product.html?productID={{product.ProductID}}" target="_self">
+                    <img ng-src="/images/{{product.Image}}" class="sticker mx-auto img-responsive"/>
+                    <h4 class="name-label text-info">{{product.Name}}</h4>
+                    <input type="button" name="see_details" ng-click="addToCart(product.ProductID)" class="btn btn-success form-control" value="See Details"/>
+                </a>
+            </div>
         </div>
     </div>
 </div>

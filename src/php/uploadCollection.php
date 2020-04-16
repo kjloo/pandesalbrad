@@ -48,7 +48,7 @@ if (is_user_admin()) {
             exit();
         }
         $conn = null;
-        header("Location: ../admin/editcollections.html?upload=success&message=Slide Update Successful.");
+        header("Location: ../admin/editcollections.html?upload=success&message=Collection Update Successful.");
     } else if (isset($_POST['upload']) && isset($_FILES['uploadedImage']) && !empty($_POST['cname']) && !empty($_POST['iname']) && isset($_POST['collectionIndex'])) {
 
         include "sqlConn.inc";
@@ -60,7 +60,7 @@ if (is_user_admin()) {
         $errors = upload_image($iname);
           
         if (empty($errors) != true) {
-            header("Location: ../bannder.html?upload=fail&message=" . join(",", $errors));
+            header("Location: ../admin/editcollections.html?upload=fail&message=" . join(",", $errors));
             exit();
         }
 
@@ -76,7 +76,7 @@ if (is_user_admin()) {
         }
 
         $conn = null;
-        header("Location: ../admin/editcollections.html?upload=success&message=Slide Upload Successful.");
+        header("Location: ../admin/editcollections.html?upload=success&message=Collection Upload Successful.");
     } else {
         header("Location: ../admin/editcollections.html?upload=fail&message=Incorrect Parameters.");
         exit();
