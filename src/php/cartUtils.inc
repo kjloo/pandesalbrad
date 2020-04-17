@@ -12,7 +12,7 @@ function getCheckoutTotal() {
         include "sqlConn.inc";
         // Create replacement string
         $ids_arr = str_repeat('?,', count($cart) - 1) . '?';
-        $sql = "SELECT i.ItemID, i.Price AS Price, i.FormatID, s.Cost AS Shipping, s.Bundle
+        $sql = "SELECT i.ItemID, i.Price AS Price, i.FormatID, f.Freebie AS Freebie, s.Cost AS Shipping, s.Bundle
                 FROM items as i
                 INNER JOIN formats AS f ON i.FormatID = f.FormatID
                 INNER JOIN shipping AS s ON f.ShippingID = s.ShippingID
@@ -25,6 +25,7 @@ function getCheckoutTotal() {
             if ($stmt->rowCount() > 0) {
                 $grandtotal = 0;
                 $shippingTotal = 0;
+                $freebieDiscount = 0;
 
                 // keep track of shipping items
                 $bundle = array();
@@ -33,6 +34,7 @@ function getCheckoutTotal() {
                     $id = $row['ItemID'];
                     $price = $row['Price'];
                     $bundleSize = $row['Bundle'];
+                    $freebie = $row['Freebie'];
                     $shipping = $row['Shipping'];
 
                     // need to calculate shipping costs
@@ -40,9 +42,12 @@ function getCheckoutTotal() {
                     if (!array_key_exists($formatID, $bundle)) {
                         $bundle[$formatID] = array();
                         $bundle[$formatID]['count'] = 0;
-                        $bundle[$formatID]['size'] = $bundleSize;
+                        $bundle[$formatID]['shippingSize'] = $bundleSize;
+                        $bundle[$formatID]['freebieSize'] = $freebie;
+                        $bundle[$formatID]['price'] = $price;
                         $bundle[$formatID]['shipping'] = $shipping;
                     }
+
                     $quantity = $_SESSION['u_cart'][$id];
                     $bundle[$formatID]['count'] += $quantity;
 
@@ -52,18 +57,30 @@ function getCheckoutTotal() {
                 // calculate shipping cost against number of items
                 foreach ($bundle as $key => $value) {
                     $bundleCount = $value['count'];
-                    $bundleSize = $value['size'];
+                    $bundleSize = $value['shippingSize'];
+                    $freebieSize = $value['freebieSize'];
+                    $price = $value['price'];
                     $shipping = $value['shipping'];
+
                     // next to check if there is a remainder
                     $nextBundle = ($bundleCount % $bundleSize) > 0 ? 1 : 0;
                     $shippingTotal += ($shipping * (intdiv($bundleCount, $bundleSize) + $nextBundle));
+                    if (isset($freebieSize)) {  
+                        // calculate freebie discount
+                        // logic for buy X get N (BOGO)
+                        $freeItems = intdiv($bundleCount, $freebieSize);
+                        $freebieDiscount += $freeItems * $price;
+                    }
                 }
 
                 // Final Row
                 $grandtotal = money_format('%.2n', $grandtotal);
                 $shippingTotal = money_format('%.2n', $shippingTotal);
+                $freebieDiscount = money_format('%.2n', $freebieDiscount);
                 $data['Total'] = $grandtotal;
                 $data['Shipping'] = $shippingTotal;
+                // Call it Bulk in the UI
+                $data['Bulk'] = $freebieDiscount;
 
                 // Save grand total in session
                 $_SESSION['u_total'] = $grandtotal;
@@ -141,9 +158,12 @@ function getGrandTotal($stateID, $code) {
     // Calculate checkout total
     $discountRate = getDiscountRate($code);
     $cart = getCheckoutTotal();
-    $discount = round($cart['Total'] * ($discountRate / 100), 2);
+    // Make bulk discount calculation here
+    $runningTotal = $cart['Total'] - $cart['Bulk'];
+    $shipping = $cart['Shipping'];
+    $discount = round($runningTotal * ($discountRate / 100), 2);
     $tax = getTaxRate($stateID);
-    $total = round(($cart['Total'] - $discount + $cart['Shipping']) * (1 + ($tax / 100)), 2);
+    $total = round(($runningTotal - $discount + $shipping) * (1 + ($tax / 100)), 2);
 
     // Save grand total in session
     $_SESSION['u_total'] = $total;

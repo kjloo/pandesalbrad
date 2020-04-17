@@ -55,10 +55,13 @@
                 <td ng-if="item.ItemID != null" class="cart-delete" ng-click="deleteFromCart(item.ItemID)">x</td>
                 <th ng-if="item.ItemID == null">{{item.Name}}</th>
                 <th ng-if="item.ItemID == null"></th>
-                <th ng-if="item.ItemID == null" class="cart-price">{{item.Total}}</th>
+                <th ng-if="item.ItemID == null" class="cart-price">{{item.Total}}*</th>
             </tr>
         </tbody>
         </table>
+    </div>
+    <div>
+        <p>*Final Price Calculated At Checkout</p>
     </div>
     <div class="row">
         <button class="my-3" ng-click="openCheckoutPage()">Proceed To Checkout</button>

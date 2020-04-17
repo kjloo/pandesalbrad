@@ -107,7 +107,8 @@
             <div class="alert alert-success" ng-if="payMessage != null"><b>{{payMessage}}</b></div>
             <h4>Confirm Order Total</h4>
             <p>Item Total: ${{shoppingCart.total | number : fractionSize}}</p>
-            <p ng-show="discountTotal > 0">Discount Total: -${{discountTotal | number : fractionSize}}</p>
+            <p ng-show="bulkDiscount > 0">Bulk Discount: -${{bulkDiscount | number : fractionSize}}</p>
+            <p ng-show="promotionalDiscount > 0">Promotional Discount: -${{promotionalDiscount | number : fractionSize}}</p>
             <p>Shipping: ${{shippingTotal | number : fractionSize}}</p>
             <p>Tax: ${{taxTotal | number : fractionSize}}</p>
             <hr>

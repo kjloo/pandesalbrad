@@ -162,6 +162,7 @@ CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
     ShippingID INT NOT NULL,
+    Freebie INT,
     FOREIGN KEY(ShippingID) REFERENCES shipping(ShippingID)
 );
 
@@ -172,7 +173,9 @@ CREATE TABLE format_options(
     FOREIGN KEY(OptionID) REFERENCES options(OptionID) ON DELETE CASCADE
 );
 
-INSERT INTO formats(Name, Shipping) VALUES("Sticker", 7.00), ("T-Shirt", 0.49);
+INSERT INTO formats(Name, ShippingID)
+VALUES("Sticker", (SELECT ShippingID FROM shipping WHERE Name = "Sticker")),
+("T-Shirt", (SELECT ShippingID FROM shipping WHERE Name = "Clothes"));
 
 INSERT INTO format_options(FormatID, OptionID)
 VALUES((SELECT FormatID FROM formats WHERE Name = "T-Shirt"), (SELECT OptionID FROM options WHERE Name = "Size"));

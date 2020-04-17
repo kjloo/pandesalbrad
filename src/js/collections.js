@@ -870,6 +870,8 @@ app.controller('usersPageController', function($http, $scope, $location, adminUt
 });
 
 app.controller('receiptPageController', function($http, $scope, $location, shoppingCart) {
+    // Display 2 decimal places
+    $scope.fractionSize = 2;
     $scope.orderID = $location.search().order;
     $scope.shoppingCart = shoppingCart;
 });
@@ -911,7 +913,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
     // Discount
     $scope.coupon = "";
     $scope.discount = 0;
-    $scope.discountTotal = 0;
+    $scope.promotionalDiscount = 0;
 
     // Notify changes
     $scope.customerFlag = false;
@@ -925,22 +927,26 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
         return Math.round(value * 100) / 100;
     }
 
-    $scope.calculateDiscount = function() {
-        $scope.discountTotal = $scope.roundMoney($scope.total * ($scope.discount / 100));
+    $scope.calculateDiscount = function(baseCost) {
+        $scope.promotionalDiscount = $scope.roundMoney(baseCost * ($scope.discount / 100));
     }
 
     $scope.calculateTotals = function() {
         // Totals
         if ($scope.shipping != null) {
-            $scope.calculateDiscount();
-            $scope.taxTotal = $scope.roundMoney(($scope.total - $scope.discountTotal + $scope.shippingTotal) * ($scope.shipping.State.Tax / 100));
-            $scope.subtotal = $scope.roundMoney($scope.total - $scope.discountTotal + $scope.shippingTotal + $scope.taxTotal);
+            // Need to do this in steps to display in the UI
+            var runningTotal = $scope.total - $scope.bulkDiscount;
+            $scope.calculateDiscount(runningTotal);
+            runningTotal = runningTotal - $scope.promotionalDiscount + $scope.shippingTotal;
+            $scope.taxTotal = $scope.roundMoney(runningTotal * ($scope.shipping.State.Tax / 100));
+            $scope.subtotal = $scope.roundMoney(runningTotal + $scope.taxTotal);
         }
     }
 
     $scope.getCheckoutTotal = function() {
         $http.get('/php/getCheckoutTotal.php').then(function(response) {
             //console.log(response.data);
+            $scope.bulkDiscount = response.data.Bulk;
             $scope.shippingTotal = response.data.Shipping;
             $scope.total = response.data.Total;
         });
