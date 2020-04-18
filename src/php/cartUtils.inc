@@ -44,11 +44,14 @@ function getCheckoutTotal() {
                         $bundle[$formatID]['count'] = 0;
                         $bundle[$formatID]['shippingSize'] = $bundleSize;
                         $bundle[$formatID]['freebieSize'] = $freebie;
-                        $bundle[$formatID]['price'] = $price;
+                        $bundle[$formatID]['price'] = array();
                         $bundle[$formatID]['shipping'] = $shipping;
                     }
 
                     $quantity = $_SESSION['u_cart'][$id];
+                    for ($i = 0; $i < $quantity; $i++) {
+                        array_push($bundle[$formatID]['price'], $price);
+                    }
                     $bundle[$formatID]['count'] += $quantity;
 
                     $total = money_format('%.2n', ($price * $quantity));
@@ -59,7 +62,9 @@ function getCheckoutTotal() {
                     $bundleCount = $value['count'];
                     $bundleSize = $value['shippingSize'];
                     $freebieSize = $value['freebieSize'];
-                    $price = $value['price'];
+                    // free item is taken from the lowest price first
+                    $priceList = $value['price'];
+                    sort($priceList);
                     $shipping = $value['shipping'];
 
                     // next to check if there is a remainder
@@ -69,7 +74,9 @@ function getCheckoutTotal() {
                         // calculate freebie discount
                         // logic for buy X get N (BOGO)
                         $freeItems = intdiv($bundleCount, $freebieSize);
-                        $freebieDiscount += $freeItems * $price;
+                        for ($i = 0; $i < $freeItems; $i++) {
+                            $freebieDiscount += array_shift($priceList);
+                        }
                     }
                 }
 
