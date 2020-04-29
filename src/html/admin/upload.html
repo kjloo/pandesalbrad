@@ -62,7 +62,7 @@
                     </div>
                     <div ng-show="choices != null">
                         <div ng-repeat="choice in choices" class="form-check form-check-inline">
-                            <input ng-value="choice.ChoiceID" class="form-check-input" type="checkbox" name="itemChoices[]">
+                            <input ng-value="choice.ChoiceID" ng-model="choice.Checked" ng-change="validateChoices()" class="form-check-input" type="checkbox" name="itemChoices[]" checked>
                             <label class="form-check-label">{{choice.Name}}</label>
                         </div>
                     </div>

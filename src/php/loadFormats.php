@@ -17,6 +17,6 @@ while ($row = $result->fetch()) {
 // Close Connection
 $conn = null;
 
-echo json_encode($data);
+echo json_encode($data, JSON_NUMERIC_CHECK);
 
 ?>

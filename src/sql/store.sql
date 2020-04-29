@@ -135,7 +135,7 @@ CREATE TABLE options(
     Name VARCHAR(255) NOT NULL
 );
 
-INSERT INTO options(Name) Values("Size"), ("Color");
+INSERT INTO options(Name) Values("Size"), ("Color"), ("Default");
 
 CREATE TABLE choices(
     ChoiceID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -148,6 +148,7 @@ INSERT INTO choices(Name, OptionID) VALUES("Small", (SELECT OptionID FROM option
 INSERT INTO choices(Name, OptionID) VALUES("Medium", (SELECT OptionID FROM options WHERE Name = "Size"));
 INSERT INTO choices(Name, OptionID) VALUES("Large", (SELECT OptionID FROM options WHERE Name = "Size"));
 INSERT INTO choices(Name, OptionID) VALUES("Extra Large", (SELECT OptionID FROM options WHERE Name = "Size"));
+INSERT INTO choices(Name, OptionID) VALUES("Basic", (SELECT OptionID FROM options WHERE Name = "Default"));
 
 CREATE TABLE shipping(
     ShippingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -163,22 +164,25 @@ CREATE TABLE formats(
     Name VARCHAR(255) NOT NULL,
     ShippingID INT NOT NULL,
     Freebie INT,
+    DefaultPrice DECIMAL(6,2) NOT NULL,
     FOREIGN KEY(ShippingID) REFERENCES shipping(ShippingID)
 );
 
 CREATE TABLE format_options(
     FormatID INT NOT NULL,
     OptionID INT NOT NULL,
+    PRIMARY KEY(FormatID, OptionID),
     FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE,
     FOREIGN KEY(OptionID) REFERENCES options(OptionID) ON DELETE CASCADE
 );
 
-INSERT INTO formats(Name, ShippingID)
-VALUES("Sticker", (SELECT ShippingID FROM shipping WHERE Name = "Sticker")),
-("T-Shirt", (SELECT ShippingID FROM shipping WHERE Name = "Clothes"));
+INSERT INTO formats(Name, ShippingID, Freebie, DefaultPrice)
+VALUES("Sticker", (SELECT ShippingID FROM shipping WHERE Name = "Sticker"), 3, 3.00),
+("T-Shirt", (SELECT ShippingID FROM shipping WHERE Name = "Clothes"), NULL, 25.00);
 
 INSERT INTO format_options(FormatID, OptionID)
-VALUES((SELECT FormatID FROM formats WHERE Name = "T-Shirt"), (SELECT OptionID FROM options WHERE Name = "Size"));
+VALUES((SELECT FormatID FROM formats WHERE Name = "T-Shirt"), (SELECT OptionID FROM options WHERE Name = "Size")),
+((SELECT FormatID FROM formats WHERE Name = "Sticker"), (SELECT OptionID FROM options WHERE Name = "Default"));
 
 CREATE TABLE items(
     ItemID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -186,6 +190,7 @@ CREATE TABLE items(
     FormatID INT NOT NULL,
     ChoiceID INT,
     Price DECIMAL(6,2) NOT NULL,
+    UNIQUE KEY(ProductID, FormatID, ChoiceID),
     FOREIGN KEY(ProductID) REFERENCES products(ProductID),
     FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE,
     FOREIGN KEY(ChoiceID) REFERENCES choices(ChoiceID) ON DELETE CASCADE

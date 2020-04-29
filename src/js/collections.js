@@ -601,7 +601,12 @@ app.controller('productPageController', function($http, $scope, $location, $wind
 
 // configure existing services inside initialization blocks.
 app.controller('productsPageController', function($http, $scope, $location, $window, adminUtils, shoppingCart) {
+    $scope.message = null;
+    $scope.status = null;
+
+    $scope.isAdmin = adminUtils.isAdmin($scope);
     $scope.adminPermissions = adminUtils.adminPermissions();
+
     $scope.loadProducts = function() {
         $http({
             url: '/php/loadProducts.php',
@@ -635,6 +640,22 @@ app.controller('productsPageController', function($http, $scope, $location, $win
             });
         }
     };
+
+    $scope.getProduct = function(searchString) {
+        var url = "admin/editproducts.html?name=" + searchString;
+        $window.location.href = url;
+    }
+
+    // Easy button to set default for all products
+    $scope.productWizard = function() {
+        $http({
+            url: '/php/productWizard.php',
+            method: "GET"
+         }).then(function(response) {
+            var data = response.data;
+            $scope.message = data['Message'];
+        });
+    }
 
     // Functions for product management
     $scope.openEditPage = function(productID) {
@@ -1159,6 +1180,18 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
         $scope.collectionID = $scope.product.CollectionID;  
     }
 
+    $scope.validateChoices = function() {
+        if (!$scope.choices.some(choice => choice.Checked)) {
+            $scope.checkAllChoices();
+        }
+    }
+
+    $scope.checkAllChoices = function() {
+        for (var key in $scope.choices) {
+           $scope.choices[key].Checked = true;
+        }
+    }
+
     $scope.setItem = function() {
         var formatID = $scope.format.FormatID;
         $scope.loadChoices(formatID);
@@ -1167,10 +1200,12 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
                 var item = $scope.items[key];
                 if (formatID == item.FormatID) {
                     $scope.setProductInfo(item);
-                    break;
+                    return;
                 }
             }
         }
+        // Didn't find a match
+        $scope.productPrice = $scope.format.DefaultPrice;
     }
 
     $scope.setSelected = function() {
@@ -1193,6 +1228,11 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.$watch('categories', function() {
         $scope.getCategories();
     });
+
+    $scope.$watch('choices', function() {
+        // By Default Set Choices to Checked
+        $scope.checkAllChoices();
+    })
 
     // Handle Dual List Box Logic
     $scope.moveRight = function(category) {
@@ -1222,6 +1262,9 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.setFormat = function() {
         if (Array.isArray($scope.formats) && $scope.formats.length) {
             $scope.format = $scope.formats[0];
+            if ($scope.productPrice === null) {
+                $scope.productPrice = $scope.format.DefaultPrice;
+            }
             $scope.setItem();
         }
     }

@@ -19,7 +19,21 @@
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container" ng-controller="productsPageController" ng-init="adminPermissions(); loadProducts()">
+<div class="body container" ng-controller="productsPageController" ng-init="isAdmin(); adminPermissions(); loadProducts()">
+    <div class="container mt-5 control-panel">
+        <form ng-submit="getProduct(searchString)">
+            <div class="d-flex search-menu mb-2">
+               <input class="form-control form-control-sm" type="search" placeholder="Search Products"
+               aria-label="Search" ng-model="searchString">
+               <button type="submit" class="icon-button"><i class="fas fa-search px-1" aria-hidden="true"></i></button>
+            </div>
+      </form>
+    </div>
+    <div class="container mb-2 d-flex admin-panel" ng-if="isUserAdmin">
+        <div class="ml-auto">
+            <button class="btn btn-info" ng-click="productWizard()">Set Product Defaults</button>
+        </div>
+    </div>
     <div class="row">
         <div class="alert alert-success" ng-if="message != null">{{message}}</div>
         <table class="table">
