@@ -21,6 +21,20 @@ body {
   margin: 0;
 }
 
+button {
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #e6e6e6;
+    border-color: #e6e6e6;
+    color: #212529;
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
 .space-buffer {
     padding: 4rem;
 }

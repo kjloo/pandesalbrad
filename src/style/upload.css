@@ -62,3 +62,7 @@
 .remove-image:hover {
     border: 2px solid red;
 }
+
+.image-small {
+    font-size: 0.75rem;
+}

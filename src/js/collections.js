@@ -75,6 +75,12 @@ app.factory('adminUtils', function($http, $window) {
                 });
             }
         },
+        loadShippingMethods: function(s) {
+            $http.get('/php/loadShippingMethods.php').then(function(response) {
+                //console.log(response.data);
+                s.methods = response.data;
+            });
+        },
         readInput: function(input, callback) {
             fileData = {};
             if (input.files && input.files[0]) {
@@ -675,7 +681,7 @@ app.controller('productsPageController', function($http, $scope, $location, $win
             $http.delete(url, config).then(function(response) {
                 $scope.message = "Successfully Deleted Product.";
                 var deleteID = response.data.ProductID;
-                $scope.showProducts = $scope.products.filter(function(product) {
+                $scope.products = $scope.products.filter(function(product) {
                     return product.ProductID != deleteID;
                 });
             });
@@ -910,7 +916,7 @@ app.controller('shippingPageController', function($http, $scope, accountLoader) 
 
     $scope.setSelected = function() {
         if (Array.isArray($scope.states) && $scope.states.length) {
-            $scope.selected = $scope.states[0];
+            $scope.shipping.State = $scope.states[0];
             for (var key in $scope.states) {
                 var state = $scope.states[key];
                 if ($scope.shipping.StateID == state.StateID) {
@@ -924,6 +930,68 @@ app.controller('shippingPageController', function($http, $scope, accountLoader) 
     $scope.$watchGroup(['states', 'shipping.StateID'], function () {
         $scope.setSelected();
     });
+});
+
+app.controller('shippingMethodPageController', function($http, $scope, $location, adminUtils) {
+    $scope.loadShippingMethods = adminUtils.loadShippingMethods($scope);
+    $scope.message = $location.search().message;
+    $scope.status = $location.search().status;
+
+    $scope.resetScope = function() {
+        $scope.selected = null;
+        $scope.name = null;
+        $scope.cost = null;
+        $scope.bundle = null;
+        $scope.shippingID = null;
+    }
+
+    $scope.resetScope();
+
+    $scope.setShippingMethod = function() {
+        $scope.shippingID = $scope.selected.ShippingID;
+        $scope.name = $scope.selected.Name;
+        $scope.cost = $scope.selected.Cost;
+        $scope.bundle = $scope.selected.Bundle;
+    }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.methods) && $scope.methods.length) {
+            $scope.selected = $scope.methods[0];
+            for (var key in $scope.methods) {
+                var method = $scope.methods[key];
+                if ($scope.shippingID == method.ShippingID) {
+                    $scope.selected = method;
+                    break;
+                }
+            }
+        }
+        $scope.setShippingMethod();
+    }
+
+    $scope.$watchGroup(['methods'], function () {
+        $scope.setSelected();
+    });
+
+    $scope.addShippingMethod = function() {
+        $scope.resetScope();
+    }
+    $scope.deleteShippingMethod = function(shippingID) {
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteShippingMethod.php/" + shippingID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Shipping Method.";
+                var deleteID = response.data.ShippingID;
+                $scope.methods = $scope.methods.filter(function(method) {
+                    return method.ShippingID != deleteID;
+                });
+            });
+        }
+    }
 });
 
 app.controller('checkoutPageController', function($http, $scope, $window, accountLoader, shoppingCart) {
@@ -981,7 +1049,7 @@ app.controller('checkoutPageController', function($http, $scope, $window, accoun
 
     $scope.setSelected = function() {
         if (Array.isArray($scope.states) && $scope.states.length) {
-            $scope.selected = $scope.states[0];
+            $scope.shipping.State = $scope.states[0];
             for (var key in $scope.states) {
                 var state = $scope.states[key];
                 if ($scope.shipping.StateID == state.StateID) {

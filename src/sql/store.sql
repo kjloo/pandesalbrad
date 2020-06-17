@@ -157,7 +157,7 @@ CREATE TABLE shipping(
     Bundle INT NOT NULL
 );
 
-INSERT INTO shipping(Name, Cost, Bundle) VALUES("Clothes", 7.00, 2), ("Sticker", 0.49, 0);
+INSERT INTO shipping(Name, Cost, Bundle) VALUES("Clothes", 7.00, 2), ("Sticker", 0.49, 0), ("Prints", 1.00, 0);
 
 CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -178,11 +178,13 @@ CREATE TABLE format_options(
 
 INSERT INTO formats(Name, ShippingID, Freebie, DefaultPrice)
 VALUES("Sticker", (SELECT ShippingID FROM shipping WHERE Name = "Sticker"), 3, 3.00),
-("T-Shirt", (SELECT ShippingID FROM shipping WHERE Name = "Clothes"), NULL, 25.00);
+("T-Shirt", (SELECT ShippingID FROM shipping WHERE Name = "Clothes"), NULL, 25.00),
+("Prints", (SELECT ShippingID FROM shipping WHERE Name = "Prints"), NULL, 10.00);
 
 INSERT INTO format_options(FormatID, OptionID)
 VALUES((SELECT FormatID FROM formats WHERE Name = "T-Shirt"), (SELECT OptionID FROM options WHERE Name = "Size")),
-((SELECT FormatID FROM formats WHERE Name = "Sticker"), (SELECT OptionID FROM options WHERE Name = "Default"));
+((SELECT FormatID FROM formats WHERE Name = "Sticker"), (SELECT OptionID FROM options WHERE Name = "Default")),
+((SELECT FormatID FROM formats WHERE Name = "Prints"), (SELECT OptionID FROM options WHERE Name = "Default"));
 
 CREATE TABLE items(
     ItemID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -191,9 +193,9 @@ CREATE TABLE items(
     ChoiceID INT,
     Price DECIMAL(6,2) NOT NULL,
     UNIQUE KEY(ProductID, FormatID, ChoiceID),
-    FOREIGN KEY(ProductID) REFERENCES products(ProductID),
-    FOREIGN KEY(FormatID) REFERENCES formats(FormatID) ON DELETE CASCADE,
-    FOREIGN KEY(ChoiceID) REFERENCES choices(ChoiceID) ON DELETE CASCADE
+    FOREIGN KEY(ProductID) REFERENCES products(ProductID) ON DELETE CASCADE,
+    FOREIGN KEY(FormatID) REFERENCES formats(FormatID),
+    FOREIGN KEY(ChoiceID) REFERENCES choices(ChoiceID)
 );
 
 CREATE TABLE addresses(

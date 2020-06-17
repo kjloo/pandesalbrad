@@ -110,6 +110,9 @@ function delete_image($iname) {
     $deleted = False;
     if (file_exists($target_file)) {
         $deleted = unlink($target_file);
+    } else {
+        // Set deleted to True if file doesn't exist
+        $deleted = True;
     }
     return $deleted;
 }

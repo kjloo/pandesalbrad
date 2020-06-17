@@ -20,26 +20,31 @@
 <div ng-include="'navbar.html'">
 </div>
 <div class="body container" ng-controller="managePageController" ng-init="adminPermissions()">
-    <div class="row">
-        <div class="summary my-5 col-12 offset-md-1 col-md-4 py-3">
+    <div class="row my-5">
+        <div class="summary col-12 offset-md-1 col-md-4 py-3">
             <h4>Product Management</h4>
             <a class="nav-link" ng-href="admin/upload.html" target="_self">Upload Product</a>
             <a class="nav-link" ng-href="admin/editproducts.html" target="_self">Edit Products</a>
             <a class="nav-link" ng-href="admin/editcollections.html" target="_self">Edit Collections</a>
             <a class="nav-link" ng-href="admin/editcategories.html" target="_self">Edit Categories</a>
         </div>
-        <div class="summary my-5 col-12 offset-md-2 col-md-4 py-3">
+        <div class="summary col-12 offset-md-2 col-md-4 py-3">
             <h4>Announcement Management</h4>
             <a class="nav-link" ng-href="admin/banner.html" target="_self">Edit Banner</a>
             <a class="nav-link" ng-href="admin/coupons.html" target="_self">Edit Coupons</a>
         </div>
     </div>
-    <div class="row">
-        <div class="summary mb-5 col-12 offset-md-1 col-md-4 py-3">
+    <div class="row mb-5">
+        <div class="summary col-12 offset-md-1 col-md-4 py-3">
             <h4>User Management</h4>
             <a class="nav-link" ng-href="admin/editusers.html" target="_self">Edit Users</a>
             <a class="nav-link" ng-href="admin/email.html" target="_self">Email Users</a>
             <a class="nav-link" ng-href="orders.html" target="_self">View Orders</a>
+        </div>
+        <div class="summary col-12 offset-md-2 col-md-4 py-3">
+            <h4>Shipping Management</h4>
+            <a class="nav-link" ng-href="admin/format.html" target="_self">Edit Format</a>
+            <a class="nav-link" ng-href="admin/editshipping.html" target="_self">Edit Shipping</a>
         </div>
     </div>
 </div>

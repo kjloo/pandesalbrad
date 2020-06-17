@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/">
+<link rel="shortcut icon" href="/images/favicon.ico?" type="image/x-icon">
+<base href="/">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/5257f58f1b.js"></script>
+<script src="/js/collections.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/upload.css">
+<title>Pandesal Brad</title>
+</head>
+<body ng-app="collectionsPage">
+<div ng-include="'navbar.html'">
+</div>
+<div class="body container" ng-controller="shippingMethodPageController" ng-init="loadShippingMethods()">
+    <div class="row">
+        <form name="shipping" class="user-form my-5 mx-auto py-3" action="/php/uploadShippingMethod.php" method="post">
+            <div class="alert alert-success" ng-if="status == 'success'"><b>Success: {{message}}</b></div>
+            <div class="alert alert-danger" ng-if="status == 'fail'"><b>Error: {{message}}</b></div>
+            <div class="form-group">
+                <h3>Edit Shipping Method</h3>
+            </div>
+            <div class="form-group">
+                <h4>Shipping Method</h4>
+                <select name="method" ng-change="setShippingMethod()" ng-model="selected" ng-options="method.Name for method in methods track by method.ShippingID">
+                </select>
+                <div class="action-button">
+                    <i class="fa fa-plus remove-image image-small" title="Add Shipping Method" ng-click=addShippingMethod()></i> 
+                    <i class="fa fa-minus remove-image image-small" title="Remove Shipping Method" ng-show="selected != null" ng-click=deleteShippingMethod(shippingID)></i> 
+                </div>
+            </div>
+            <div class="form-group">
+                <h4>Name</h4>
+                <input name="name" type="text" placeholder="Name" ng-model="name" required>
+            </div>
+            <div class="form-group">
+                <h4>Cost</h4>
+                <input name="cost" type="number" ng-model="cost" min="0.01" step="0.01" required>
+            </div>
+            <!-- Hidden field to send shipping ID if needed -->
+            <input type="hidden" ng-value="shippingID" name="shippingID">
+            <div class="form-group">
+                <h4>Bundle</h4>
+                <input name="bundle" type="number" ng-model="bundle" min="1" step="1" required>      
+            </div>
+            <div class="form-group">
+                <button type="submit" name="save">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div ng_include="'footer.html'"></div>
+</body>
+</html>
