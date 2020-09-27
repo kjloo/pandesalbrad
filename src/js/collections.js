@@ -75,6 +75,14 @@ app.factory('adminUtils', function($http, $window) {
                 });
             }
         },
+        loadAboutMessage: function(s) {
+            return function() {
+                $http.get('/php/loadAboutMessage.php').then(function(response) {
+                    console.log(response.data);
+                    s.info = response.data.Message;
+                });
+            }
+        },
         loadShippingMethods: function(s) {
             $http.get('/php/loadShippingMethods.php').then(function(response) {
                 //console.log(response.data);
@@ -233,6 +241,14 @@ isEmpty = function(o) {
     }
     return true;
 }
+
+// configure controller for about page
+app.controller('aboutPageController', function($http, $scope, $location, adminUtils) {
+    $scope.message = $location.search().message;
+    $scope.status = $location.search().status;
+
+    $scope.loadAboutMessage = adminUtils.loadAboutMessage($scope);
+});
 
 // configure controller for sign-up page
 app.controller('signupPageController', function($http, $scope, $location) {
@@ -679,11 +695,16 @@ app.controller('productsPageController', function($http, $scope, $location, $win
                 }
             };
             $http.delete(url, config).then(function(response) {
-                $scope.message = "Successfully Deleted Product.";
-                var deleteID = response.data.ProductID;
-                $scope.products = $scope.products.filter(function(product) {
-                    return product.ProductID != deleteID;
-                });
+                if (response.data.Status) {
+                    $scope.message = "Successfully Deleted Product.";
+                    var deleteID = response.data.ProductID;
+                    $scope.products = $scope.products.filter(function(product) {
+                        return product.ProductID != deleteID;
+                    });
+                } else {
+                    $scope.message = response.data.Message;
+                }
+
             });
         }
     }

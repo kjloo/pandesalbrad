@@ -17,17 +17,24 @@ html {
 
 body {
   min-height: 100vh;
+  background: black;
+  color: white;
   position: relative;
   margin: 0;
 }
 
-button {
+hr {
+    color: white;
+    background: white;
+}
+
+button, .submit-button {
     font-weight: 400;
     text-align: center;
     white-space: nowrap;
-    background-color: #e6e6e6;
-    border-color: #e6e6e6;
-    color: #212529;
+    background-color: #2f3259;
+    border-color: #2f3259;
+    color: white;
     border-radius: 0.25rem;
     border: 1px solid transparent;
     padding: .375rem .75rem;
@@ -54,7 +61,8 @@ img {
 }
 
 #main-background {
-    background-image: url('/images/logo1.jpeg');
+    //background-image: url('/images/logo1.jpeg');
+    background: black;
     background-repeat: repeat;
 }
 
@@ -63,12 +71,8 @@ img {
   height: 60px;
 }
 
-.inline-header {
-    display: inline;
-}
-
 .trim {
-    background-color: #330011;
+    background-color: black;
     padding: 0px;
     border: 0px;
     margin: 0px;
@@ -179,8 +183,9 @@ hr.dark {
 }
 
 .summary {
-    border-color: black;
+    border-color: white;
     border-style: solid;
+    background: black;
     border-width: 1px;
 }
 
@@ -190,8 +195,9 @@ hr.dark {
 }
 
 .user-form {
-    border-color: black;
+    border-color: white;
     border-style: solid;
+    background: black;
     border-width: 1px;
     padding-top: 1rem;
 }
@@ -236,7 +242,7 @@ footer {
     }
 
     #main-background {
-        background-image: url('/images/logo2.jpeg');
+        //background-image: url('/images/logo2.jpeg');
         background-repeat: repeat;
     }
 

@@ -14,21 +14,15 @@
 <script src="/js/collections.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="/style/style.css">
+<link rel="stylesheet" href="/style/about.css">
 <title>Pandesal Brad</title>
 </head>
 <body ng-app="collectionsPage">
 <div ng-include="'navbar.html'">
 </div>
-<div class="body container">
+<div class="body container" ng-controller="aboutPageController" ng-init="loadAboutMessage()">
 	<h4>About Me</h4>
-	<p>Aloha,</p>
-	<p>I am Pandesal. I loved drawing since I was a kid, made it a hobby throughout life, and now have made it into a dream freelancing business.</p>
-	<p>Home is in Hawaii. I am Hapa (Mixed Ethnicity) of both Filipino and Caucasian decent.</p>
-	<p>From this, you will see that I pull a lot of ideas and inspiration from my background/experiences of living in Hawaii and being part of the Filipino heritage.</p>
-	<p>My art has been and always will be dedicated to God, my loving wife, and newborn son. Thank you for supporting me in this journey to the unknown.</p>
-	<p>AND...</p>
-	<p>...To YOU! Without you this dream of mine would not have any water or sunlight to grow.</p>
-	<p>Mahalo for your support!</p>
+	<div class="about-message">{{info}}</div>
 </div>
 <div ng_include="'footer.html'"></div>
 </body>

@@ -5,6 +5,10 @@ CREATE TABLE roles(
 
 INSERT INTO roles(Role) VALUES("Admin"), ("Customer");
 
+CREATE TABLE about(
+    Message VARCHAR(512) NOT NULL
+);
+
 CREATE TABLE states(
     StateID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(14) NOT NULL UNIQUE,

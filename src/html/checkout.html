@@ -44,7 +44,7 @@
                 <input type="text" placeholder="Email" ng-model="account.Email" required>
             </div>
             <div class="form-group">
-                <input type="submit" name="setCustomer" ng-disabled="accountInfo.$invalid" ng-click="editCustomer(false)" value="Next"/>
+                <input class="submit-button" type="submit" name="setCustomer" ng-disabled="accountInfo.$invalid" ng-click="editCustomer(false)" value="Next"/>
             </div>
         </form>
         <div class="border border-dark p-2" ng-show="accountInfo.$valid && !customerFlag">
@@ -82,7 +82,7 @@
             </div>
             <input type="hidden" ng-model="shipping.AddressID">
             <div class="form-group">
-                <input type="submit" name="setAddress" ng-disabled="shippingInfo.$invalid" ng-click="setAddress(false); editShipping(false)" value="Use This Address"/>
+                <input class="submit-button" type="submit" name="setAddress" ng-disabled="shippingInfo.$invalid" ng-click="setAddress(false); editShipping(false)" value="Use This Address"/>
             </div>
         </form>
         <div class="border border-dark p-2" ng-show="shippingInfo.$valid && !shippingFlag">
@@ -118,7 +118,10 @@
             <div id="paypal-button-container"></div>
             <div class="p-2">
                 <form ng-submit="applyCoupon()">
-                    <input type="string" ng-model="coupon" placeholder="Coupon Code"><button type="submit">Apply</button>
+                    <div class="row">
+                        <input class="col-md-8" type="string" ng-model="coupon" placeholder="Coupon Code">
+                        <button class="offset-md-1 col-md-3" type="submit">Apply</button>
+                    </div>
                     <p class="text-small text-right">{{couponMessage}}</p>
                 </form>
             </div>

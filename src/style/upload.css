@@ -66,3 +66,20 @@
 .image-small {
     font-size: 0.75rem;
 }
+
+.file-upload::-webkit-file-upload-button {
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #2f3259;
+    border-color: #2f3259;
+    color: white;
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    display: inline-block;
+    -webkit-user-select: none;
+    cursor: pointer;
+}

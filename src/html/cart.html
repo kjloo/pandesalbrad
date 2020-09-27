@@ -22,7 +22,7 @@
 </div>
 <div class="body container" ng-controller="cartPageController" ng-init="loadCart()">
     <div class="row">
-    	<table class="table">
+    	<table class="table table-striped table-dark">
         <thead>
             <tr>
                 <th scope="col"></th>
@@ -40,7 +40,7 @@
                         <img ng-src="/images/{{item.Image}}" class="table-sticker img-responsive"/>{{item.Name}}
                     </div>
                     <div class="collapse" id="details{{$index}}">
-                      <div class="card card-body">
+                      <div class="card card-body bg-dark">
                           <h5>Details</h5>
                           <p class="m-0">{{item.Format}}</p>
                           <p class="m-0">{{item.Choice}}</p>

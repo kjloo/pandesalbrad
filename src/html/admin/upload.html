@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="uploadedImage" accept="image/png, image/jpeg"/>
+                <input class="file-upload" type="file" onchange="angular.element(this).scope().readInput(this)" id="image-file" name="uploadedImage" accept="image/png, image/jpeg"/>
             </div>
             <!-- Hidden field to send product ID if needed -->
             <input type="hidden" ng-value="productID" name="productID">
