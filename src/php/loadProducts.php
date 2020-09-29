@@ -9,7 +9,7 @@ $name = isset($_GET["name"]) ? $_GET["name"] : null;
 $parameters = array();
 // Create SQL Query
 // Base Quersy
-$sql_arr = ["SELECT p.ProductID, p.Name, p.Image, p.CollectionID, pc.CategoryID FROM products AS p 
+$sql_arr = ["SELECT p.ProductID, p.Name, p.Image, p.Available, p.CollectionID, pc.CategoryID FROM products AS p 
         INNER JOIN product_categories AS pc ON p.ProductID = pc.ProductID"];
 if (!empty($product)) {
     array_push($sql_arr, "WHERE p.ProductID = ?");
@@ -41,6 +41,7 @@ if($stmt = $conn->prepare($sql)) {
                 $product["ProductID"] = $row["ProductID"];
                 $product["Name"] = $row["Name"];
                 $product["Image"] = $row["Image"];
+                $product["Available"] = $row["Available"];
                 $product["CollectionID"] = $row["CollectionID"];
                 $product["Categories"] = [$row["CategoryID"]];
                 $products[$productID] = $product;
@@ -50,6 +51,15 @@ if($stmt = $conn->prepare($sql)) {
 }
 // Close Connection
 $conn = null;
+
+// Filter unavailable products
+require_once "adminUtils.inc";
+
+if (!is_user_admin()) {
+    $products = array_filter($products, function($product) {
+        return $product["Available"];
+    });
+}
 
 echo json_encode(array_values($products));
 

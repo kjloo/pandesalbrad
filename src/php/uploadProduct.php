@@ -11,6 +11,7 @@ if (is_user_admin()) {
         $productID = $_POST['productID'];
         $pname = $_POST['pname'];
         $iname = $_POST['iname'];
+        $available = intval(isset($_POST['available']));
         $format = $_POST['format'];
         $price = $_POST['price'];
         $collection = $_POST['collection'];
@@ -47,9 +48,9 @@ if (is_user_admin()) {
 
         // Update product info in database
         // Create SQL Query
-        $sql = "UPDATE products SET Image = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
+        $sql = "UPDATE products SET Image = ?, Available = ?, Name = ?, CollectionID = ? WHERE ProductID = ?";
         if($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$iname, $pname, $collection, $productID]);
+            $stmt->execute([$iname, $available, $pname, $collection, $productID]);
             // Error Check?
             $stmt->closeCursor();
         }
@@ -139,6 +140,7 @@ if (is_user_admin()) {
         include "sqlConn.inc";
         $pname = $_POST['pname'];
         $iname = $_POST['iname'];
+        $available = intval(isset($_POST['available']));
         $format = $_POST['format'];
         $price = $_POST['price'];
         $collection = $_POST['collection'];
@@ -159,9 +161,9 @@ if (is_user_admin()) {
         $conn->beginTransaction();
         // Create SQL Query
         // First insert product
-        $sql = "INSERT INTO products (Image, Name, CollectionID) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO products (Image, Available, Name, CollectionID) VALUES (?, ?, ?, ?)";
         if ($stmt = $conn->prepare($sql)) {
-            $stmt->execute([$iname, $pname, $collection]);
+            $stmt->execute([$iname, $available, $pname, $collection]);
             // Error Check?
             $stmt->closeCursor();
         }

@@ -122,6 +122,7 @@ CREATE TABLE products(
     ProductID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
     Image VARCHAR(255) NOT NULL,
+    Available BOOLEAN NOT NULL,
     CollectionID INT NOT NULL,
     FOREIGN KEY(CollectionID) REFERENCES collections(CollectionID)
 );

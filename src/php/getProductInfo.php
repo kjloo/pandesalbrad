@@ -10,7 +10,7 @@ if ($method == "GET" && !empty($_SERVER['PATH_INFO'])) {
     $productID = $_SERVER['PATH_INFO'];
 
     // Create SQL Query
-    $sql = "SELECT p.ProductID, i.Price, p.Image, p.Name, p.CollectionID, i.FormatID FROM products AS p INNER JOIN items AS i ON p.ProductID = i.ProductID WHERE p.ProductID = ?";
+    $sql = "SELECT p.ProductID, i.Price, p.Image, p.Available, p.Name, p.CollectionID, i.FormatID FROM products AS p INNER JOIN items AS i ON p.ProductID = i.ProductID WHERE p.ProductID = ?";
     if ($stmt = $conn->prepare($sql)) {
         $stmt->execute([$productID]);
         // Get Result

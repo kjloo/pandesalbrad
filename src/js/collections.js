@@ -1211,6 +1211,7 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
     $scope.productID = null;
     $scope.productPrice = null;
     $scope.imageName = null;
+    $scope.available = true;
     $scope.productName = null;
     $scope.collectionID = null;
     $scope.selected = null;
@@ -1265,6 +1266,7 @@ app.controller('uploadPageController', function($http, $scope, $location, shoppi
         $scope.productID = $scope.product.ProductID;
         $scope.productPrice = $scope.product.Price;
         $scope.imageName = $scope.product.Image;
+        $scope.available = Boolean($scope.product.Available);
         $scope.productName = $scope.product.Name;
         $scope.collectionID = $scope.product.CollectionID;  
     }

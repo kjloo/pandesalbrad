@@ -76,7 +76,7 @@ if (isset($_POST['processOrder']) && !empty($_POST['orderID']) && !empty($_POST[
         // Successfully inserted into database
         // Update database to reflect order
         // Create an array where a table row is every three elements
-        $cart = $_SESSION['u_cart'];
+        $cart = getCart();
         $ids_arr = str_repeat('(?,?,?),', count($cart) - 1) . '(?,?,?)';
         $productsArr = array();
         foreach ($cart as $key => $value) {

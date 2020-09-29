@@ -5,6 +5,7 @@ session_start();
 if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['password'])) {
 
     include "sqlConn.inc";
+    include "cartUtils.inc";
 
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -34,10 +35,10 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
                 $_SESSION['u_name'] = $row['Username'];
                 $_SESSION['u_email'] = $row['Email'];
 
+                $cart = getCart();
                 // Add current cart to database
-                $isCart = isset($_SESSION['u_cart']) && !empty($_SESSION['u_cart']);
+                $isCart = isset($cart) && !empty($cart);
                 if ($isCart) {
-                    $cart = $_SESSION['u_cart'];
                     $ids_arr = str_repeat('(?,?,?),', count($cart) - 1) . '(?,?,?)';
                     $itemsArr = array();
                     foreach ($cart as $key => $value) {
@@ -48,7 +49,11 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
                 }
 
                 // Query for shopping cart
-                $sql = "SELECT ItemID, Quantity FROM carts WHERE UserID = ?";
+                $sql = "SELECT c.ItemID, Quantity FROM carts AS c
+                        INNER JOIN items AS i ON c.ItemID = i.ItemID
+                        INNER JOIN products as p ON i.ProductID = p.ProductID
+                        WHERE UserID = ?
+                        AND p.Available";
                 if ($stmt = $conn->prepare($sql)) {
                     $stmt->execute([$_SESSION['u_id']]);
 

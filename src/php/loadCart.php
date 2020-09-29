@@ -3,7 +3,8 @@
 session_start();
 
 // Create SQL Query
-$cart = array_keys($_SESSION['u_cart']);
+include "cartUtils.inc";
+$cart = array_keys(getCart());
 $data = array();
 // Check if cart is empty
 if (count($cart)) {
@@ -15,7 +16,8 @@ if (count($cart)) {
             INNER JOIN products AS p ON i.ProductID = p.ProductID
             INNER JOIN formats AS f ON i.FormatID = f.FormatID
             LEFT JOIN choices AS c ON i.ChoiceID = c.ChoiceID
-            WHERE i.ItemID in ({$ids_arr})";
+            WHERE i.ItemID in ({$ids_arr})
+            AND p.Available";
 
     if($stmt = $conn->prepare($sql)) {
 

@@ -1,11 +1,64 @@
 <?php
 
+function getCart() {
+    // Get cart and update user session and database
+
+    // Grab session cart
+    $cart = array_keys($_SESSION['u_cart']);
+
+    // Verify all products in cart are available
+    include "sqlConn.inc";
+    if (count($cart)) {
+        // Create replacement string
+        $ids_arr = str_repeat('?,', count($cart) - 1) . '?';
+        $sql = "SELECT i.ItemID
+                FROM items as i
+                INNER JOIN products AS p ON i.ProductID = p.ProductID
+                WHERE i.ItemID in ({$ids_arr})
+                AND p.Available";
+
+        $data = array();
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->execute($cart);
+
+            foreach($stmt as $row) {
+                $data[] = $row["ItemID"];
+            }
+        }
+
+        // Check if cart item is in data
+        if (!empty($data)) {
+            $_SESSION['u_cart'] = array_filter($_SESSION['u_cart'], function($item) use($data) {
+                return in_array($item, $data);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+    }
+
+    // Update database if user
+    if (isset($_SESSION['u_id'])) {
+        // Query for shopping cart
+        $sql = "DELETE c FROM carts AS c
+                INNER JOIN items AS i ON c.ItemID = i.ItemID
+                INNER JOIN products AS p on i.ProductID = p.ProductID
+                WHERE UserID = ?
+                AND p.Available = 0";
+
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->execute([$_SESSION['u_id']]);
+            // Error Check?
+        }
+    }
+    $conn = null;
+
+    return $_SESSION['u_cart'];
+}
+
 function getCheckoutTotal() {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
     // Create SQL Query
-    $cart = array_keys($_SESSION['u_cart']);
+    $cart = array_keys(getCart());
     $data = array();
     // Check if cart is empty
     if (count($cart)) {
@@ -16,7 +69,9 @@ function getCheckoutTotal() {
                 FROM items as i
                 INNER JOIN formats AS f ON i.FormatID = f.FormatID
                 INNER JOIN shipping AS s ON f.ShippingID = s.ShippingID
-                WHERE i.ItemID in ({$ids_arr})";
+                INNER JOIN products AS p ON i.ProductID = p.ProductID
+                WHERE i.ItemID in ({$ids_arr})
+                AND p.Available";
 
         if($stmt = $conn->prepare($sql)) {
             $stmt->execute($cart);
