@@ -83,11 +83,21 @@ app.factory('adminUtils', function($http, $window) {
                 });
             }
         },
+        loadFormats: function(s) {
+            return function() {
+                $http.get('/php/loadFormats.php').then(function(response) {
+                    //console.log(response.data);
+                    s.formats = response.data;
+                });
+            }
+        },
         loadShippingMethods: function(s) {
-            $http.get('/php/loadShippingMethods.php').then(function(response) {
-                //console.log(response.data);
-                s.methods = response.data;
-            });
+            return function() {
+                $http.get('/php/loadShippingMethods.php').then(function(response) {
+                    //console.log(response.data);
+                    s.methods = response.data;
+                });
+            }
         },
         readInput: function(input, callback) {
             fileData = {};
@@ -951,6 +961,88 @@ app.controller('shippingPageController', function($http, $scope, accountLoader) 
     $scope.$watchGroup(['states', 'shipping.StateID'], function () {
         $scope.setSelected();
     });
+});
+
+app.controller('formatsPageController', function($http, $scope, $location, adminUtils) {
+    $scope.loadFormats = adminUtils.loadFormats($scope);
+    $scope.loadShippingMethods = adminUtils.loadShippingMethods($scope);
+    $scope.message = $location.search().message;
+    $scope.status = $location.search().status;
+
+    $scope.resetScope = function() {
+        $scope.selected = null;
+        $scope.name = null;
+        $scope.freebie = null;
+        $scope.defaultPrice = null;
+        $scope.method = null;
+        $scope.formatID = null;
+    }
+
+    $scope.resetScope();
+
+    $scope.setFormat = function() {
+        $scope.formatID = $scope.selected.FormatID;
+        $scope.name = $scope.selected.Name;
+        $scope.freebie = $scope.selected.Freebie;
+        $scope.defaultPrice = $scope.selected.DefaultPrice;
+        $scope.shippingID = $scope.selected.ShippingID;
+    }
+
+    $scope.setSelected = function() {
+        if (Array.isArray($scope.formats) && $scope.formats.length) {
+            $scope.selected = $scope.formats[0];
+            for (var key in $scope.formats) {
+                var format = $scope.formats[key];
+                if ($scope.formatID == format.FormatID) {
+                    $scope.selected = format;
+                    break;
+                }
+            }
+        }
+        $scope.setFormat();
+    }
+
+    $scope.setMethod = function() {
+        if (Array.isArray($scope.methods) && $scope.methods.length) {
+            $scope.method = $scope.methods[0];
+            for (var key in $scope.methods) {
+                var method = $scope.methods[key];
+                if ($scope.shippingID == method.ShippingID) {
+                    $scope.method = method;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.$watchGroup(['formats'], function () {
+        $scope.setSelected();
+    });
+
+    $scope.$watchGroup(['methods', 'shippingID'], function () {
+        $scope.setMethod();
+    });
+
+    $scope.addFormat = function() {
+        $scope.resetScope();
+    }
+    $scope.deleteFormat = function(formatID) {
+        if (confirm("Are You Sure You Want To Delete?")) {
+            var url = "/php/deleteFormat.php/" + formatID;
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+                }
+            };
+            $http.delete(url, config).then(function(response) {
+                $scope.message = "Successfully Deleted Format.";
+                var deleteID = response.data.FormatID;
+                $scope.formats = $scope.formats.filter(function(format) {
+                    return format.FormatID != deleteID;
+                });
+            });
+        }
+    }
 });
 
 app.controller('shippingMethodPageController', function($http, $scope, $location, adminUtils) {

@@ -125,7 +125,7 @@ function getCheckoutTotal() {
                     // next to check if there is a remainder
                     $nextBundle = ($bundleCount % $bundleSize) > 0 ? 1 : 0;
                     $shippingTotal += ($shipping * (intdiv($bundleCount, $bundleSize) + $nextBundle));
-                    if (isset($freebieSize)) {  
+                    if (!empty($freebieSize)) {  
                         // calculate freebie discount
                         // logic for buy X get N (BOGO)
                         $freeItems = intdiv($bundleCount, $freebieSize);
