@@ -164,12 +164,22 @@ CREATE TABLE shipping(
 
 INSERT INTO shipping(Name, Cost, Bundle) VALUES("Clothes", 7.00, 2), ("Sticker", 0.49, 0), ("Prints", 1.00, 0);
 
+CREATE TABLE backgrounds(
+    BackgroundID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Background VARCHAR(255) NOT NULL,
+    Scale DECIMAL(3,2) NOT NULL,
+    X DECIMAL(3,2) NOT NULL,
+    Y DECIMAL(3,2) NOT NULL
+);
+
 CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
+    BackgroundID INT,
     ShippingID INT NOT NULL,
     Freebie INT,
     DefaultPrice DECIMAL(6,2) NOT NULL,
+    FOREIGN KEY(BackgroundID) REFERENCES backgrounds(BackgroundID),
     FOREIGN KEY(ShippingID) REFERENCES shipping(ShippingID)
 );
 

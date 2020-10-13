@@ -78,7 +78,7 @@ app.factory('adminUtils', function($http, $window) {
         loadAboutMessage: function(s) {
             return function() {
                 $http.get('/php/loadAboutMessage.php').then(function(response) {
-                    console.log(response.data);
+                    //console.log(response.data);
                     s.info = response.data.Message;
                 });
             }
@@ -526,6 +526,36 @@ app.controller('productPageController', function($http, $scope, $location, $wind
     $scope.options = null;
     $scope.choiceID = null;
 
+    $scope.image  = document.getElementById("product");
+    $scope.image.onload = function() {
+        $scope.loadAndDraw();
+    }
+
+    $scope.background  = document.getElementById("background");
+    $scope.background.onload = function() {
+        $scope.loadAndDraw();
+    }
+
+    $scope.loadAndDraw = function() {    
+        var canvas = document.getElementById("canvas");
+
+        canvas.width  = $scope.background.width;
+        canvas.height = $scope.background.height;
+
+        var context = canvas.getContext("2d");
+
+        var scale = 1;
+        var xPos = 0;
+        var yPos = 0;
+        if ($scope.item != null && $scope.item.Background != null) {
+            scale = $scope.item.Scale;
+            xPos = $scope.item.X;
+            yPos = $scope.item.Y;
+        }
+        context.drawImage($scope.background, 0, 0);
+        context.drawImage($scope.image, canvas.width * xPos, canvas.height * yPos, canvas.width * scale, canvas.height * scale);
+    }
+
     $scope.loadProduct = function() {
         var productID = $location.search().productID;
         $http({
@@ -554,6 +584,15 @@ app.controller('productPageController', function($http, $scope, $location, $wind
 
     $scope.makeSelection = function() {
         var productID = $location.search().productID;
+
+        // If selected is not set, try to set it.
+        if ($scope.selected === null) {
+            if (Array.isArray($scope.items) && $scope.items.length) {
+                $scope.selected = $scope.items[0];
+            } else {
+                return;
+            }
+        }
         var formatID = $scope.selected.FormatID;
         $http({
             url: '/php/getItem.php',
@@ -601,13 +640,10 @@ app.controller('productPageController', function($http, $scope, $location, $wind
         if (Array.isArray($scope.selections) && $scope.selections.length) {
             $scope.selected = $scope.selections[0];
         }
-    }
-    $scope.$watchGroup(['selections'], function() {
-        for (var key in $scope.selections) {
-            var selection = $scope.selections[key];
-            $scope.setSelected(selection);
-        }
-    });*/
+    }*/
+    $scope.$watchGroup(['items'], function() {
+        $scope.makeSelection();
+    });
 
     $scope.addToCart = function(itemID) {
         var choiceID = $scope.choiceID;
@@ -976,6 +1012,11 @@ app.controller('formatsPageController', function($http, $scope, $location, admin
         $scope.defaultPrice = null;
         $scope.method = null;
         $scope.formatID = null;
+        $scope.backgroundID = null;
+        $scope.background = null;
+        $scope.scale = null;
+        $scope.xPos = null;
+        $scope.yPos = null;
     }
 
     $scope.resetScope();
@@ -986,6 +1027,11 @@ app.controller('formatsPageController', function($http, $scope, $location, admin
         $scope.freebie = $scope.selected.Freebie;
         $scope.defaultPrice = $scope.selected.DefaultPrice;
         $scope.shippingID = $scope.selected.ShippingID;
+        $scope.backgroundID = $scope.selected.BackgroundID;
+        $scope.background = $scope.selected.Background;
+        $scope.scale = $scope.selected.Scale;
+        $scope.xPos = $scope.selected.X;
+        $scope.yPos = $scope.selected.Y;
     }
 
     $scope.setSelected = function() {
@@ -998,8 +1044,8 @@ app.controller('formatsPageController', function($http, $scope, $location, admin
                     break;
                 }
             }
+            $scope.setFormat();
         }
-        $scope.setFormat();
     }
 
     $scope.setMethod = function() {

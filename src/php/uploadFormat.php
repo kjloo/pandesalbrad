@@ -14,6 +14,9 @@ if (is_user_admin()) {
 
         $parameters = array($name, $freebie, $defaultPrice, $shippingID);
 
+        // Begin Transcation
+        $conn->beginTransaction();
+        // Update format table
         if (!empty($_POST['formatID'])) {
             // Update
             $formatID = $_POST['formatID'];
@@ -27,8 +30,55 @@ if (is_user_admin()) {
         if($stmt = $conn->prepare($sql)) {
             $stmt->execute($parameters);
             // Error Check?
+            $stmt->closeCursor();
+
+            if (empty($_POST['formatID'])) {         
+                // Store inserted id as the new formatID
+                $formatID = $conn->lastInsertId();
+            }
         }
 
+        // Update background table
+        if (!empty($_POST['background']) && isset($_POST['scale']) && isset($_POST['xPos']) && isset($_POST['yPos'])) {
+            $background = $_POST['background'];
+            $scale = $_POST['scale'];
+            $xPos = $_POST['xPos'];
+            $yPos = $_POST['yPos'];
+
+            $parameters = array($background, $scale, $xPos, $yPos);
+
+            if (!empty($_POST['backgroundID'])) {
+                $backgroundID = $_POST['backgroundID'];
+                $sql = "UPDATE backgrounds SET Background = ?, Scale = ?, X = ?, Y = ? WHERE BackgroundID = ?";
+                array_push($parameters, $backgroundID);
+            } else {
+                $sql = "INSERT INTO backgrounds(Background, Scale, X, Y) VALUES(?, ?, ?, ?)";
+            }
+
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->execute($parameters);
+                // Error Check?
+                $stmt->closeCursor();
+
+                if (empty($_POST['backgroundID'])) {
+                    // Store inserted id as the new backgroundID
+                    $backgroundID = $conn->lastInsertId();
+
+                    // Insert new ID into format table
+                    if ($backgroundID) {
+                        $sql = "UPDATE formats SET BackgroundID = ? WHERE FormatID = ?";
+                        if($stmt = $conn->prepare($sql)) {
+                            $stmt->execute([$backgroundID, $formatID]);
+                            // Error Check?
+                            $stmt->closeCursor();
+                        }
+                    }
+                }
+
+            }
+        }
+
+        $conn->commit();
         // Close Connection
         $conn = null;
         // Success

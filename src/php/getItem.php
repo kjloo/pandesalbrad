@@ -12,10 +12,16 @@ if (!empty($_GET["product"]) && !empty($_GET["format"])) {
     $parameters = array();
     // Create SQL Query
     if (!empty($choice)) {
-        $sql = "SELECT ItemID, Price FROM items WHERE ProductID = ? AND FormatID = ? AND ChoiceID = ?";
+        $sql = "SELECT i.ItemID, i.Price, b.Background, b.Scale, b.X, b.Y FROM items AS i
+                INNER JOIN formats AS f ON i.FormatID = f.FormatID
+                LEFT JOIN backgrounds AS b ON f.BackgroundID = b.BackgroundID
+                WHERE i.ProductID = ? AND i.FormatID = ? AND i.ChoiceID = ?";
         array_push($parameters, $product, $format, $choice);
     } else {
-        $sql = "SELECT ItemID, Price FROM items WHERE ProductID = ? AND FormatID = ?";
+        $sql = "SELECT i.ItemID, i.Price, b.Background, b.Scale, b.X, b.Y FROM items AS i
+                INNER JOIN formats AS f ON i.FormatID = f.FormatID
+                LEFT JOIN backgrounds AS b ON f.BackgroundID = b.BackgroundID
+                WHERE i.ProductID = ? AND i.FormatID = ?";
         array_push($parameters, $product, $format);
     }
 

@@ -14,6 +14,11 @@
     content: "$";
 }
 
+canvas {
+    width: 100%;
+    height: auto;
+}
+
 .option-text {
     font-size: .8rem;
     white-space: nowrap;

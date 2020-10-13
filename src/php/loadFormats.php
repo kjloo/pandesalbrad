@@ -3,7 +3,8 @@
 include "sqlConn.inc";
 
 // Create SQL Query
-$sql = "SELECT * FROM formats";
+$sql = "SELECT * FROM formats AS f
+        LEFT JOIN backgrounds AS b on f.backgroundID = b.backgroundID";
 $result = $conn->query($sql);
 
 $data = array();
