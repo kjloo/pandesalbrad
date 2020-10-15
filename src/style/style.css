@@ -11,14 +11,29 @@
 .navbar-dark .navbar-nav .nav-link {
     color: white;
 }
+
 html {
     height: 100%;
+
+    --bg-color: white;
+    --text-color: black;
+    --border-color: black;
+    --button-bg-color: #5bc0de;
+}
+
+html.darkmode {
+    height: 100%;
+
+    --bg-color: black;
+    --text-color: white;
+    --border-color: white;
+    --button-bg-color: #2f3259;
 }
 
 body {
   min-height: 100vh;
-  background: black;
-  color: white;
+  background: var(--bg-color);
+  color: var(--text-color);
   position: relative;
   margin: 0;
 }
@@ -32,9 +47,9 @@ button, .submit-button {
     font-weight: 400;
     text-align: center;
     white-space: nowrap;
-    background-color: #2f3259;
+    background-color: var(--button-bg-color);
     border-color: #2f3259;
-    color: white;
+    color: var(--text-color);
     border-radius: 0.25rem;
     border: 1px solid transparent;
     padding: .375rem .75rem;
@@ -62,7 +77,7 @@ img {
 
 #main-background {
     //background-image: url('/images/logo1.jpeg');
-    background: black;
+    background: var(--bg-color);
     background-repeat: repeat;
 }
 
@@ -72,7 +87,7 @@ img {
 }
 
 .trim {
-    background-color: black;
+    background-color: var(--bg-color);
     padding: 0px;
     border: 0px;
     margin: 0px;
@@ -183,9 +198,9 @@ hr.dark {
 }
 
 .summary {
-    border-color: white;
+    border-color: var(--border-color);
     border-style: solid;
-    background: black;
+    background: var(--bg-color)
     border-width: 1px;
 }
 
@@ -195,9 +210,9 @@ hr.dark {
 }
 
 .user-form {
-    border-color: white;
+    border-color: var(--border-color);
     border-style: solid;
-    background: black;
+    background: var(--bg-color)
     border-width: 1px;
     padding-top: 1rem;
 }

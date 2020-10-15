@@ -85,6 +85,7 @@ CREATE TABLE users(
     Activated BOOLEAN NOT NULL,
     Token VARCHAR(255),
     RoleID INT NOT NULL,
+    Darkmode BOOLEAN NOT NULL,
     FOREIGN KEY(RoleID) REFERENCES roles(RoleID)
 );
 

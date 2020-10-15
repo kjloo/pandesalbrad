@@ -210,8 +210,19 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
             for (var key in shoppingCart.cart) {
                 shoppingCart.count += shoppingCart.cart[key];
             }
-        })
+            $scope.darkmode = response.data.Darkmode;
+        });
     }
+
+    $scope.$watch('darkmode', function() {
+        const className = "darkmode";
+        var rootElement = document.documentElement;
+        if ($scope.darkmode) {
+            rootElement.classList.add(className);
+        } else {
+            rootElement.classList.remove(className);
+        }
+    });
 
     $scope.isAdmin = adminUtils.isAdmin($scope);
 
@@ -233,6 +244,13 @@ app.controller('navbarController', function($http, $scope, $window, shoppingCart
         })
     }
     $scope.shoppingCart = shoppingCart;
+
+    $scope.toggleDarkMode = function() {
+        $http.get('/php/toggleDarkMode.php').then(function(response) {
+            // toggle value
+            $scope.darkmode = !$scope.darkmode;
+        });
+    }
 });
 
 jsonToURI = function(data) {

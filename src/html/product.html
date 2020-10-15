@@ -36,7 +36,7 @@
                     </select>
                 <h4 class="price-label text-danger" ng-show="item != null">{{item.Price}}</h4>
                 <ul class="list-group list-group-horizontal" ng-show="options != null">
-                    <li ng-class="{active: $index == activeOption}" ng-click="setActiveOption($index)" class="mx-2 option-text list-group-item list-group-item-dark" ng-repeat="option in options">{{option.Name}}</li>
+                    <li ng-class="{active: $index == activeOption}" ng-click="setActiveOption($index)" class="mx-2 option-text list-group-item list-group-item-dark rounded" ng-repeat="option in options">{{option.Name}}</li>
                 </ul>
             </div>
             <div class="col-md-4 col-sm-6 p-1 align-self-end">

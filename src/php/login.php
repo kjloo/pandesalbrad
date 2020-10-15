@@ -34,6 +34,7 @@ if (isset($_POST['login']) && !empty($_POST['username']) && !empty($_POST['passw
                 $_SESSION['u_id'] = $userID;
                 $_SESSION['u_name'] = $row['Username'];
                 $_SESSION['u_email'] = $row['Email'];
+                $_SESSION['u_darkmode'] = $row['Darkmode'];
 
                 $cart = getCart();
                 // Add current cart to database
