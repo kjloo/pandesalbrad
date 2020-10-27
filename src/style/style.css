@@ -1,24 +1,37 @@
-.navbar-dark {
-    color: white;
-    background-color: #4D004D;
+.navbar {
+    color: var(--text-color);
+    background-color: var(--header-color);
     border-color: #E7E7E7;
 }
 
-.navbar-dark .navbar-toggler {
+.navbar .navbar-toggler {
     border-color: rgba(255, 255, 255, 0);
 }
 
-.navbar-dark .navbar-nav .nav-link {
-    color: white;
+.navbar .navbar-nav .nav-link {
+    color: var(--nav-text-color);
+}
+
+.nav-item {
+    color: var(--nav-text-color);
+}
+
+.nav-link:hover {
+    font-weight: bold;
 }
 
 html {
     height: 100%;
 
-    --bg-color: white;
+    --bg-color: #f5f5f5;
     --text-color: black;
+    --nav-text-color: black;
     --border-color: black;
     --button-bg-color: #5bc0de;
+    --trim-color: #9D250B;
+    --stamp-color: #f5180c;
+    --header-color: white;
+    --footer-color: white;
 }
 
 html.darkmode {
@@ -26,8 +39,13 @@ html.darkmode {
 
     --bg-color: black;
     --text-color: white;
+    --nav-text-color: white;
     --border-color: white;
     --button-bg-color: #2f3259;
+    --trim-color: #9D250B;
+    --stamp-color: #f5180c;
+    --header-color: black;
+    --footer-color: black;
 }
 
 body {
@@ -61,12 +79,6 @@ button, .submit-button {
     padding: 4rem;
 }
 
-footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-}
-
 img {
     pointer-events: none;
 }
@@ -87,7 +99,16 @@ img {
 }
 
 .trim {
-    background-color: var(--bg-color);
+    background-color: var(--trim-color);
+    box-shadow: inset 0px 3px 1px rgba(0,0,0,0.125);
+    padding: 0px;
+    border: 0px;
+    margin: 0px;
+}
+
+.footer-trim {
+    background-color: var(--trim-color);
+    box-shadow: inset 0px -3px 1px rgba(0,0,0,0.125);
     padding: 0px;
     border: 0px;
     margin: 0px;
@@ -142,6 +163,10 @@ img {
     outline: inherit;
 }
 
+.fa-bars {
+    color: var(--trim-color);
+}
+
 .fa-stack {
     font-size: 1.5em;
 }
@@ -153,7 +178,7 @@ img {
   padding:.6em;
   border-radius:999px;
   line-height:.75em;
-  color: white;
+  color: var(--stamp-color);
   text-align:center;
   min-width:2em;
   font-weight:bold;
@@ -166,6 +191,11 @@ img {
 
 .fa-user {
     margin: 1em;
+    color: var(--trim-color);
+}
+
+.fa-shopping-cart {
+    color: var(--trim-color);
 }
 
 #user:hover {
@@ -223,8 +253,11 @@ hr.dark {
 }
 
 footer {
-    background-color: #4D004D;
+    background-color: var(--footer-color);
     color: white;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 .w-xs-50 {

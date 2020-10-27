@@ -85,7 +85,7 @@ CREATE TABLE users(
     Activated BOOLEAN NOT NULL,
     Token VARCHAR(255),
     RoleID INT NOT NULL,
-    Darkmode BOOLEAN NOT NULL,
+    Darkmode BOOLEAN DEFAULT 0 NOT NULL,
     FOREIGN KEY(RoleID) REFERENCES roles(RoleID)
 );
 
@@ -176,6 +176,7 @@ CREATE TABLE backgrounds(
 CREATE TABLE formats(
     FormatID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
+    Description VARCHAR(255),
     BackgroundID INT,
     ShippingID INT NOT NULL,
     Freebie INT,

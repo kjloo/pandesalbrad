@@ -21,8 +21,8 @@
 <body ng-app="collectionsPage">
     <div ng-include="'navbar.html'">
     </div>
-    <div class="container" ng-controller="productPageController" ng-init="loadProduct()">
-        <div class="row">
+    <div class="container my-2" ng-controller="productPageController" ng-init="loadProduct()">
+        <div class="row product-panel">
             <div class="col-md-4 col-sm-6 p-2">
                 <canvas id="canvas">
                     <img id="product" ng-src="/images/{{product.Image}}" class="sticker mx-auto img-responsive"/>
@@ -39,7 +39,11 @@
                     <li ng-class="{active: $index == activeOption}" ng-click="setActiveOption($index)" class="mx-2 option-text list-group-item list-group-item-dark rounded" ng-repeat="option in options">{{option.Name}}</li>
                 </ul>
             </div>
-            <div class="col-md-4 col-sm-6 p-1 align-self-end">
+            <div class="col-md-4 col-sm-6 p-4 align-self-center">
+                <div class="product-info p-3 mb-4">
+                    <h4>Description</h4>
+                    <p>{{selected.Description}}</p>
+                </div>
                 <input type="button" name="add_to_cart" ng-disabled="item == null" ng-click="addToCart(item.ItemID)" class="btn btn-success form-control" value="Add to Cart"/>
             </div>
         </div>

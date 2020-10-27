@@ -8,7 +8,7 @@ if (!empty($_GET["product"])) {
     $product = $_GET["product"];
 
     // Create SQL Query
-    $sql = "SELECT f.FormatID AS FormatID, f.Name AS Name FROM items AS i INNER JOIN formats AS f ON i.FormatID = f.FormatID WHERE i.ProductID = ? GROUP BY f.FormatID";
+    $sql = "SELECT f.FormatID AS FormatID, f.Name AS Name, f.Description AS Description FROM items AS i INNER JOIN formats AS f ON i.FormatID = f.FormatID WHERE i.ProductID = ? GROUP BY f.FormatID";
 
     if($stmt = $conn->prepare($sql)) {
         $stmt->execute([$product]);

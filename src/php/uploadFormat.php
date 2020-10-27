@@ -8,11 +8,12 @@ if (is_user_admin()) {
         !empty($_POST['method'])) {
         include "sqlConn.inc";
         $name = $_POST['name'];
+        $description = $_POST['description'];
         $freebie = $_POST['freebie'];
         $defaultPrice = $_POST['defaultPrice'];
         $shippingID = $_POST['method'];
 
-        $parameters = array($name, $freebie, $defaultPrice, $shippingID);
+        $parameters = array($name, $description, $freebie, $defaultPrice, $shippingID);
 
         // Begin Transcation
         $conn->beginTransaction();
@@ -20,11 +21,11 @@ if (is_user_admin()) {
         if (!empty($_POST['formatID'])) {
             // Update
             $formatID = $_POST['formatID'];
-            $sql = "UPDATE formats SET Name = ?, Freebie = ?, DefaultPrice = ?, ShippingID = ? WHERE FormatID = ?";
+            $sql = "UPDATE formats SET Name = ?, Description = ?, Freebie = ?, DefaultPrice = ?, ShippingID = ? WHERE FormatID = ?";
             array_push($parameters, $formatID);
         } else {
             // Insert
-            $sql = "INSERT INTO formats(Name, Freebie, DefaultPrice, ShippingID) VALUES(?, ?, ?, ?)";
+            $sql = "INSERT INTO formats(Name, Description, Freebie, DefaultPrice, ShippingID) VALUES(?, ?, ?, ?, ?)";
         }
 
         if($stmt = $conn->prepare($sql)) {

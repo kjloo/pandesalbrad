@@ -1026,6 +1026,7 @@ app.controller('formatsPageController', function($http, $scope, $location, admin
     $scope.resetScope = function() {
         $scope.selected = null;
         $scope.name = null;
+        $scope.description = null;
         $scope.freebie = null;
         $scope.defaultPrice = null;
         $scope.method = null;
@@ -1042,6 +1043,7 @@ app.controller('formatsPageController', function($http, $scope, $location, admin
     $scope.setFormat = function() {
         $scope.formatID = $scope.selected.FormatID;
         $scope.name = $scope.selected.Name;
+        $scope.description = $scope.selected.Description;
         $scope.freebie = $scope.selected.Freebie;
         $scope.defaultPrice = $scope.selected.DefaultPrice;
         $scope.shippingID = $scope.selected.ShippingID;

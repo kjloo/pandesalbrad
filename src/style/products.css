@@ -1,6 +1,6 @@
 .sticker {
-    height: 250px;
-    width: 250px;
+    height: 100%;
+    width: 100%;
     display: block;
     align-content: center;
     padding: 1.5em;
@@ -32,4 +32,13 @@ canvas {
     align-items: flex-start;
     height: auto;
     z-index: 1;
+}
+
+.product-info {
+    padding: 1em;
+    border: 1px solid #ccc;
+}
+
+.product-panel {
+    background-color: var(--header-color);
 }
