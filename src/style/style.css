@@ -12,12 +12,12 @@
     color: var(--nav-text-color);
 }
 
-.nav-item {
-    color: var(--nav-text-color);
+.navbar .navbar-nav .nav-link:hover {
+    color: #379af0;
 }
 
-.nav-link:hover {
-    font-weight: bold;
+.nav-item {
+    color: var(--nav-text-color);
 }
 
 html {
@@ -76,7 +76,7 @@ button, .submit-button {
 }
 
 .space-buffer {
-    padding: 4rem;
+    padding: 6rem;
 }
 
 img {
